@@ -9,29 +9,6 @@ import matplotlib.pyplot as plt
 import time
 from aks_communication import sendToArduino
 from threading import Thread, Lock
-#from ggg import teknikKontrol
-
-
-class KalmanFilter():
-
-    def __init__(self, hataliOlcum, hataliTahmin, q):
-        self.olcumHatasi = hataliOlcum  # R matrisi-> sensör gürültüsü
-        self.tahminHatasi = hataliTahmin  # H matrisi-> hatalı ölçüm
-        self.q = q  # Q matrisi-> işlem gürültüsü
-        self.guncelTahmin = 0  # A matrisi-> güncel durum
-        self.sonTahmin = 0  # Son tahmin
-        self.kalmanK = 0  # Kalman kazancı
-
-    def tahminiGuncelle(self, olcum):
-        self.kalmanK = self.tahminHatasi / (self.tahminHatasi +
-                                            self.olcumHatasi)
-        self.guncelTahmin = self.sonTahmin + self.kalmanK * (olcum -
-                                                             self.sonTahmin)
-        self.tahminHatasi = (1 - self.kalmanK) * self.tahminHatasi + abs(
-            self.sonTahmin - self.guncelTahmin) * self.q
-        self.sonTahmin = self.guncelTahmin
-        return self.guncelTahmin
-
 
 colors = [(0, 0, 0), (128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128),
           (128, 0, 128), (0, 128, 128), (128, 128, 128),
@@ -378,15 +355,6 @@ while True:
     donme_acisi = (180 * math.atan(abs(uzaklik_x / uzaklik_y))) / (3.14)
 
     donme_acisi = int(donme_acisi * 53 / 10)
-    """
-    donme_acisi_eski=str(donme_acisi)
-    donme_acisi=olcum.tahminiGuncelle(donme_acisi)
-    donme_acisi=int(donme_acisi)
-    text=donme_acisi_eski+","+str(donme_acisi)
-    print(text)
-    cv2.putText(img=image, text=text, org=(100,700 ), fontFace=cv2.FONT_HERSHEY_SCRIPT_COMPLEX, fontScale=4, color=(255,255,0), thickness=3)
-    """
-
     
     if True :
 
