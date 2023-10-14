@@ -2,7 +2,7 @@ from rplidar import RPLidar #rplidar kütüphanesinden RPLidar sınıfını çek
 import time #lidarın başlatılması için gerekli zaman aşımını verebilmek için time kütüphanesini çekiyoruz.
 
 #Bilgisayarımıza CP2102 USB to UART Bridge Controller Driver'ını yükledikten sonra Aygıt Yöneticisinden lidarımızın com portunu öğrenip port_name değişkenine atıyoruz
-PORT_NAME = 'COM3' 
+PORT_NAME = 'COM5' 
 #UART Bridge üzerinde işaretli olan BAUDRATE değerini değişkene atıyoruz. Baud Rate: Saniyede gönderilecek bit sayısını belirtir.
 BAUD_RATE = 115200
 
