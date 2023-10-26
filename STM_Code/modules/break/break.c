@@ -57,7 +57,7 @@ void breakCheckSwitchStatus(switchBreak_adjust_t *breakParameters)
 		breakParameters->switchStatus_press = SWITCH_PRESSED;
 	}
 
-	if(HAL_GPIO_ReadPin(FrenSwitch_Release_GPIO_Port, FrenSwitch_Release_Pin)) {
+	if(!HAL_GPIO_ReadPin(FrenSwitch_Release_GPIO_Port, FrenSwitch_Release_Pin)) {
 
 		breakParameters->switchStatus_release = SWITCH_RELEASED;
 	}

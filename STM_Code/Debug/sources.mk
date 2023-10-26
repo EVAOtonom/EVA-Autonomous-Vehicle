@@ -26,5 +26,6 @@ Core/Startup \
 Drivers/STM32F3xx_HAL_Driver/Src \
 modules/bldc \
 modules/break \
+modules/modbus \
 modules/wheels \
 
