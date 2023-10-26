@@ -8,6 +8,7 @@
 #ifndef SRC_WHEEL_H_
 #define SRC_WHEEL_H_
 #include "main.h"
+
 #define WheelREnable HAL_GPIO_WritePin(DireksiyonEn_R_GPIO_Port, DireksiyonEn_R_Pin, GPIO_PIN_SET)
 #define WheelRDisable HAL_GPIO_WritePin(DireksiyonEn_R_GPIO_Port, DireksiyonEn_R_Pin, GPIO_PIN_RESET)
 #define WheelLEnable HAL_GPIO_WritePin(DireksiyonEn_L_GPIO_Port, DireksiyonEn_L_Pin, GPIO_PIN_SET)

@@ -22,8 +22,12 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "wheels/wheel.h"
+#include "break/break.h"
+#include "bldc/bldc.h"
 
 wheel_adjust_t wheelParameters = {0} ;
+switchBreak_adjust_t breakParameters = {0};
+
 int16_t counter2 = 0;
 uint8_t data[]="Samet Aygun\n";
 uint8_t pdata = 1;
@@ -83,8 +87,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	{
 
 		adjustBldc(wantedSpeed);
+
 		//break durumunda stopBldc komutu kullanılmalı
 
+		breakCheckSwitchStatus(&breakParameters);
+
+		breakAdjust(&breakParameters);
+		//wheel_degree = (GPIOB->IDR >> 4)&0x1FF;
 		if(!HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin)){
 			__HAL_TIM_SET_COUNTER(&htim1,0);
 			wheelParameters.wantedDegree = 0;
@@ -127,6 +136,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				wheelStop(&wheelParameters);
 			}
 		}
+
+
+
 	}
 
 }
@@ -181,7 +193,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  HAL_GPIO_WritePin(RS485_Dir_GPIO_Port, RS485_Dir_Pin, GPIO_PIN_SET);
 	  HAL_UART_Transmit(&huart1, data , sizeof(data), HAL_MAX_DELAY);
+
 	  HAL_Delay(1000);
 
     /* USER CODE END WHILE */
@@ -628,6 +642,18 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : FrenSwitch_Release_Pin */
+  GPIO_InitStruct.Pin = FrenSwitch_Release_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(FrenSwitch_Release_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : FrenSwitch_Press_Pin */
+  GPIO_InitStruct.Pin = FrenSwitch_Press_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(FrenSwitch_Press_GPIO_Port, &GPIO_InitStruct);
 
 }
 

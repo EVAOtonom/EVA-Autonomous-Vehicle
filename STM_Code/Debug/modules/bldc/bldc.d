@@ -1,5 +1,5 @@
 modules/bldc/bldc.o: ../modules/bldc/bldc.c \
- C:/Users/EVA\ Otonom/STM32CubeIDE/workspace_1.13.2/Otonom_Code/modules/bldc/bldc.h \
+ C:/Users/hp/STM32CubeIDE/Otonom/Otonom_Code/modules/bldc/bldc.h \
  ../Core/Inc/main.h ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal.h \
  ../Core/Inc/stm32f3xx_hal_conf.h \
  ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_rcc.h \
@@ -29,7 +29,7 @@ modules/bldc/bldc.o: ../modules/bldc/bldc.c \
  ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_tim_ex.h \
  ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_uart.h \
  ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_uart_ex.h
-C:/Users/EVA\ Otonom/STM32CubeIDE/workspace_1.13.2/Otonom_Code/modules/bldc/bldc.h:
+C:/Users/hp/STM32CubeIDE/Otonom/Otonom_Code/modules/bldc/bldc.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal.h:
 ../Core/Inc/stm32f3xx_hal_conf.h:

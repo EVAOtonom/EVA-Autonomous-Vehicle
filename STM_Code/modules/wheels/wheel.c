@@ -14,6 +14,7 @@ void wheelInit(){
 	WheelREnable;
 	HAL_TIM_PWM_Start(&htim15, WheelPWMLeft);
 	HAL_TIM_PWM_Start(&htim15, WheelPWMRight);
+
 }
 
 
@@ -30,4 +31,5 @@ void wheelStop(wheel_adjust_t * wheelParameter){
 
 	__HAL_TIM_SET_COMPARE(&htim15,WheelPWMLeft,0);
 	__HAL_TIM_SET_COMPARE(&htim15,WheelPWMRight,0);
+
 }
