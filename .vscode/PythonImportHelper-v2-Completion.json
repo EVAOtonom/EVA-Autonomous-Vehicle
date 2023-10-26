@@ -1,0 +1,602 @@
+[
+    {
+        "label": "serial",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "serial",
+        "description": "serial",
+        "detail": "serial",
+        "documentation": {}
+    },
+    {
+        "label": "time",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "time",
+        "description": "time",
+        "detail": "time",
+        "documentation": {}
+    },
+    {
+        "label": "torch",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "torch",
+        "description": "torch",
+        "detail": "torch",
+        "documentation": {}
+    },
+    {
+        "label": "goruntuisleme",
+        "importPath": "objetespiti",
+        "description": "objetespiti",
+        "isExtraImport": true,
+        "detail": "objetespiti",
+        "documentation": {}
+    },
+    {
+        "label": "cv2",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "cv2",
+        "description": "cv2",
+        "detail": "cv2",
+        "documentation": {}
+    },
+    {
+        "label": "pyzed.sl",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "pyzed.sl",
+        "description": "pyzed.sl",
+        "detail": "pyzed.sl",
+        "documentation": {}
+    },
+    {
+        "label": "sys",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "sys",
+        "description": "sys",
+        "detail": "sys",
+        "documentation": {}
+    },
+    {
+        "label": "Thread",
+        "importPath": "threading",
+        "description": "threading",
+        "isExtraImport": true,
+        "detail": "threading",
+        "documentation": {}
+    },
+    {
+        "label": "Lock",
+        "importPath": "threading",
+        "description": "threading",
+        "isExtraImport": true,
+        "detail": "threading",
+        "documentation": {}
+    },
+    {
+        "label": "Thread",
+        "importPath": "threading",
+        "description": "threading",
+        "isExtraImport": true,
+        "detail": "threading",
+        "documentation": {}
+    },
+    {
+        "label": "Lock",
+        "importPath": "threading",
+        "description": "threading",
+        "isExtraImport": true,
+        "detail": "threading",
+        "documentation": {}
+    },
+    {
+        "label": "karar",
+        "importPath": "karar_algoritması",
+        "description": "karar_algoritması",
+        "isExtraImport": true,
+        "detail": "karar_algoritması",
+        "documentation": {}
+    },
+    {
+        "label": "aks_communication",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "aks_communication",
+        "description": "aks_communication",
+        "detail": "aks_communication",
+        "documentation": {}
+    },
+    {
+        "label": "sendToArduino",
+        "importPath": "aks_communication",
+        "description": "aks_communication",
+        "isExtraImport": true,
+        "detail": "aks_communication",
+        "documentation": {}
+    },
+    {
+        "label": "sendToArduino",
+        "importPath": "aks_communication",
+        "description": "aks_communication",
+        "isExtraImport": true,
+        "detail": "aks_communication",
+        "documentation": {}
+    },
+    {
+        "label": "sendToArduino",
+        "importPath": "ardunio",
+        "description": "ardunio",
+        "isExtraImport": true,
+        "detail": "ardunio",
+        "documentation": {}
+    },
+    {
+        "label": "triangulation",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "triangulation",
+        "description": "triangulation",
+        "detail": "triangulation",
+        "documentation": {}
+    },
+    {
+        "label": "load_model",
+        "importPath": "keras.models",
+        "description": "keras.models",
+        "isExtraImport": true,
+        "detail": "keras.models",
+        "documentation": {}
+    },
+    {
+        "label": "math",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "math",
+        "description": "math",
+        "detail": "math",
+        "documentation": {}
+    },
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "numpy",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "numpy",
+        "description": "numpy",
+        "detail": "numpy",
+        "documentation": {}
+    },
+    {
+        "label": "Image",
+        "importPath": "PIL",
+        "description": "PIL",
+        "isExtraImport": true,
+        "detail": "PIL",
+        "documentation": {}
+    },
+    {
+        "label": "copy",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "copy",
+        "description": "copy",
+        "detail": "copy",
+        "documentation": {}
+    },
+    {
+        "label": "matplotlib.pyplot",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "matplotlib.pyplot",
+        "description": "matplotlib.pyplot",
+        "detail": "matplotlib.pyplot",
+        "documentation": {}
+    },
+    {
+        "label": "pygame",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "pygame",
+        "description": "pygame",
+        "detail": "pygame",
+        "documentation": {}
+    },
+    {
+        "label": "RPLidar",
+        "importPath": "rplidar",
+        "description": "rplidar",
+        "isExtraImport": true,
+        "detail": "rplidar",
+        "documentation": {}
+    },
+    {
+        "label": "sendToArduino",
+        "kind": 2,
+        "importPath": "aks_communication",
+        "description": "aks_communication",
+        "peekOfCode": "def sendToArduino(x):\n    arduino.write(x.encode())\n    time.sleep(0.1)\n    #Seri haberleşmede gönderilecek veriyi uygun formata çevirmek gerekir.\n    #Bunun için encode() fonksiyonu kullanılır. Bu sayede 8 bitlik dizilere (UTF-8) çevrilir. \n    #Karşı taraf aldığında ise decode() şeklinde tekrar metin haline çevirir.",
+        "detail": "aks_communication",
+        "documentation": {}
+    },
+    {
+        "label": "arduino",
+        "kind": 5,
+        "importPath": "aks_communication",
+        "description": "aks_communication",
+        "peekOfCode": "arduino = serial.Serial(port='COM4', baudrate=9600, timeout=.1)\ntime.sleep(2)\ndef sendToArduino(x):\n    arduino.write(x.encode())\n    time.sleep(0.1)\n    #Seri haberleşmede gönderilecek veriyi uygun formata çevirmek gerekir.\n    #Bunun için encode() fonksiyonu kullanılır. Bu sayede 8 bitlik dizilere (UTF-8) çevrilir. \n    #Karşı taraf aldığında ise decode() şeklinde tekrar metin haline çevirir.",
+        "detail": "aks_communication",
+        "documentation": {}
+    },
+    {
+        "label": "kamera",
+        "kind": 2,
+        "importPath": "goruntu_isle",
+        "description": "goruntu_isle",
+        "peekOfCode": "def kamera(lock):\n    global kilid,img_sol,img_lane,img_sag\n    #Zed kameranın komutları, bu kodlar zed sayfasından alınmıştır.\n    # ZED kameranın bir nesnesi oluşturuluyor. Bu nesne, ZED kamerayla iletişimi sağlamak için kullanılır.\n    zed = sl.Camera()\n    # Set configuration parameters\n    input_type = sl.InputType()\n    if len(sys.argv) >= 2 :\n        input_type.set_from_svo_file(sys.argv[1])\n    init = sl.InitParameters(input_t=input_type)",
+        "detail": "goruntu_isle",
+        "documentation": {}
+    },
+    {
+        "label": "labellar",
+        "kind": 5,
+        "importPath": "goruntu_isle",
+        "description": "goruntu_isle",
+        "peekOfCode": "labellar = {'20': 99999, '30': 99999, 'dur':99999,'durak':99999,'girisyok':99999, 'ilerisag':99999, 'ilerisol':99999, 'kirmizi':99999, 'park':99999, 'parkyasak':99999, 'sag':99999, 'sagadonulmez':99999, 'sari':99999, 'sol':99999, 'soladonulmez':99999, 'yesil':99999, 'engellipark':99999, 'tasitrafiginekapali':99999,'yayagecidi':99999}\nstates={'aracdurdu':False} \n#karar algoritmasında kulanıyoruz bu dictionary yapısını\n#baslangıc kilit degişkeninin tanımlanması, kilit değişkeni kamera çalışmaya başladığında 0 olur ve kameradan görüntüyü ekranda da görebilmek adına bu değişkeni kullanacağız\nkilid = 1\n#resim üreten thread fonksiyonunun tanımı\ndef kamera(lock):\n    global kilid,img_sol,img_lane,img_sag\n    #Zed kameranın komutları, bu kodlar zed sayfasından alınmıştır.\n    # ZED kameranın bir nesnesi oluşturuluyor. Bu nesne, ZED kamerayla iletişimi sağlamak için kullanılır.",
+        "detail": "goruntu_isle",
+        "documentation": {}
+    },
+    {
+        "label": "kilid",
+        "kind": 5,
+        "importPath": "goruntu_isle",
+        "description": "goruntu_isle",
+        "peekOfCode": "kilid = 1\n#resim üreten thread fonksiyonunun tanımı\ndef kamera(lock):\n    global kilid,img_sol,img_lane,img_sag\n    #Zed kameranın komutları, bu kodlar zed sayfasından alınmıştır.\n    # ZED kameranın bir nesnesi oluşturuluyor. Bu nesne, ZED kamerayla iletişimi sağlamak için kullanılır.\n    zed = sl.Camera()\n    # Set configuration parameters\n    input_type = sl.InputType()\n    if len(sys.argv) >= 2 :",
+        "detail": "goruntu_isle",
+        "documentation": {}
+    },
+    {
+        "label": "lock_cam",
+        "kind": 5,
+        "importPath": "goruntu_isle",
+        "description": "goruntu_isle",
+        "peekOfCode": "lock_cam = Lock()\nthread_cam = Thread(target=kamera, args=(lock_cam,))\nthread_cam.start()\nlock_main = Lock()\nsendToArduino('w90\\n')\nwhile True:\n    if kilid==0:\n        sagresim=img_sag.copy()\n        solresim = img_sol.copy()\n        img_pred=cv.cvtColor(solresim,cv.COLOR_BGR2RGB)",
+        "detail": "goruntu_isle",
+        "documentation": {}
+    },
+    {
+        "label": "thread_cam",
+        "kind": 5,
+        "importPath": "goruntu_isle",
+        "description": "goruntu_isle",
+        "peekOfCode": "thread_cam = Thread(target=kamera, args=(lock_cam,))\nthread_cam.start()\nlock_main = Lock()\nsendToArduino('w90\\n')\nwhile True:\n    if kilid==0:\n        sagresim=img_sag.copy()\n        solresim = img_sol.copy()\n        img_pred=cv.cvtColor(solresim,cv.COLOR_BGR2RGB)\n        customresults=custommodel(img_pred)",
+        "detail": "goruntu_isle",
+        "documentation": {}
+    },
+    {
+        "label": "lock_main",
+        "kind": 5,
+        "importPath": "goruntu_isle",
+        "description": "goruntu_isle",
+        "peekOfCode": "lock_main = Lock()\nsendToArduino('w90\\n')\nwhile True:\n    if kilid==0:\n        sagresim=img_sag.copy()\n        solresim = img_sol.copy()\n        img_pred=cv.cvtColor(solresim,cv.COLOR_BGR2RGB)\n        customresults=custommodel(img_pred)\n        print(\"obje tespiti yapıldı\")\n        customlabels, customcord = customresults.xyxyn[0][:, -1], customresults.xyxyn[0][:, :-1]",
+        "detail": "goruntu_isle",
+        "documentation": {}
+    },
+    {
+        "label": "KalmanFilter",
+        "kind": 6,
+        "importPath": "kalmanFilter",
+        "description": "kalmanFilter",
+        "peekOfCode": "class KalmanFilter():\n    def __init__(self,hataliOlcum,hataliTahmin,q):\n        #KALMAN Kazancı ne kadar büyük olursa o kadar yavaş yaklaşacaktır.\n        #KALMAN Kazancı ne kadar küçük olursa o kadar hızlı yaklaşır.\n        #İki değeride arttırmak kalman kazancını küçültür. Tahmin değeri artarsa kalman daha çok küçülür.\n        #Q değerini arttırmak tekrardan kalman kazancını küçültür.Yaklaşım hızlanır.\n        self.olcumHatasi=hataliOlcum   # R matrisi-> sensör gürültüsü\n        self.tahminHatasi=hataliTahmin # H matrisi-> hatalı ölçüm\n        self.q=q                       # Q matrisi-> işlem gürültüsü\n        self.guncelTahmin=0            # A matrisi-> güncel durum",
+        "detail": "kalmanFilter",
+        "documentation": {}
+    },
+    {
+        "label": "counter",
+        "kind": 2,
+        "importPath": "karar_algoritması",
+        "description": "karar_algoritması",
+        "peekOfCode": "def counter(wait_time):\n    baslangic_zamani = time.time()\n    while True:\n        simdiki_zaman = time.time()\n        gecen_vakit = simdiki_zaman - baslangic_zamani\n        if gecen_vakit >= wait_time:\n            break\ndef karar(labellar,states):\n    if labellar['sag']<900:\n        if states['aracdurdu'] == False:",
+        "detail": "karar_algoritması",
+        "documentation": {}
+    },
+    {
+        "label": "karar",
+        "kind": 2,
+        "importPath": "karar_algoritması",
+        "description": "karar_algoritması",
+        "peekOfCode": "def karar(labellar,states):\n    if labellar['sag']<900:\n        if states['aracdurdu'] == False:\n            print(\"ARAC SAGA DONUYOR\")\n            sendToArduino('w0\\n') #hızı sıfırla\n            counter(1)\n            sendToArduino('t-30') #t açı komutunu gönderir arduinoya, -30, 30 derece sağa döndürür tekeri\n            counter(1)\n            sendToArduino('w90\\n') #w hız komutunu gönderir, hızı 90 olarak ayarlıyoruz burada\n            counter(1)",
+        "detail": "karar_algoritması",
+        "documentation": {}
+    },
+    {
+        "label": "goruntuisleme",
+        "kind": 2,
+        "importPath": "objetespiti",
+        "description": "objetespiti",
+        "peekOfCode": "def goruntuisleme(customlabels, customcord,customclasses,custommodel,k,sagresim,solresim,labellar):  \n    x_shape = solresim.shape[1]\n    y_shape = solresim.shape[0]\n    for a in range(0,k):\n        row = customcord[a]\n        # row = (x1, y1, x2, y2, confidence)  \n        sınıf2=customclasses[int(customlabels[a])]\n        if row[4]>0.7:\n            x1, y1, x2, y2 = int(row[0] * x_shape), int(row[1] * y_shape), int(row[2] * x_shape), int(row[3] * y_shape)\n            boyut=(x2-x1)*(y2-y1)",
+        "detail": "objetespiti",
+        "documentation": {}
+    },
+    {
+        "label": "cvtColor",
+        "kind": 2,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "def cvtColor(image):\n    if len(np.shape(image)) == 3 and np.shape(image)[-2] == 3:\n        return image\n    else:\n        image = image.convert('RGB')\n        return image\n\"\"\"\nEğer görüntü 3 boyutlu ve ikinci boyutun uzunluğu 3 ise (yani renk kanalları RGB ise), görüntü zaten doğru renk formatındadır. \nBu durumda görüntü doğrudan döndürülür (return image).\nEğer yukarıdaki koşul sağlanmazsa, yani görüntü farklı bir renk formatına sahipse, image.convert('RGB') ifadesi görüntüyü ",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "normalize",
+        "kind": 2,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "def normalize(image):\n    image = image / 127.5 - 1\n    return image\n\"\"\" \nGörüntüyü normalize etme işlemi (normalization gerçekleşiyor). Computer visionda piksel normalleştirme tekniği genellikle model öğrenmeyi hızlandırmak \niçin kullanılıyormuş. Bir görüntünün normalizasyonu, piksel değerlerinin her birinin, bir pikselin alabileceği maksimum değere bölünmesinden oluşur \n(8 bitlik bir görüntü için 255, 12 bitlik bir görüntü için 4095, 16 bitlik bir görüntü için 65 535). \nBu da demek oluyor ki her piksel değerinin aralığı 0-255 olduğundan 127.5 (255/2) ortalama piksel değerini verir. \nBu ortalama değer, tüm piksel değerlerini [-1, 1'e eşleyen basit bir normalleştirme yöntemidir. ]\n\"\"\"",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "resize_image",
+        "kind": 2,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "def resize_image(image, size):\n    iw, ih = image.size\n    w, h = size\n    scale = min(w / iw, h / ih)\n    #scale, orijinal boyut ile hedef boyut arasında minimum ölçekteki oranı belirler. \n    #Bu oran, etiket görüntüsünün hem yatayda hem de dikeyde ne kadar ölçeklendirilmesi gerektiğini belirler.\n    nw = int(iw * scale)\n    nh = int(ih * scale)\n    #nw ve nh, ölçeklendirilmiş genişlik ve yükseklik olarak hesaplanır.\n    image = image.resize((nw, nh), Image.BICUBIC)",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "resize_label",
+        "kind": 2,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "def resize_label(image, size):\n#Bu fonksiyon, etiket görüntülerini belirli bir boyuta yeniden boyutlandırmak ve işlemek için kullanılır. Genellikle model eğitimi sırasında girdi görüntülerinin boyutlarını değiştirirken, etiket görüntülerinin de aynı oranda yeniden boyutlandırılması gerekmektedir. \n#Bu fonksiyon, bu yeniden boyutlandırma işlemini gerçekleştirirken uygun etiketlerin korunmasını sağlamak için kullanılır.\n    iw, ih = image.size\n    w, h = size\n    #iw ve ih, orijinal etiket görüntüsünün genişliği ve yüksekliği olarak alınır.\n    #w ve h, hedef boyutun genişliği ve yüksekliği olarak alınır.\n    scale = min(w / iw, h / ih)\n    nw = int(iw * scale)\n    nh = int(ih * scale)",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "detect_image",
+        "kind": 2,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "def detect_image(image_path, yakinmi):\n    #şerit için görüntü işleme fonksiyonu\n    label_names = ['backround', 'ensol', 'sol', 'sag', 'ensag']\n    threshold = 100\n    #threshold değeri, \"sol\" ve \"sag\" şeritlerin arasındaki mesafeyi belirleyen bir eşik değeridir.\n    image = Image.open(image_path)\n    image = cvtColor(image)\n    old_img = copy.deepcopy(image)\n    ori_h = np.array(image).shape[0]\n    ori_w = np.array(image).shape[1]",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "colors",
+        "kind": 5,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "colors = [(0, 0, 0), (128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128),\n          (128, 0, 128), (0, 128, 128), (128, 128, 128),\n          (64, 0, 0), (192, 0, 0), (64, 128, 0), (192, 128, 0), (64, 0, 128),\n          (192, 0, 128), (64, 128, 128), (192, 128, 128), (0, 64, 0),\n          (128, 64, 0), (0, 192, 0), (128, 192, 0), (0, 64, 128),\n          (128, 64, 12)]\nINPUT_SHAPE = [480, 640, 3]  # (H, W, C)\n\"\"\"INPUT_SHAPE değişkeni, modelin beklediği giriş görüntüsünün boyutunu temsil eder. Bu boyut üç bileşen içerir:\nH: Görüntünün yüksekliği (height)\nW: Görüntünün genişliği (width)",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "INPUT_SHAPE",
+        "kind": 5,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "INPUT_SHAPE = [480, 640, 3]  # (H, W, C)\n\"\"\"INPUT_SHAPE değişkeni, modelin beklediği giriş görüntüsünün boyutunu temsil eder. Bu boyut üç bileşen içerir:\nH: Görüntünün yüksekliği (height)\nW: Görüntünün genişliği (width)\nC: Görüntünün kanal sayısı (channels). Bu genellikle renk kanalları için 3 (RGB) veya siyah-beyaz görüntülerde 1 (grayscale) olarak ayarlanır.\n\"\"\"\ndef cvtColor(image):\n    if len(np.shape(image)) == 3 and np.shape(image)[-2] == 3:\n        return image\n    else:",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "cam",
+        "kind": 5,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "cam = cv2.VideoCapture(3, cv2.CAP_DSHOW)\n#cam = cv2.VideoCapture(\"C:\\\\Users\\\\Lenovo\\\\Desktop\\\\f.mp4\")\n\"\"\"# Kameraya erişim sağla\ncam = cv2.VideoCapture(0)\n# Sonsuz bir döngüde kameradan görüntü al\nwhile True:\n    ret, frame = cam.read()  # Görüntüyü yakala\n    cv2.imshow('Kamera Görüntüsü', frame)  # Görüntüyü göster\n    if cv2.waitKey(1) & 0xFF == ord('q'):  # 'q' tuşuna basıldığında döngüyü kır\n        break\"\"\"",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "#cam",
+        "kind": 5,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "#cam = cv2.VideoCapture(\"C:\\\\Users\\\\Lenovo\\\\Desktop\\\\f.mp4\")\n\"\"\"# Kameraya erişim sağla\ncam = cv2.VideoCapture(0)\n# Sonsuz bir döngüde kameradan görüntü al\nwhile True:\n    ret, frame = cam.read()  # Görüntüyü yakala\n    cv2.imshow('Kamera Görüntüsü', frame)  # Görüntüyü göster\n    if cv2.waitKey(1) & 0xFF == ord('q'):  # 'q' tuşuna basıldığında döngüyü kır\n        break\"\"\"\n#model = load_model(\"C:\\\\Users\\\\Lenovo\\\\Desktop\\\\logs\\\\the-last-model.h5\")",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "cam",
+        "kind": 5,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "cam = cv2.VideoCapture(0)\n# Sonsuz bir döngüde kameradan görüntü al\nwhile True:\n    ret, frame = cam.read()  # Görüntüyü yakala\n    cv2.imshow('Kamera Görüntüsü', frame)  # Görüntüyü göster\n    if cv2.waitKey(1) & 0xFF == ord('q'):  # 'q' tuşuna basıldığında döngüyü kır\n        break\"\"\"\n#model = load_model(\"C:\\\\Users\\\\Lenovo\\\\Desktop\\\\logs\\\\the-last-model.h5\")\nmodel=load_model(\"C:\\\\Users\\\\evaot\\\\Desktop\\\\tf-unet-labelme-lane detection\\\\logs\\\\the-last-model.h5\")\n#BASLANGIC PARAMETTRELERININ YUKLENMESI",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "#model",
+        "kind": 5,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "#model = load_model(\"C:\\\\Users\\\\Lenovo\\\\Desktop\\\\logs\\\\the-last-model.h5\")\nmodel=load_model(\"C:\\\\Users\\\\evaot\\\\Desktop\\\\tf-unet-labelme-lane detection\\\\logs\\\\the-last-model.h5\")\n#BASLANGIC PARAMETTRELERININ YUKLENMESI\nguvenaraligi = 5\n\"\"\"\nki=0.005#belirlenecek test sonucuna göre\nkd=0.1#belirlenecek test sonucuna göre\nkp=0.5#belirlenecek test sonucuna göre\n\"\"\"\naracdurdumu=[0]",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "guvenaraligi",
+        "kind": 5,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "guvenaraligi = 5\n\"\"\"\nki=0.005#belirlenecek test sonucuna göre\nkd=0.1#belirlenecek test sonucuna göre\nkp=0.5#belirlenecek test sonucuna göre\n\"\"\"\naracdurdumu=[0]\neskidonmeacisi = 00\np = 0\ni = 0",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "eskidonmeacisi",
+        "kind": 5,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "eskidonmeacisi = 00\np = 0\ni = 0\nd = 0\ndt = 0\nkp = 1 / 2\nkd = 0\nki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "p",
+        "kind": 5,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "p = 0\ni = 0\nd = 0\ndt = 0\nkp = 1 / 2\nkd = 0\nki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\nwhile True:",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "i",
+        "kind": 5,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "i = 0\nd = 0\ndt = 0\nkp = 1 / 2\nkd = 0\nki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\nwhile True:\n    yakinmi = 0",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "d",
+        "kind": 5,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "d = 0\ndt = 0\nkp = 1 / 2\nkd = 0\nki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\nwhile True:\n    yakinmi = 0\n    baslangıc_zamani = time.time()",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "dt",
+        "kind": 5,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "dt = 0\nkp = 1 / 2\nkd = 0\nki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\nwhile True:\n    yakinmi = 0\n    baslangıc_zamani = time.time()\n    ret, frame = cam.read()",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "kp",
+        "kind": 5,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "kp = 1 / 2\nkd = 0\nki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\nwhile True:\n    yakinmi = 0\n    baslangıc_zamani = time.time()\n    ret, frame = cam.read()\n    #frame=cv2.imread(\"41.jpg\")",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "kd",
+        "kind": 5,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "kd = 0\nki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\nwhile True:\n    yakinmi = 0\n    baslangıc_zamani = time.time()\n    ret, frame = cam.read()\n    #frame=cv2.imread(\"41.jpg\")\n    cv2.imwrite(\"frame.jpg\", frame)",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "ki",
+        "kind": 5,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "ki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\nwhile True:\n    yakinmi = 0\n    baslangıc_zamani = time.time()\n    ret, frame = cam.read()\n    #frame=cv2.imread(\"41.jpg\")\n    cv2.imwrite(\"frame.jpg\", frame)\n    image, midpoints, yakinmi, areas, endpoints = detect_image(\"frame.jpg\", yakinmi)",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "cagırma",
+        "kind": 5,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "cagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\nwhile True:\n    yakinmi = 0\n    baslangıc_zamani = time.time()\n    ret, frame = cam.read()\n    #frame=cv2.imread(\"41.jpg\")\n    cv2.imwrite(\"frame.jpg\", frame)\n    image, midpoints, yakinmi, areas, endpoints = detect_image(\"frame.jpg\", yakinmi)\n    if aracdurdumu[0]==1:",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "olcum",
+        "kind": 5,
+        "importPath": "pid",
+        "description": "pid",
+        "peekOfCode": "olcum = KalmanFilter(55, 62, 0.1)\nwhile True:\n    yakinmi = 0\n    baslangıc_zamani = time.time()\n    ret, frame = cam.read()\n    #frame=cv2.imread(\"41.jpg\")\n    cv2.imwrite(\"frame.jpg\", frame)\n    image, midpoints, yakinmi, areas, endpoints = detect_image(\"frame.jpg\", yakinmi)\n    if aracdurdumu[0]==1:\n        break",
+        "detail": "pid",
+        "documentation": {}
+    },
+    {
+        "label": "func",
+        "kind": 6,
+        "importPath": "remote-vehicle-control",
+        "description": "remote-vehicle-control",
+        "peekOfCode": "class func:\n    def disengage_clutch():\n        func.stop_motor()\n        func.straighten_wheels()\n        func.release_brake()\n    def release_brake():\n        aks_communication.sendToArduino(\"b0\\n\")\n        time.sleep(0.5)\n        brake=0\n    def apply_brake():",
+        "detail": "remote-vehicle-control",
+        "documentation": {}
+    },
+    {
+        "label": "steeringAngle",
+        "kind": 5,
+        "importPath": "remote-vehicle-control",
+        "description": "remote-vehicle-control",
+        "peekOfCode": "steeringAngle = gear = brake = gas = 0\nclass func:\n    def disengage_clutch():\n        func.stop_motor()\n        func.straighten_wheels()\n        func.release_brake()\n    def release_brake():\n        aks_communication.sendToArduino(\"b0\\n\")\n        time.sleep(0.5)\n        brake=0",
+        "detail": "remote-vehicle-control",
+        "documentation": {}
+    },
+    {
+        "label": "joystick",
+        "kind": 5,
+        "importPath": "remote-vehicle-control",
+        "description": "remote-vehicle-control",
+        "peekOfCode": "joystick = pygame.joystick.Joystick(0)\njoystick.init()\nvehicle=func()\nstart=False\nwhile True:\n    for event in pygame.event.get():\n        if event.type == pygame.JOYBUTTONDOWN:\n            if event.button==7:\n                start=not start\n                print(\"Kumanda devrede\")",
+        "detail": "remote-vehicle-control",
+        "documentation": {}
+    },
+    {
+        "label": "runLidar",
+        "kind": 2,
+        "importPath": "RPLidarA2M8-R5-explained",
+        "description": "RPLidarA2M8-R5-explained",
+        "peekOfCode": "def runLidar():\n    try:\n        print('LIDAR Baslatiliyor.\\nDurdurmak için \\'CTRL+C\\'')\n        time.sleep(2)\n        for data in lidar.iter_scans():\n            for q,angle,distance in data:\n                if angle>=350 or angle<=10:\n                    print(distance)\n    except KeyboardInterrupt:\n        print('LIDAR Durduruluyor.')",
+        "detail": "RPLidarA2M8-R5-explained",
+        "documentation": {}
+    },
+    {
+        "label": "PORT_NAME",
+        "kind": 5,
+        "importPath": "RPLidarA2M8-R5-explained",
+        "description": "RPLidarA2M8-R5-explained",
+        "peekOfCode": "PORT_NAME = 'COM5' \n#UART Bridge üzerinde işaretli olan BAUDRATE değerini değişkene atıyoruz. Baud Rate: Saniyede gönderilecek bit sayısını belirtir.\nBAUD_RATE = 115200\n#lidar isminde bir RPLidar sınıfı oluşturuyoruz ve bu sınıfın içine gerekli değişkenleri gönderiyoruz.\nlidar = RPLidar(PORT_NAME,baudrate=BAUD_RATE)\ndef runLidar():\n    try:\n        print('LIDAR Baslatiliyor.\\nDurdurmak için \\'CTRL+C\\'')\n        time.sleep(2)\n        for data in lidar.iter_scans():",
+        "detail": "RPLidarA2M8-R5-explained",
+        "documentation": {}
+    },
+    {
+        "label": "BAUD_RATE",
+        "kind": 5,
+        "importPath": "RPLidarA2M8-R5-explained",
+        "description": "RPLidarA2M8-R5-explained",
+        "peekOfCode": "BAUD_RATE = 115200\n#lidar isminde bir RPLidar sınıfı oluşturuyoruz ve bu sınıfın içine gerekli değişkenleri gönderiyoruz.\nlidar = RPLidar(PORT_NAME,baudrate=BAUD_RATE)\ndef runLidar():\n    try:\n        print('LIDAR Baslatiliyor.\\nDurdurmak için \\'CTRL+C\\'')\n        time.sleep(2)\n        for data in lidar.iter_scans():\n            for q,angle,distance in data:\n                if angle>=350 or angle<=10:",
+        "detail": "RPLidarA2M8-R5-explained",
+        "documentation": {}
+    },
+    {
+        "label": "lidar",
+        "kind": 5,
+        "importPath": "RPLidarA2M8-R5-explained",
+        "description": "RPLidarA2M8-R5-explained",
+        "peekOfCode": "lidar = RPLidar(PORT_NAME,baudrate=BAUD_RATE)\ndef runLidar():\n    try:\n        print('LIDAR Baslatiliyor.\\nDurdurmak için \\'CTRL+C\\'')\n        time.sleep(2)\n        for data in lidar.iter_scans():\n            for q,angle,distance in data:\n                if angle>=350 or angle<=10:\n                    print(distance)\n    except KeyboardInterrupt:",
+        "detail": "RPLidarA2M8-R5-explained",
+        "documentation": {}
+    },
+    {
+        "label": "find_depth",
+        "kind": 2,
+        "importPath": "triangulation",
+        "description": "triangulation",
+        "peekOfCode": "def find_depth(right_point, left_point, frame_right, frame_left, baseline,f, alpha):\n    # CONVERT FOCAL LENGTH f FROM [mm] TO [pixel]:\n    height_right, width_right, depth_right = frame_right.shape\n    # Sağ kamera görüntüsünün yüksekliğini, genişliğini ve derinliğini alırız. frame_right sağ kamera görüntüsünü temsil eder.\n    height_left, width_left, depth_left = frame_left.shape\n    # Sol kamera görüntüsünün yüksekliğini, genişliğini ve derinliğini alırız. frame_left sol kamera görüntüsünü temsil eder.\n    if width_right == width_left:\n        f_pixel = (width_right * 0.5) / np.tan(alpha * 0.5 * np.pi/180)\n        # Sağ ve sol kamera görüntülerinin genişlikleri aynı mı diye kontrol ederiz. Eğer aynıysa, odak uzunluğunu piksel cinsinden hesaplamak için gerekli işlemleri yaparız.\n    else:",
+        "detail": "triangulation",
+        "documentation": {}
+    }
+]

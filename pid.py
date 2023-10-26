@@ -51,8 +51,11 @@ def normalize(image):
     return image
 
 """ 
-Fonksiyon, verilen görüntüyü 127.5'e böler ve ardından 1 çıkararak görüntüyü -1 ile 1 arasında bir aralığa getirir. 
-Bu genellikle Convolutional Neural Networks (CNN) gibi derin öğrenme modellerinin daha iyi performans göstermesine yardımcı olabilir.
+Görüntüyü normalize etme işlemi (normalization gerçekleşiyor). Computer visionda piksel normalleştirme tekniği genellikle model öğrenmeyi hızlandırmak 
+için kullanılıyormuş. Bir görüntünün normalizasyonu, piksel değerlerinin her birinin, bir pikselin alabileceği maksimum değere bölünmesinden oluşur 
+(8 bitlik bir görüntü için 255, 12 bitlik bir görüntü için 4095, 16 bitlik bir görüntü için 65 535). 
+Bu da demek oluyor ki her piksel değerinin aralığı 0-255 olduğundan 127.5 (255/2) ortalama piksel değerini verir. 
+Bu ortalama değer, tüm piksel değerlerini [-1, 1'e eşleyen basit bir normalleştirme yöntemidir. ]
 """
 
 def resize_image(image, size):
