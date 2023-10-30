@@ -521,3 +521,8 @@ Son olarak, "donme_acisi" değeri belirli bir formül kullanılarak tekrar hesap
     os.remove('frame.jpg')
 
     #print("FPS:       ",1/(time.time()-baslangıc_zamani))
+
+
+
+
+    "deneme yasin"
