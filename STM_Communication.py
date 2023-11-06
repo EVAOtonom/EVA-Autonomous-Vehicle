@@ -1,6 +1,6 @@
 import minimalmodbus
-#slaveadress=1 -> STM'in kaçıncı slave olduğunu belirtir.
-#register_adress -> Direksiyon açısı komutu göndermeyi sağlar.
+#slaveadress = 1 -> STM'in kaçıncı slave olduğunu belirtir.
+#register_adress = 0 -> Direksiyon açısı komutu göndermeyi sağlar.
 instrument = minimalmodbus.Instrument('COM4',slaveaddress=1) 
 instrument.serial.baudrate = 38400
 
