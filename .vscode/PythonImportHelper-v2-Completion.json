@@ -246,6 +246,15 @@
         "documentation": {}
     },
     {
+        "label": "minimalmodbus",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "minimalmodbus",
+        "description": "minimalmodbus",
+        "detail": "minimalmodbus",
+        "documentation": {}
+    },
+    {
         "label": "sendToArduino",
         "kind": 2,
         "importPath": "aks_communication",
@@ -394,7 +403,7 @@
         "kind": 2,
         "importPath": "pid",
         "description": "pid",
-        "peekOfCode": "def normalize(image):\n    image = image / 127.5 - 1\n    return image\n\"\"\" \nGörüntüyü normalize etme işlemi (normalization gerçekleşiyor). Computer visionda piksel normalleştirme tekniği genellikle model öğrenmeyi hızlandırmak \niçin kullanılıyormuş. Bir görüntünün normalizasyonu, piksel değerlerinin her birinin, bir pikselin alabileceği maksimum değere bölünmesinden oluşur \n(8 bitlik bir görüntü için 255, 12 bitlik bir görüntü için 4095, 16 bitlik bir görüntü için 65 535). \nBu da demek oluyor ki her piksel değerinin aralığı 0-255 olduğundan 127.5 (255/2) ortalama piksel değerini verir. \nBu ortalama değer, tüm piksel değerlerini [-1, 1'e eşleyen basit bir normalleştirme yöntemidir. ]\n\"\"\"",
+        "peekOfCode": "def normalize(image):\n    image = image / 127.5 - 1\n    return image\n\"\"\" \nFonksiyon, verilen görüntüyü 127.5'e böler ve ardından 1 çıkararak görüntüyü -1 ile 1 arasında bir aralığa getirir. (BU ARALIKTA OLDUĞUNDAN NASIL EMİN OLACAĞIZ?)\nBu genellikle Convolutional Neural Networks (CNN) gibi derin öğrenme modellerinin daha iyi performans göstermesine yardımcı olabilir.\n\"\"\"\ndef resize_image(image, size):\n    iw, ih = image.size\n    w, h = size",
         "detail": "pid",
         "documentation": {}
     },
@@ -403,7 +412,7 @@
         "kind": 2,
         "importPath": "pid",
         "description": "pid",
-        "peekOfCode": "def resize_image(image, size):\n    iw, ih = image.size\n    w, h = size\n    scale = min(w / iw, h / ih)\n    #scale, orijinal boyut ile hedef boyut arasında minimum ölçekteki oranı belirler. \n    #Bu oran, etiket görüntüsünün hem yatayda hem de dikeyde ne kadar ölçeklendirilmesi gerektiğini belirler.\n    nw = int(iw * scale)\n    nh = int(ih * scale)\n    #nw ve nh, ölçeklendirilmiş genişlik ve yükseklik olarak hesaplanır.\n    image = image.resize((nw, nh), Image.BICUBIC)",
+        "peekOfCode": "def resize_image(image, size):\n    iw, ih = image.size\n    w, h = size\n    scale = min(w / iw, h / ih)\n    #scale, orijinal boyut ile hedef boyut arasında minimum ölçekteki oranı belirler. \n    #Bu oran, etiket görüntüsünün hem yatayda hem de dikeyde ne kadar ölçeklendirilmesi gerektiğini belirler.\n    nw = int(iw * scale)\n    nh = int(ih * scale)\n    #nw ve nh, ölçeklendirilmiş genişlik ve yükseklik olarak hesaplanır. ( nw= new weight nh = new height )\n    image = image.resize((nw, nh), Image.BICUBIC)",
         "detail": "pid",
         "documentation": {}
     },
@@ -421,7 +430,7 @@
         "kind": 2,
         "importPath": "pid",
         "description": "pid",
-        "peekOfCode": "def detect_image(image_path, yakinmi):\n    #şerit için görüntü işleme fonksiyonu\n    label_names = ['backround', 'ensol', 'sol', 'sag', 'ensag']\n    threshold = 100\n    #threshold değeri, \"sol\" ve \"sag\" şeritlerin arasındaki mesafeyi belirleyen bir eşik değeridir.\n    image = Image.open(image_path)\n    image = cvtColor(image)\n    old_img = copy.deepcopy(image)\n    ori_h = np.array(image).shape[0]\n    ori_w = np.array(image).shape[1]",
+        "peekOfCode": "def detect_image(image_path, yakinmi):  \n    #şerit için görüntü işleme fonksiyonu   # detect_image fonksiyonu, bir görüntü dosyası yolu (image_path) ve bir yakınlık değeri (yakinmi) alır.\n    label_names = ['backround', 'ensol', 'sol', 'sag', 'ensag'] #label_names listesi, sınıf etiketlerini içerir.\n    threshold = 100\n    #threshold değeri, \"sol\" ve \"sag\" şeritlerin arasındaki mesafeyi belirleyen bir eşik değeridir. (standart bi değer mi bu değer?)\n    image = Image.open(image_path)\n    image = cvtColor(image)\n    # Görüntü dosyası Image.open yöntemi ile açılır ve daha sonra cvtColor fonksiyonu ile işlenir.\n    old_img = copy.deepcopy(image) \n    ori_h = np.array(image).shape[0]",
         "detail": "pid",
         "documentation": {}
     },
@@ -466,7 +475,7 @@
         "kind": 5,
         "importPath": "pid",
         "description": "pid",
-        "peekOfCode": "cam = cv2.VideoCapture(0)\n# Sonsuz bir döngüde kameradan görüntü al\nwhile True:\n    ret, frame = cam.read()  # Görüntüyü yakala\n    cv2.imshow('Kamera Görüntüsü', frame)  # Görüntüyü göster\n    if cv2.waitKey(1) & 0xFF == ord('q'):  # 'q' tuşuna basıldığında döngüyü kır\n        break\"\"\"\n#model = load_model(\"C:\\\\Users\\\\Lenovo\\\\Desktop\\\\logs\\\\the-last-model.h5\")\nmodel=load_model(\"C:\\\\Users\\\\evaot\\\\Desktop\\\\tf-unet-labelme-lane detection\\\\logs\\\\the-last-model.h5\")\n#BASLANGIC PARAMETTRELERININ YUKLENMESI",
+        "peekOfCode": "cam = cv2.VideoCapture(0)\n# Sonsuz bir döngüde kameradan görüntü al\nwhile True:\n    ret, frame = cam.read()  # Görüntüyü yakala\n    cv2.imshow('Kamera Görüntüsü', frame)  # Görüntüyü göster\n    if cv2.waitKey(1) & 0xFF == ord('q'):  # 'q' tuşuna basıldığında döngüyü kır\n        break\"\"\"\n#model = load_model(\"C:\\\\Users\\\\Lenovo\\\\Desktop\\\\logs\\\\the-last-model.h5\")\nmodel=load_model(\"C:\\\\Users\\\\evaot\\\\Desktop\\\\tf-unet-labelme-lane detection\\\\logs\\\\the-last-model.h5\")\n# eğitilmiş modelin yuklenmesi sağlanır.",
         "detail": "pid",
         "documentation": {}
     },
@@ -475,7 +484,7 @@
         "kind": 5,
         "importPath": "pid",
         "description": "pid",
-        "peekOfCode": "#model = load_model(\"C:\\\\Users\\\\Lenovo\\\\Desktop\\\\logs\\\\the-last-model.h5\")\nmodel=load_model(\"C:\\\\Users\\\\evaot\\\\Desktop\\\\tf-unet-labelme-lane detection\\\\logs\\\\the-last-model.h5\")\n#BASLANGIC PARAMETTRELERININ YUKLENMESI\nguvenaraligi = 5\n\"\"\"\nki=0.005#belirlenecek test sonucuna göre\nkd=0.1#belirlenecek test sonucuna göre\nkp=0.5#belirlenecek test sonucuna göre\n\"\"\"\naracdurdumu=[0]",
+        "peekOfCode": "#model = load_model(\"C:\\\\Users\\\\Lenovo\\\\Desktop\\\\logs\\\\the-last-model.h5\")\nmodel=load_model(\"C:\\\\Users\\\\evaot\\\\Desktop\\\\tf-unet-labelme-lane detection\\\\logs\\\\the-last-model.h5\")\n# eğitilmiş modelin yuklenmesi sağlanır.\n#BASLANGIC PARAMETTRELERININ YUKLENMESI\nguvenaraligi = 5\n\"\"\"\nki=0.005#belirlenecek test sonucuna göre\nkd=0.1#belirlenecek test sonucuna göre\nkp=0.5#belirlenecek test sonucuna göre\n\"\"\"",
         "detail": "pid",
         "documentation": {}
     },
@@ -502,7 +511,7 @@
         "kind": 5,
         "importPath": "pid",
         "description": "pid",
-        "peekOfCode": "p = 0\ni = 0\nd = 0\ndt = 0\nkp = 1 / 2\nkd = 0\nki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\nwhile True:",
+        "peekOfCode": "p = 0\ni = 0\nd = 0\ndt = 0\nkp = 1 / 2\nkd = 0\nki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\n\"\"\"",
         "detail": "pid",
         "documentation": {}
     },
@@ -511,7 +520,7 @@
         "kind": 5,
         "importPath": "pid",
         "description": "pid",
-        "peekOfCode": "i = 0\nd = 0\ndt = 0\nkp = 1 / 2\nkd = 0\nki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\nwhile True:\n    yakinmi = 0",
+        "peekOfCode": "i = 0\nd = 0\ndt = 0\nkp = 1 / 2\nkd = 0\nki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\n\"\"\"\nKalmanFilter adında bir nesne oluşturulduktan sonra, bir döngü başlatır.",
         "detail": "pid",
         "documentation": {}
     },
@@ -520,7 +529,7 @@
         "kind": 5,
         "importPath": "pid",
         "description": "pid",
-        "peekOfCode": "d = 0\ndt = 0\nkp = 1 / 2\nkd = 0\nki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\nwhile True:\n    yakinmi = 0\n    baslangıc_zamani = time.time()",
+        "peekOfCode": "d = 0\ndt = 0\nkp = 1 / 2\nkd = 0\nki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\n\"\"\"\nKalmanFilter adında bir nesne oluşturulduktan sonra, bir döngü başlatır.\n Döngü, 'yakinmi' değişkenine başlangıçta 0 değerini atar. Ardından, kameradan bir kare okur ve bu kare üzerinde işlem yapar. ",
         "detail": "pid",
         "documentation": {}
     },
@@ -529,7 +538,7 @@
         "kind": 5,
         "importPath": "pid",
         "description": "pid",
-        "peekOfCode": "dt = 0\nkp = 1 / 2\nkd = 0\nki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\nwhile True:\n    yakinmi = 0\n    baslangıc_zamani = time.time()\n    ret, frame = cam.read()",
+        "peekOfCode": "dt = 0\nkp = 1 / 2\nkd = 0\nki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\n\"\"\"\nKalmanFilter adında bir nesne oluşturulduktan sonra, bir döngü başlatır.\n Döngü, 'yakinmi' değişkenine başlangıçta 0 değerini atar. Ardından, kameradan bir kare okur ve bu kare üzerinde işlem yapar. \n Eğer 'aracdurdumu' listesinin ilk elemanı 1 ise, döngüyü sonlandırır. Ayrıca, 'cagırma' değişkeni 0 ise, döngü devam eder. ",
         "detail": "pid",
         "documentation": {}
     },
@@ -538,7 +547,7 @@
         "kind": 5,
         "importPath": "pid",
         "description": "pid",
-        "peekOfCode": "kp = 1 / 2\nkd = 0\nki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\nwhile True:\n    yakinmi = 0\n    baslangıc_zamani = time.time()\n    ret, frame = cam.read()\n    #frame=cv2.imread(\"41.jpg\")",
+        "peekOfCode": "kp = 1 / 2\nkd = 0\nki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\n\"\"\"\nKalmanFilter adında bir nesne oluşturulduktan sonra, bir döngü başlatır.\n Döngü, 'yakinmi' değişkenine başlangıçta 0 değerini atar. Ardından, kameradan bir kare okur ve bu kare üzerinde işlem yapar. \n Eğer 'aracdurdumu' listesinin ilk elemanı 1 ise, döngüyü sonlandırır. Ayrıca, 'cagırma' değişkeni 0 ise, döngü devam eder. \n\"\"\"",
         "detail": "pid",
         "documentation": {}
     },
@@ -547,7 +556,7 @@
         "kind": 5,
         "importPath": "pid",
         "description": "pid",
-        "peekOfCode": "kd = 0\nki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\nwhile True:\n    yakinmi = 0\n    baslangıc_zamani = time.time()\n    ret, frame = cam.read()\n    #frame=cv2.imread(\"41.jpg\")\n    cv2.imwrite(\"frame.jpg\", frame)",
+        "peekOfCode": "kd = 0\nki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\n\"\"\"\nKalmanFilter adında bir nesne oluşturulduktan sonra, bir döngü başlatır.\n Döngü, 'yakinmi' değişkenine başlangıçta 0 değerini atar. Ardından, kameradan bir kare okur ve bu kare üzerinde işlem yapar. \n Eğer 'aracdurdumu' listesinin ilk elemanı 1 ise, döngüyü sonlandırır. Ayrıca, 'cagırma' değişkeni 0 ise, döngü devam eder. \n\"\"\"\nwhile True:",
         "detail": "pid",
         "documentation": {}
     },
@@ -556,7 +565,7 @@
         "kind": 5,
         "importPath": "pid",
         "description": "pid",
-        "peekOfCode": "ki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\nwhile True:\n    yakinmi = 0\n    baslangıc_zamani = time.time()\n    ret, frame = cam.read()\n    #frame=cv2.imread(\"41.jpg\")\n    cv2.imwrite(\"frame.jpg\", frame)\n    image, midpoints, yakinmi, areas, endpoints = detect_image(\"frame.jpg\", yakinmi)",
+        "peekOfCode": "ki = 0\ncagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\n\"\"\"\nKalmanFilter adında bir nesne oluşturulduktan sonra, bir döngü başlatır.\n Döngü, 'yakinmi' değişkenine başlangıçta 0 değerini atar. Ardından, kameradan bir kare okur ve bu kare üzerinde işlem yapar. \n Eğer 'aracdurdumu' listesinin ilk elemanı 1 ise, döngüyü sonlandırır. Ayrıca, 'cagırma' değişkeni 0 ise, döngü devam eder. \n\"\"\"\nwhile True:\n    yakinmi = 0 ",
         "detail": "pid",
         "documentation": {}
     },
@@ -565,7 +574,7 @@
         "kind": 5,
         "importPath": "pid",
         "description": "pid",
-        "peekOfCode": "cagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\nwhile True:\n    yakinmi = 0\n    baslangıc_zamani = time.time()\n    ret, frame = cam.read()\n    #frame=cv2.imread(\"41.jpg\")\n    cv2.imwrite(\"frame.jpg\", frame)\n    image, midpoints, yakinmi, areas, endpoints = detect_image(\"frame.jpg\", yakinmi)\n    if aracdurdumu[0]==1:",
+        "peekOfCode": "cagırma = 0\nolcum = KalmanFilter(55, 62, 0.1)\n\"\"\"\nKalmanFilter adında bir nesne oluşturulduktan sonra, bir döngü başlatır.\n Döngü, 'yakinmi' değişkenine başlangıçta 0 değerini atar. Ardından, kameradan bir kare okur ve bu kare üzerinde işlem yapar. \n Eğer 'aracdurdumu' listesinin ilk elemanı 1 ise, döngüyü sonlandırır. Ayrıca, 'cagırma' değişkeni 0 ise, döngü devam eder. \n\"\"\"\nwhile True:\n    yakinmi = 0 \n    baslangıc_zamani = time.time()",
         "detail": "pid",
         "documentation": {}
     },
@@ -574,7 +583,7 @@
         "kind": 5,
         "importPath": "pid",
         "description": "pid",
-        "peekOfCode": "olcum = KalmanFilter(55, 62, 0.1)\nwhile True:\n    yakinmi = 0\n    baslangıc_zamani = time.time()\n    ret, frame = cam.read()\n    #frame=cv2.imread(\"41.jpg\")\n    cv2.imwrite(\"frame.jpg\", frame)\n    image, midpoints, yakinmi, areas, endpoints = detect_image(\"frame.jpg\", yakinmi)\n    if aracdurdumu[0]==1:\n        break",
+        "peekOfCode": "olcum = KalmanFilter(55, 62, 0.1)\n\"\"\"\nKalmanFilter adında bir nesne oluşturulduktan sonra, bir döngü başlatır.\n Döngü, 'yakinmi' değişkenine başlangıçta 0 değerini atar. Ardından, kameradan bir kare okur ve bu kare üzerinde işlem yapar. \n Eğer 'aracdurdumu' listesinin ilk elemanı 1 ise, döngüyü sonlandırır. Ayrıca, 'cagırma' değişkeni 0 ise, döngü devam eder. \n\"\"\"\nwhile True:\n    yakinmi = 0 \n    baslangıc_zamani = time.time()\n    ret, frame = cam.read()",
         "detail": "pid",
         "documentation": {}
     },
@@ -639,6 +648,51 @@
         "description": "RPLidarA2M8-R5-explained",
         "peekOfCode": "lidar = RPLidar(PORT_NAME,baudrate=BAUD_RATE)\ndef runLidar():\n    try:\n        print('LIDAR Baslatiliyor.\\nDurdurmak için \\'CTRL+C\\'')\n        time.sleep(2)\n        for data in lidar.iter_scans():\n            for q,angle,distance in data:\n                if angle>=350 or angle<=10:\n                    print(distance)\n    except KeyboardInterrupt:",
         "detail": "RPLidarA2M8-R5-explained",
+        "documentation": {}
+    },
+    {
+        "label": "send_to_STM",
+        "kind": 2,
+        "importPath": "STM_Communication",
+        "description": "STM_Communication",
+        "peekOfCode": "def send_to_STM(register_adress,data):\n    write_register_address=register_adress\n    value=data\n    instrument.write_register(write_register_address, value, functioncode=6)  # Function code 6: Write Single Register\n    print(f'Register {write_register_address} değeri {data} olarak yazıldı.')",
+        "detail": "STM_Communication",
+        "documentation": {}
+    },
+    {
+        "label": "#slaveadress",
+        "kind": 5,
+        "importPath": "STM_Communication",
+        "description": "STM_Communication",
+        "peekOfCode": "#slaveadress = 1 -> STM'in kaçıncı slave olduğunu belirtir.\n#register_adress = 0 -> Direksiyon açısı komutu göndermeyi sağlar.\ninstrument = minimalmodbus.Instrument('COM4',slaveaddress=1) \ninstrument.serial.baudrate = 38400\ndef send_to_STM(register_adress,data):\n    write_register_address=register_adress\n    value=data\n    instrument.write_register(write_register_address, value, functioncode=6)  # Function code 6: Write Single Register\n    print(f'Register {write_register_address} değeri {data} olarak yazıldı.')",
+        "detail": "STM_Communication",
+        "documentation": {}
+    },
+    {
+        "label": "#register_adress",
+        "kind": 5,
+        "importPath": "STM_Communication",
+        "description": "STM_Communication",
+        "peekOfCode": "#register_adress = 0 -> Direksiyon açısı komutu göndermeyi sağlar.\ninstrument = minimalmodbus.Instrument('COM4',slaveaddress=1) \ninstrument.serial.baudrate = 38400\ndef send_to_STM(register_adress,data):\n    write_register_address=register_adress\n    value=data\n    instrument.write_register(write_register_address, value, functioncode=6)  # Function code 6: Write Single Register\n    print(f'Register {write_register_address} değeri {data} olarak yazıldı.')",
+        "detail": "STM_Communication",
+        "documentation": {}
+    },
+    {
+        "label": "instrument",
+        "kind": 5,
+        "importPath": "STM_Communication",
+        "description": "STM_Communication",
+        "peekOfCode": "instrument = minimalmodbus.Instrument('COM4',slaveaddress=1) \ninstrument.serial.baudrate = 38400\ndef send_to_STM(register_adress,data):\n    write_register_address=register_adress\n    value=data\n    instrument.write_register(write_register_address, value, functioncode=6)  # Function code 6: Write Single Register\n    print(f'Register {write_register_address} değeri {data} olarak yazıldı.')",
+        "detail": "STM_Communication",
+        "documentation": {}
+    },
+    {
+        "label": "instrument.serial.baudrate",
+        "kind": 5,
+        "importPath": "STM_Communication",
+        "description": "STM_Communication",
+        "peekOfCode": "instrument.serial.baudrate = 38400\ndef send_to_STM(register_adress,data):\n    write_register_address=register_adress\n    value=data\n    instrument.write_register(write_register_address, value, functioncode=6)  # Function code 6: Write Single Register\n    print(f'Register {write_register_address} değeri {data} olarak yazıldı.')",
+        "detail": "STM_Communication",
         "documentation": {}
     },
     {
