@@ -28,7 +28,10 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_tim_ex.h \
  ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_uart.h \
  ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_uart_ex.h \
- C:/Users/EVA\ Otonom/STM32CubeIDE/workspace_1.13.2/Otonom_Code/modules/wheels/wheel.h
+ C:/Users/EVA\ Otonom/Desktop/Otonom_Code/modules/wheels/wheel.h \
+ C:/Users/EVA\ Otonom/Desktop/Otonom_Code/modules/break/break.h \
+ C:/Users/EVA\ Otonom/Desktop/Otonom_Code/modules/bldc/bldc.h \
+ C:/Users/EVA\ Otonom/Desktop/Otonom_Code/modules/modbus/modbus.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal.h:
 ../Core/Inc/stm32f3xx_hal_conf.h:
@@ -59,4 +62,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_tim_ex.h:
 ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_uart.h:
 ../Drivers/STM32F3xx_HAL_Driver/Inc/stm32f3xx_hal_uart_ex.h:
-C:/Users/EVA\ Otonom/STM32CubeIDE/workspace_1.13.2/Otonom_Code/modules/wheels/wheel.h:
+C:/Users/EVA\ Otonom/Desktop/Otonom_Code/modules/wheels/wheel.h:
+C:/Users/EVA\ Otonom/Desktop/Otonom_Code/modules/break/break.h:
+C:/Users/EVA\ Otonom/Desktop/Otonom_Code/modules/bldc/bldc.h:
+C:/Users/EVA\ Otonom/Desktop/Otonom_Code/modules/modbus/modbus.h:

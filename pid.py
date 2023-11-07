@@ -51,11 +51,8 @@ def normalize(image):
     return image
 
 """ 
-Görüntüyü normalize etme işlemi (normalization gerçekleşiyor). Computer visionda piksel normalleştirme tekniği genellikle model öğrenmeyi hızlandırmak 
-için kullanılıyormuş. Bir görüntünün normalizasyonu, piksel değerlerinin her birinin, bir pikselin alabileceği maksimum değere bölünmesinden oluşur 
-(8 bitlik bir görüntü için 255, 12 bitlik bir görüntü için 4095, 16 bitlik bir görüntü için 65 535). 
-Bu da demek oluyor ki her piksel değerinin aralığı 0-255 olduğundan 127.5 (255/2) ortalama piksel değerini verir. 
-Bu ortalama değer, tüm piksel değerlerini [-1, 1'e eşleyen basit bir normalleştirme yöntemidir. ]
+Fonksiyon, verilen görüntüyü 127.5'e böler ve ardından 1 çıkararak görüntüyü -1 ile 1 arasında bir aralığa getirir. (BU ARALIKTA OLDUĞUNDAN NASIL EMİN OLACAĞIZ?)
+Bu genellikle Convolutional Neural Networks (CNN) gibi derin öğrenme modellerinin daha iyi performans göstermesine yardımcı olabilir.
 """
 
 def resize_image(image, size):
@@ -67,10 +64,10 @@ def resize_image(image, size):
     #Bu oran, etiket görüntüsünün hem yatayda hem de dikeyde ne kadar ölçeklendirilmesi gerektiğini belirler.
     nw = int(iw * scale)
     nh = int(ih * scale)
-    #nw ve nh, ölçeklendirilmiş genişlik ve yükseklik olarak hesaplanır.
+    #nw ve nh, ölçeklendirilmiş genişlik ve yükseklik olarak hesaplanır. ( nw= new weight nh = new height )
 
     image = image.resize((nw, nh), Image.BICUBIC)
-    new_image = Image.new('RGB', size, (128, 128, 128))
+    new_image = Image.new('RGB', size, (128, 128, 128))   # gri renk (128,128,128)
     new_image.paste(image, ((w - nw) // 2, (h - nh) // 2))
 
     return new_image, nw, nh
@@ -98,41 +95,43 @@ def resize_label(image, size):
     return new_image, nw, nh
 
 
-def detect_image(image_path, yakinmi):
-    #şerit için görüntü işleme fonksiyonu
-    label_names = ['backround', 'ensol', 'sol', 'sag', 'ensag']
+def detect_image(image_path, yakinmi):  
+    #şerit için görüntü işleme fonksiyonu   # detect_image fonksiyonu, bir görüntü dosyası yolu (image_path) ve bir yakınlık değeri (yakinmi) alır.
+    label_names = ['backround', 'ensol', 'sol', 'sag', 'ensag'] #label_names listesi, sınıf etiketlerini içerir.
     threshold = 100
-    #threshold değeri, "sol" ve "sag" şeritlerin arasındaki mesafeyi belirleyen bir eşik değeridir.
+    #threshold değeri, "sol" ve "sag" şeritlerin arasındaki mesafeyi belirleyen bir eşik değeridir. (standart bi değer mi bu değer?)
     image = Image.open(image_path)
     image = cvtColor(image)
-
-    old_img = copy.deepcopy(image)
+    # Görüntü dosyası Image.open yöntemi ile açılır ve daha sonra cvtColor fonksiyonu ile işlenir.
+    old_img = copy.deepcopy(image) 
     ori_h = np.array(image).shape[0]
     ori_w = np.array(image).shape[1]
-
+    #copy.deepcopy fonksiyonu kullanılarak bir kopya alınır ve orijinal boyutlar ori_h ve ori_w değişkenlerine atanır.
     image_data, nw, nh = resize_image(image, (INPUT_SHAPE[1], INPUT_SHAPE[0]))
-
+    #resize_image fonksiyonu ile görüntü boyutu belirli bir giriş şekline (INPUT_SHAPE) yeniden boyutlandırılır.
     image_data = normalize(np.array(image_data, np.float32))
-
+    #normalize fonksiyonu, görüntü verilerini belirli bir aralığa ölçeklendirir.
     image_data = np.expand_dims(image_data, 0)
-
+    #np.expand_dims fonksiyonu ile boyut artırma yapılır.
     pr = model.predict(image_data)[0]
-
+    #Model tahmini model.predict ile gerçekleştirilir ve sonuçlar pr değişkenine atanır.
     pr = pr[int((INPUT_SHAPE[0] - nh) // 2):int((INPUT_SHAPE[0] - nh) // 2 +
                                                 nh),
             int((INPUT_SHAPE[1] - nw) // 2):int((INPUT_SHAPE[1] - nw) // 2 +
                                                 nw)]
-
+    #Gerekli boyutlarda kırpma işlemi yapılır.
     pr = cv2.resize(pr, (ori_w, ori_h), interpolation=cv2.INTER_LINEAR)
-
+    #cv2.resize fonksiyonu ile boyutlar orijinal boyutlara döndürülür.
     pr = pr.argmax(axis=-1)
-
+    #argmax fonksiyonu kullanılarak en yüksek değere sahip sınıf indeksi belirlenir.
     seg_img = np.reshape(
         np.array(colors, np.uint8)[np.reshape(pr, [-1])], [ori_h, ori_w, -1])
 
     image = Image.fromarray(seg_img)
+    #Sonuç görüntü Image.fromarray yöntemi kullanılarak yeniden oluşturulur.
 
     image = Image.blend(old_img, image, 0.7)
+    #Orijinal görüntü ile sonuç görüntü Image.blend yöntemi ile karıştırılır.
     
     #buradan itibaren kodumuzda bize özel kısım başlıyor
     midpoints = {}
@@ -141,20 +140,32 @@ def detect_image(image_path, yakinmi):
     midpoints['sol'] = (0, 0)
     midpoints['sag'] = (0, 0)
     midpoints['ensag'] = (0, 0)
+# Bu bölümde, midpoints adında bir boş sözlük oluşturuluyor. Daha sonra bu sözlüğe bazı anahtar-değer çiftleri ekleniyor.
+# Her bir anahtar, arka plan veya farklı etiketlerin temsil ettiği nesneleri belirtir. Örneğin, 
+# 'ensol' sol şeridin orta noktasını temsil eder. Koordinatlar (0, 0) olarak başlatılır, çünkü henüz bu bilgilere erişilememiş olabilir.
     areas = {}
     areas['ensol'] = 0
     areas['sol'] = 0
     areas['sag'] = 0
     areas['ensag'] = 0
+ #Benzer şekilde, areas adında başka bir boş sözlük oluşturulur ve burada da belirli nesnelerin alanları depolanır. 
+ # Her bir anahtar, 'ensol', 'sol', 'sag' ve 'ensag' gibi nesnelerin alanını temsil eder.
+ #  Başlangıçta tüm alanlar sıfır olarak ayarlanmıştır, çünkü henüz bu alanlara dair veri elde edilmemiş olabilir.
     """midpoints ve areas adında iki sözlük oluşturuluyor. Bu sözlükler, nesnelerin merkez noktalarını ve alanlarını depolamak için kullanılır."""
     endpoints = {}
     endpoints['ensol'] = ((0, 0), (0, 0))
     endpoints['sol'] = ((0, 0), (0, 0))
     endpoints['sag'] = ((0, 0), (0, 0))
     endpoints['ensag'] = ((0, 0), (0, 0))
+# endpoints sözlüğü, 'ensol', 'sol', 'sag' ve 'ensag' gibi nesnelerin uç noktalarının koordinatlarını depolar. 
+# Her bir anahtarın değeri, başlangıçta ((0, 0), (0, 0)) olarak belirlenir, çünkü bu koordinatlar henüz elde edilmemiş olabilir.
     # nesnenin ("ensol", "sol", "sag" ...) uç noktalarının koordinatları depolanır. 
 
+#Bu kod parçaları, ilgili verilerin depolanması için kullanılan sözlüklerin oluşturulmasını ve başlangıç değerlerinin atanmasını gösterir.
+#  Bu veriler, sonraki işlemlerde kullanılmak üzere saklanır ve güncellenir.
     img = np.array(image)
+#Bu satır, 'image' adlı görüntüyü NumPy dizisine dönüştürür ve 'img' adında bir değişkene atar. 
+# Bu dönüşüm, daha sonra kullanılmak üzere görüntü verilerinin bir NumPy dizisinde depolanmasını sağlar.
     for c in range(5):
         y, x = np.where(pr == c)
         area = len(y)
@@ -167,7 +178,20 @@ def detect_image(image_path, yakinmi):
 
         areas[label_names[c]] = len(y)
         midpoints[label_names[c]] = (int(np.mean(y)), int(np.mean(x)))
+""" 
+Bu döngü, etiketlerin sınıflarına göre işlem yapar. pr dizisindeki her bir elemanın sınıfı kontrol edilir.
+ Sınıf etiketinin indeksi c olarak atanır ve bu sınıfın görüntüdeki koordinatları bulunur.
+Bu koordinatlar, np.where fonksiyonu kullanılarak alınır. Ardından, bu sınıfın alanı hesaplanır ve bir değişkene atılır.
 
+Eğer bu alan belirli bir eşik değerinden küçükse (area<150 gibi), işleme devam edilmez. 
+Bu satır şu anlık yorum içerisindedir, yani bu kısımdaki kod çalıştırılmaz.
+
+Daha sonra, eğer 'y' ve 'x' dizilerinin uzunlukları 0 ise veya sıfıra eşitse, işlem devam ettirilmez.
+Yani, eğer bu sınıfın pikselleri bulunamazsa veya koordinatları 0 ise, işlem atlanır.
+
+Eğer yukarıdaki koşullar sağlanmazsa, bu sınıfın alanı ve merkez noktası ilgili sözlüklerdeki değerler güncellenir.
+
+""" 
 
 
         # Find the points with the maximum and minimum y values
@@ -181,24 +205,31 @@ def detect_image(image_path, yakinmi):
         #Her nesne için endpoints adlı bir sözlüğe maksimum ve minimum y noktalarını kaydeder.
         
         if label_names[c]=='sol' or label_names[c]=='sag':
-
+# eğer sınıf etiketi 'sol' veya 'sag' ise, içerideki bloğun çalıştırılacağını belirtir.
             if label_names[c]=='sag':
-
+#eğer sınıf etiketi 'sag' ise, içerideki bloğun çalıştırılacağını belirtir.
                 cv2.circle(img, (endpoints[label_names[c]]['max_y'][0], endpoints[label_names[c]]['max_y'][1]), 10, (0, 255, 0), -1)
+#Bu satır, 'cv2.circle' fonksiyonunu kullanarak 'img' üzerinde bir daire çizer. Bu daire, 'sag' sınıfının en yüksek 'y' noktasına, 
+# yeşil renk ile ve yarıçapı 10 olan bir daire olarak çizilir.
                 cv2.putText(img, 'sag',(endpoints[label_names[c]]['max_y'][0], endpoints[label_names[c]]['max_y'][1]+20),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+#Bu satır, 'cv2.putText' fonksiyonunu kullanarak 'img' üzerine bir metin ekler.
+# Bu metin, 'sag' olarak belirlenmiş ve 'sag' sınıfının en yüksek 'y' noktasının hemen altında görüntülenir.
+
                 #Belirli etiketler ('sol' veya 'sag' gibi) için özel durumlar oluşturur. Eğer etiket 'sag' ise, ilgili nesnenin üst noktasını yeşil bir daire ile işaretler ve üzerine 'sag' yazısı ekler. 
                 #Eğer etiket 'sol' ise, ilgili nesnenin üst noktasını yeşil bir daire ile işaretler ve üzerine 'sol' yazısı ekler. Her iki durumda da, nesnenin alt noktasını yeşil bir daire ile işaretler.
                 
                 cv2.circle(img, (endpoints[label_names[c]]['min_y'][0], endpoints[label_names[c]]['min_y'][1]), 10, (0, 255, 0), -1)
-
+#cv2.circle fonksiyonu kullanılarak 'img' üzerinde bir daire çizer. 
+# Bu daire 'sol' veya 'sag' sınıfının en düşük 'y' noktasına, yeşil renk ile ve yarıçapı 10 olan bir daire olarak çizilir.
 
             if label_names[c]=='sol':
-
+#eğer sınıf etiketi 'sol' ise, içerideki bloğun çalıştırılacağını belirtir.
                 cv2.circle(img, (endpoints[label_names[c]]['max_y'][0], endpoints[label_names[c]]['max_y'][1]), 10, (0, 255, 0), -1)
                 cv2.putText(img, 'sol', (endpoints[label_names[c]]['max_y'][0], endpoints[label_names[c]]['max_y'][1]+20),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
                 cv2.circle(img, (endpoints[label_names[c]]['min_y'][0], endpoints[label_names[c]]['min_y'][1]), 10, (0, 255, 0), -1)
-
+#'sol' sınıf etiketi için belirli noktalara daireler çizer ve bu dairelerin üzerine metin ekler. 
+#'max_y' ve 'min_y' noktaları üzerine daireler çizilir ve bu noktaların hemen üstünde ve altında 'sol' metni görüntülenir.
 
     
 
@@ -213,6 +244,10 @@ def detect_image(image_path, yakinmi):
                     (0, 255, 0), 2)
         cv2.putText(img, 'area: ' + str(areas[label]), (x, y + 20),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+# Bu döngü, 'midpoints' sözlüğündeki her bir öğe için işlem yapar. 'midpoints' sözlüğü, nesnelerin merkez noktalarını içerir.
+# 'label' ve 'midpoint' değişkenleri, sırasıyla etiket adını ve merkez noktanın koordinatlarını temsil eder.
+# Bu koordinatlara göre, her bir nesnenin merkezine bir daire çizilir ve nesnenin etiketi ile birlikte görüntüye eklenir. 
+# Ayrıca, nesnenin alanı da bu işlemde görüntüye eklenir.
     if label_names[2] in midpoints and label_names[3] in midpoints:
         distance = abs(midpoints['sol'][1] - midpoints['sag'][1])
         if distance < threshold:
@@ -221,7 +256,8 @@ def detect_image(image_path, yakinmi):
                         (x + 15, y + 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                         (0, 255, 0), 2)
     return img, midpoints, yakinmi, areas, endpoints
-
+# Bu bölümde, 'sol' ve 'sag' nesnelerinin merkez noktaları arasındaki uzaklığı kontrol eder. 
+# Eğer bu uzaklık belirli bir eşik değerinden (threshold) küçükse, 'yakinmi' değişkeni 1 olarak ayarlanır ve görüntüye bir uyarı mesajı eklenir.
 
 cam = cv2.VideoCapture(3, cv2.CAP_DSHOW)
 #cam = cv2.VideoCapture("C:\\Users\\Lenovo\\Desktop\\f.mp4")
@@ -239,6 +275,8 @@ while True:
 
 #model = load_model("C:\\Users\\Lenovo\\Desktop\\logs\\the-last-model.h5")
 model=load_model("C:\\Users\\evaot\\Desktop\\tf-unet-labelme-lane detection\\logs\\the-last-model.h5")
+# eğitilmiş modelin yuklenmesi sağlanır.
+
 
 #BASLANGIC PARAMETTRELERININ YUKLENMESI
 guvenaraligi = 5
@@ -258,8 +296,13 @@ kd = 0
 ki = 0
 cagırma = 0
 olcum = KalmanFilter(55, 62, 0.1)
+"""
+KalmanFilter adında bir nesne oluşturulduktan sonra, bir döngü başlatır.
+ Döngü, 'yakinmi' değişkenine başlangıçta 0 değerini atar. Ardından, kameradan bir kare okur ve bu kare üzerinde işlem yapar. 
+ Eğer 'aracdurdumu' listesinin ilk elemanı 1 ise, döngüyü sonlandırır. Ayrıca, 'cagırma' değişkeni 0 ise, döngü devam eder. 
+"""
 while True:
-    yakinmi = 0
+    yakinmi = 0 
     baslangıc_zamani = time.time()
     ret, frame = cam.read()
     #frame=cv2.imread("41.jpg")
@@ -268,6 +311,11 @@ while True:
     if aracdurdumu[0]==1:
         break
     if cagırma == 0:
+"""
+Kod, döngü içinde görüntü işleme işlevlerini çağırır ve sonuçları işler. 
+'aracdurdumu' listesinin durumuna bağlı olarak döngüyü sonlandırır veya devam ettirir. 
+'cagırma' değişkeninin durumu da döngünün devam etmesi veya sonlanması üzerinde etkili olabilir.
+"""
 
         #write_read('w70\n')
         cagırma = 1
@@ -302,15 +350,33 @@ while True:
             if endpoints['sag']['max_y'][0]-endpoints['sag']['min_y'][0]>0:
                 orta_x = -400 + orta_serit_x
                 orta_y = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
+""" 
+Bu kod parçacığı, 'midpoints' ve 'yakinmi' değişkenlerinin değerlerine dayalı olarak çeşitli hesaplamalar yapar.
+ İlk olarak, 'sol' ve 'sag' seritlerinin x ve y değerlerinin 0 olmadığı koşulu kontrol eder. 
+ Daha sonra 'yakinmi' değişkeninin 1'e eşit olup olmadığını kontrol eder. 
+ Eğer bu koşullar sağlanırsa, 'orta_serit_x' ve 'orta_y' değerlerini hesaplar.
 
-            """ 
+Daha sonra, 'endpoints' sözlüğünde belirli değerlere göre koşullar kontrol edilir. 
+'orta_x' ve 'orta_y' değerleri, 'orta_serit_x' ve 'midpoints' değerlerinin bir fonksiyonu olarak belirlenir. 
+'endpoints' sözlüğündeki değerlere bağlı olarak, 'orta_x' değeri belirli bir şekilde hesaplanır.
+
+Kodda orta_x ve orta_y değerleri şeritlerin konumlarına ilişkin hesaplamalarda kullanılır.
+
+orta_serit_x, 'sol' ve 'sağ' şeritlerinin x koordinatlarının ortalamasıdır. Bu değer, şeritlerin genel konumunu belirlemeye yardımcı olur.
+orta_x, 'orta_serit_x' değerine dayalı olarak belirlenir. 'orta_serit_x' değerine 400 eklenir veya 400 çıkarılır. Bu, şeritlerin merkezine göre bir konum sağlamak için yapılır. Yani eğer 'sag' şeridinin sağ ucu 'sol' şeridinin sol ucundan daha ilerideyse, 'orta_x' değeri 400 eklenir, aksi halde 400 çıkarılır. Bu, aracın yönünü belirlemede kullanılabilir.
+orta_y, 'sol' ve 'sağ' şeritlerinin y koordinatlarının ortalamasıdır. Bu, şeritlerin yüksekliği veya y eksenindeki konumları hakkında bilgi verir.
+
+Bu hesaplamalar, aracın şeritler arasında konumunu belirlemesine yardımcı olur ve bu bilgiler daha sonra aracın hareketini düzenlemek için PID kontrolü gibi diğer hesaplamalarda kullanılabilir.
+ """ 
+
+            
             if orta_serit_x > image.shape[1] / 2:
                 orta_x = -400 + orta_serit_x
                 orta_y = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
             if orta_serit_x < image.shape[1] / 2:
                 orta_x = -400 + orta_serit_x
                 orta_y = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
-            """
+            
              
         else:
             #print('Ucgen cizildi')
@@ -348,9 +414,23 @@ while True:
 
     else:
         print('ucgen cizilemedi')
-        continue
+ """ 
+ if orta_serit_x > image.shape[1] / 2: ve if orta_serit_x < image.shape[1] / 2:: Bu if-else bloğu, orta seridin görüntünün 
+ yarısından büyük veya küçük olmasını kontrol eder. Eğer orta serit, görüntünün sol yarısında ise, orta_x değeri -400 eklenerek belirlenir. 
+ Eğer orta serit, görüntünün sağ yarısında ise, orta_x değeri 400 çıkarılarak belirlenir.
+   orta_y değeri ise 'sol' ve 'sağ' şeritlerinin y koordinatlarının ortalamasını alır.
+else:: Eğer orta serit, görüntünün yarısına eşitse, orta_y ve orta_x değerleri, 'sol' ve 'sağ' şeritlerinin ortalamasını alır.
+Her durumda, çizgilerin çizilmesi işlemi gerçekleşir. İlk cv2.line() fonksiyonu, görüntünün ortasından başlayarak orta_y'ye bir çizgi çizer. 
+İkinci ve üçüncü cv2.line() fonksiyonları ise orta_x ve orta_y noktaları arasında bir çizgi çizer.
+elif midpoints['sag'] == (0, 0) and midpoints['sol'] != (0, 0): ve elif midpoints['sol'] == (0, 0) and midpoints['sag'] != (0, 0): blokları, 
+sırasıyla 'sağ' ve 'sol' şeritlerin birinin görüntüde olmadığı durumları kontrol eder. Bu durumlarda, çizgilerin çizilmesi işlemi gerçekleşir.
+else:: Eğer hiçbir şerit yoksa, "ucgen cizilemedi" yazdırılır
+ """ 
 
-    uzaklik_y = (image.shape[0] - orta_y
+
+ƒ        continue
+
+    uzaklik_y = (image.shape[0] - orta_Y
                  )  #kameranın orta noktasından şerit orta noktası çıkarma
     uzaklik_x = (
         ((image.shape[1] / 2)+30) - orta_x
@@ -358,13 +438,20 @@ while True:
     donme_acisi = (180 * math.atan(abs(uzaklik_x / uzaklik_y))) / (3.14)
 
     donme_acisi = int(donme_acisi * 53 / 10)
-    
+ """"""
+ uzaklik_y" değişkeni, kameranın orta noktasından şerit orta noktasının çıkarılmasıyla hesaplanır.
+"uzaklik_x" değişkeni, kameradan gelen görüntünün genişliğini 2'ye böler, ardından orta noktayı bulur ve şeridin orta noktasından çıkarır.
+"donme_acisi" değişkeni, bu iki uzaklık değeri kullanılarak hesaplanır. İlk olarak, bu iki uzaklık değeri arasındaki arctan işlemi kullanılarak bir açı hesaplanır.
+ Bu açı, daha sonra 180'e bölünür ve 3.14'e bölünerek radyan cinsinden ifade edilir.
+Son olarak, "donme_acisi" değeri belirli bir formül kullanılarak tekrar hesaplanır ve tam sayıya dönüştürülür.
+ """"""
+
     if True :
 
         try:
             
             """image = cv2.putText(image, 'pid ye girdim', (640, 360), 
-                                cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2,
+                                cv2.FONT_HERfffSHEY_SIMPLEX, 1, (0, 0, 0), 2,
                                 cv2.LINE_AA)"""
             dt = time.time() - zaman
             p = kp * donme_acisi
@@ -434,3 +521,8 @@ while True:
     os.remove('frame.jpg')
 
     #print("FPS:       ",1/(time.time()-baslangıc_zamani))
+
+
+
+
+    "deneme yasin"

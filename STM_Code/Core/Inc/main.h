@@ -57,6 +57,9 @@ typedef struct wheel_adjust_s{
 	int16_t currrentDegree;
 	status_t status;
 }wheel_adjust_t;
+
+
+
 /* USER CODE END EM */
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
@@ -105,6 +108,10 @@ void Error_Handler(void);
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
 #define TCK_GPIO_Port GPIOA
+#define FrenSwitch_Release_Pin GPIO_PIN_15
+#define FrenSwitch_Release_GPIO_Port GPIOA
+#define FrenSwitch_Press_Pin GPIO_PIN_10
+#define FrenSwitch_Press_GPIO_Port GPIOC
 #define FrenPWM_L_Pin GPIO_PIN_11
 #define FrenPWM_L_GPIO_Port GPIOC
 #define FrenPWM_R_Pin GPIO_PIN_12

@@ -22,13 +22,17 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "wheels/wheel.h"
-
+#include "break/break.h"
+#include "bldc/bldc.h"
+#include "modbus/modbus.h"
 wheel_adjust_t wheelParameters = {0} ;
+switchBreak_adjust_t breakParameters = {0};
 int16_t counter2 = 0;
 uint8_t data[]="Samet Aygun\n";
 uint8_t pdata = 1;
 uint16_t wantedWheelDegree = 0;
-unsigned int wantedSpeed=0;
+int16_t wantedSpeed=0;
+modbusRegister_t ModbusRegister[MODBUS_REGISTER_NUMBER];
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -83,13 +87,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	{
 
 		adjustBldc(wantedSpeed);
+
 		//break durumunda stopBldc komutu kullanılmalı
 
+		breakCheckSwitchStatus(&breakParameters);
+
+		breakAdjust(&breakParameters);
+		//wheel_degree = (GPIOB->IDR >> 4)&0x1FF;
 		if(!HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin)){
 			__HAL_TIM_SET_COUNTER(&htim1,0);
 			wheelParameters.wantedDegree = 0;
 		}
-		 wheelParameters.currrentDegree = ((int16_t)__HAL_TIM_GET_COUNTER(&htim1) >> 3 );
+		 wheelParameters.currrentDegree = ((int16_t)__HAL_TIM_GET_COUNTER(&htim1) >> 3
+				 );
 		counter2 = __HAL_TIM_GET_COUNTER(&htim2);
 
 		if(wheelParameters.wantedDegree > wheelParameters.currrentDegree)
@@ -127,10 +137,21 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				wheelStop(&wheelParameters);
 			}
 		}
+
+
+
 	}
 
 }
+void pointerWorks(){
+	ModbusRegister[0].modbusregister = &wheelParameters.wantedDegree;
+	ModbusRegister[1].modbusregister = &breakParameters.pressing_break;
+	ModbusRegister[2].modbusregister = &wantedSpeed;
 
+	ModbusRegister[3].modbusregister = &wheelParameters.currrentDegree;
+	ModbusRegister[4].modbusregister = (int16_t *)breakParameters.switchStatus_press;
+	ModbusRegister[5].modbusregister = (int16_t *)breakParameters.switchStatus_release;
+}
 /* USER CODE END 0 */
 
 /**
@@ -175,14 +196,19 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim16);
   wheelInit();
   bldcInit();
+  breakInit();
+  pointerWorks();
+
+  modbus_Init(ModbusRegister);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  HAL_UART_Transmit(&huart1, data , sizeof(data), HAL_MAX_DELAY);
-	  HAL_Delay(1000);
+	 // HAL_GPIO_WritePin(RS485_Dir_GPIO_Port, RS485_Dir_Pin, GPIO_PIN_SET);
+	 // HAL_UART_Transmit(&huart1, data , sizeof(data), HAL_MAX_DELAY);
+	  modbus_Loop();
 
     /* USER CODE END WHILE */
 
@@ -628,6 +654,18 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : FrenSwitch_Release_Pin */
+  GPIO_InitStruct.Pin = FrenSwitch_Release_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(FrenSwitch_Release_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : FrenSwitch_Press_Pin */
+  GPIO_InitStruct.Pin = FrenSwitch_Press_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(FrenSwitch_Press_GPIO_Port, &GPIO_InitStruct);
 
 }
 
