@@ -127,11 +127,35 @@
         "documentation": {}
     },
     {
-        "label": "sendToArduino",
-        "importPath": "ardunio",
-        "description": "ardunio",
+        "label": "write_read",
+        "importPath": "enkoder.ardunio",
+        "description": "enkoder.ardunio",
         "isExtraImport": true,
-        "detail": "ardunio",
+        "detail": "enkoder.ardunio",
+        "documentation": {}
+    },
+    {
+        "label": "read",
+        "importPath": "enkoder.ardunio",
+        "description": "enkoder.ardunio",
+        "isExtraImport": true,
+        "detail": "enkoder.ardunio",
+        "documentation": {}
+    },
+    {
+        "label": "write_read",
+        "importPath": "enkoder.ardunio",
+        "description": "enkoder.ardunio",
+        "isExtraImport": true,
+        "detail": "enkoder.ardunio",
+        "documentation": {}
+    },
+    {
+        "label": "hareket_durak",
+        "importPath": "karar_ver",
+        "description": "karar_ver",
+        "isExtraImport": true,
+        "detail": "karar_ver",
         "documentation": {}
     },
     {
@@ -307,7 +331,16 @@
         "kind": 2,
         "importPath": "karar_algoritması",
         "description": "karar_algoritması",
-        "peekOfCode": "def counter(wait_time):\n    baslangic_zamani = time.time()\n    while True:\n        simdiki_zaman = time.time()\n        gecen_vakit = simdiki_zaman - baslangic_zamani\n        if gecen_vakit >= wait_time:\n            break\ndef karar(labellar,states):\n    if labellar['sag']<900:\n        if states['aracdurdu'] == False:",
+        "peekOfCode": "def counter(wait_time):\n    baslangic_zamani = time.time()\n    while True:\n        simdiki_zaman = time.time()\n        gecen_vakit = simdiki_zaman - baslangic_zamani\n        if gecen_vakit >= wait_time:\n            break\ndef turn_and_wait(angle, time_to_wait):\n    write_read('t' + str(angle) + '\\n')\n    time.sleep(time_to_wait)",
+        "detail": "karar_algoritması",
+        "documentation": {}
+    },
+    {
+        "label": "turn_and_wait",
+        "kind": 2,
+        "importPath": "karar_algoritması",
+        "description": "karar_algoritması",
+        "peekOfCode": "def turn_and_wait(angle, time_to_wait):\n    write_read('t' + str(angle) + '\\n')\n    time.sleep(time_to_wait)\n    if angle < 0:\n        print(\"sağa dön\")\n    else:\n        print(\"sola dön\")\n    time.sleep(time_to_wait)\ndef karar(labellar,states,enkoder_veriler,lidaretkin,goruntuislemeetkin):\n    if labellar['kirmizi'] <= 800:",
         "detail": "karar_algoritması",
         "documentation": {}
     },
@@ -316,8 +349,26 @@
         "kind": 2,
         "importPath": "karar_algoritması",
         "description": "karar_algoritması",
-        "peekOfCode": "def karar(labellar,states):\n    if labellar['sag']<900:\n        if states['aracdurdu'] == False:\n            print(\"ARAC SAGA DONUYOR\")\n            sendToArduino('w0\\n') #hızı sıfırla\n            counter(1)\n            sendToArduino('t-30') #t açı komutunu gönderir arduinoya, -30, 30 derece sağa döndürür tekeri\n            counter(1)\n            sendToArduino('w90\\n') #w hız komutunu gönderir, hızı 90 olarak ayarlıyoruz burada\n            counter(1)",
+        "peekOfCode": "def karar(labellar,states,enkoder_veriler,lidaretkin,goruntuislemeetkin):\n    if labellar['kirmizi'] <= 800:\n        print(\"ARAC DURDU\")\n        if states['aracdurdu']==False:\n            write_read('w0\\n')\n            #write_read('b1\\n')\n            states['aracdurdu']=True\n            labellar['kirmizi']==999999\n    if labellar['yesil'] <= 800:\n        print(\"ARAC GIDIYOR\")",
         "detail": "karar_algoritması",
+        "documentation": {}
+    },
+    {
+        "label": "counter",
+        "kind": 2,
+        "importPath": "karar_ver",
+        "description": "karar_ver",
+        "peekOfCode": "def counter(wait_time):\n    baslangic_zamani = time.time()\n    while True:\n        simdiki_zaman = time.time()\n        gecen_vakit = simdiki_zaman - baslangic_zamani\n        if gecen_vakit >= wait_time:\n            break\ndef hareket_durak(enkoder_veriler,labellar,states,lidaretkin,goruntuislemeetkin):\n    if lidaretkin[0]==0:\n        goruntuislemeetkin[0]=1",
+        "detail": "karar_ver",
+        "documentation": {}
+    },
+    {
+        "label": "hareket_durak",
+        "kind": 2,
+        "importPath": "karar_ver",
+        "description": "karar_ver",
+        "peekOfCode": "def hareket_durak(enkoder_veriler,labellar,states,lidaretkin,goruntuislemeetkin):\n    if lidaretkin[0]==0:\n        goruntuislemeetkin[0]=1\n        write_read('w0\\n')\n        #write_read('b1\\n')\n        #time.sleep(1) \n        write_read('t-65\\n')\n        #time.sleep(2) \n        enkoder_veriler[0][0] = 1\n        enkoder_veriler[1][0]=0",
+        "detail": "karar_ver",
         "documentation": {}
     },
     {
