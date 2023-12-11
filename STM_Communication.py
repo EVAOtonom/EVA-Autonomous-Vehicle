@@ -12,16 +12,18 @@ instrument = minimalmodbus.Instrument('COM7',slaveaddress=1)
 instrument.serial.baudrate = 38400
 
 def send_to_STM(register_adress,data):
-    if data>-32769 and data<32768:
-        write_register_address=register_adress
-        if (data<0):
-            data = 65536 + data
+    try:
+        if data>-32769 and data<32768:
+            write_register_address=register_adress
+            if (data<0):
+                data = 65536 + data
+            else:
+                pass
+            value=data
+            instrument.write_register(write_register_address, value, functioncode=6)
+            print(f'Register {write_register_address} değeri {data} olarak yazıldı.')
         else:
-            pass
-        value=data
-        instrument.write_register(write_register_address, value, functioncode=6)
-        print(f'Register {write_register_address} değeri {data} olarak yazıldı.')
-    else:
-        print("Fonksiyon içerisine 32767 ila -32768 aralığında değer giriniz.")
-
-send_to_STM(0,1000)
+            print("Fonksiyon içerisine 32767 ila -32768 aralığında değer giriniz.")
+    except minimalmodbus.ModbusException as e:
+        printf(f"hata : {e}")
+        pass
