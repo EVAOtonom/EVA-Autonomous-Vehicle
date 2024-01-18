@@ -1,0 +1,4 @@
+<launch>
+    <node pkg = "lidar_pkg" type = "lidar_publisher.py" name = "lidar_publisher" output = "screen"></node>
+    <node pkg = "lidar_pkg" type = "lidar_subscriber.py" name = "lidar_subscriber" output = "screen"></node>
+</launch>
