@@ -1,0 +1,6 @@
+../modules/break/break.c:10:6:breakInit	8	static
+../modules/break/break.c:16:13:stop_break	16	static
+../modules/break/break.c:24:13:press_break	16	static
+../modules/break/break.c:34:13:release_break	16	static
+../modules/break/break.c:49:6:breakCheckSwitchStatus	16	static
+../modules/break/break.c:72:6:breakAdjust	16	static

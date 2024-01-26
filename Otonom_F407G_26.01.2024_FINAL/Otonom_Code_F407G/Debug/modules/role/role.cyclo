@@ -1,0 +1,16 @@
+../modules/role/role.c:12:6:signalInit	1
+../modules/role/role.c:23:6:bldcReverseSignal	1
+../modules/role/role.c:30:6:bldcForwardSignal	1
+../modules/role/role.c:35:6:rightSignalOpen	1
+../modules/role/role.c:42:6:rightSignalClose	1
+../modules/role/role.c:48:6:leftSignalOpen	1
+../modules/role/role.c:52:6:leftSignalClose	1
+../modules/role/role.c:57:6:stopSignalOpen	1
+../modules/role/role.c:61:6:stopSignalClose	1
+../modules/role/role.c:67:6:emergencySignalClose	1
+../modules/role/role.c:73:6:emergencySignalOpen	1
+../modules/role/role.c:80:6:frontSignalOpen	1
+../modules/role/role.c:87:6:frontSignalClose	1
+../modules/role/role.c:94:6:signalDispose	1
+../modules/role/role.c:104:6:switchAdjust	13
+../modules/role/role.c:213:6:delay_ms	3

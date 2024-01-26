@@ -1,0 +1,4 @@
+../modules/wheels/wheel.c:12:6:wheelInit	1
+../modules/wheels/wheel.c:21:6:wheelTurnRight	1
+../modules/wheels/wheel.c:26:6:wheelTurnLeft	1
+../modules/wheels/wheel.c:30:6:wheelStop	1

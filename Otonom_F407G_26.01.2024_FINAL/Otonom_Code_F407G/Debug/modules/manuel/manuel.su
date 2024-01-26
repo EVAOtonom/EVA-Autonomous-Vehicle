@@ -1,0 +1,2 @@
+../modules/manuel/manuel.c:19:6:getMode	16	static
+../modules/manuel/manuel.c:190:6:readAdc_speed	16	static
