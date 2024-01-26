@@ -6,11 +6,11 @@ Kod **Berkay Aşık, Samet Aygün ,Kaan Avcı, Esma Arhan, Emirhan Akdemir** Tar
 
 Başlamadan önce eğer yeterince **temel programlama ve elektrik beceriniz** yok ise ilk önce bu konularda fikir sahibi olmanız ardından **STM_HAL** kütüphanesi ve **bit kaydırma** işlemlerinde temel bilgilere sahip olmanız gerekmektedir. Bu dökümantasyonu daha iyi anlamanızı sağlayacaktır.
 
-## Araç Modları
+## Araç Modları 
 
 Aracımızda 4 adet moddan oluşmaktadır. 
 
-| Modlar |                    |  Anahtar | Button  |   |
+|     *  |           Modlar   |  Anahtar | Button  |   |
 |--------|--------------------|---|---|---|
 | Mod1   | Otonom Araç Modu   |   Anahtar OFF|  Button OFF |   |
 | Mod2   | Manuel Sürüş Modu  |  Anahtar ON |  Button OFF |   |
@@ -65,10 +65,71 @@ Burada temel olarak mevut açı bilgisini almaktayız. Bu şekilde +45 ve -45 de
 
 **Wheel Offset** ise direksiyon motoruna enkoderi bağladığımızda başlganıç değeri değişmesi durumundan kaynaklı eklenmiştir. 2 bit shiftlediğimiz için -4 le çarpıp  +4 ekleyerek offsetin durumu toplanmalıdır. 
 
+Aynı zamanda kod içinde 40 derece içerisinde sınırlandırılmıştır.
+
+**Wheel.c & Wheel.h** dosyaları içerisinde kullandığımız ve oluşturduğumuz komutlar ve fonksiyonlar ile tekerleklerin dönüşü sağlanmaktadır. Dönüş için **TIM12** den faydalanılmaktadır. İlgili direksiyon sisteminin H Bridge bağlantıları sağlanarak pwm üretilerek tekerler hareketi sağlanmaktadır.
+Detaylı bilgi için kodları inceleyiniz.
+
+> Tekerlekleri nasıl kontrol ediyoruz açı değerini nasıl veriyoruz ? Şu ana kadar genel olarak sizlere açı okumak ve dc motoru nasıl sürebileceğimizden ve nasıl sürdüğümüzden bahsettim.
+
+**main.h** içerisinde bulunan header dosyasında
 
 
+```c
+typedef enum status_s {
+	NoTurning,
+	TurningRight,
+	TurningLeft
+
+}status_t;
+typedef struct wheel_adjust_s{
+	int16_t wantedDegree;
+	int16_t wantedDegreeTemp;
+	int16_t wheel_manuel;
+	int16_t currrentDegree;
+	int16_t currrentDegreeTemp;
+	status_t status;
+}wheel_adjust_t;
+
+```
+Bu kod bloğu içerisinde bir enum ve bir structure(C dilinde classlar sahip olmadığımız için tür topluluklarını tutmak için structure kullanırız) oluşturulmuştur.
+
+* Typedef komutu bir struct değişkeninde tip tanımlamak için kullanılmıştır bu structe dan nesne oluştururken struct ön ekine ihtiyaç duymadan tanımladığımız **wheel_adjust_t** tip ile üretilir.
+
+- **wantedDegreeTemp** değişkeni bizim direksiyon sistemine istediğimiz açı değerini göndererek döndürmemizi sağlamaktadır.
+- **currentDegree** bu ise aracın şuan hangi açı değerinde olduğunu göstermektedir.
+- **status** aracın ne tarafa döndüğünü enum vasıttasyıla bize gösterir.
+- **wheel_manuel** şu an değinmiyeceğim fakat manuel sürüşte kullandığımız bir parametredir.
+
+> Bu kısım samet abi tarafından oluşturulduğu için dilim döndükçe açıklamaya çalıştım. Umarım anlaşılır olmuştur
 
 
+2. **Motor Sürücü**
+
+Merhaba bu kısımda ise sizlere motor sürücü nedir ve neden aracımızda buna yer verdiğimizi anlatacağım.
+Lütfen kendinizi salak gibi hissetmeyin veya oldukça akıllı neden bunlara değindiniz diye. **Bu yazıyı ileride okuyacak bilgi ve terim eksikliğine sahip arkadaşlarında okuyacağını unutmayınız.**
+
+Motor sürücülerin temel prensibi elinizde bulunan dc,step,bldc motorları sürmenize olanak sağlayan bir parçadır. Bu parçanın içerisinde mosfet, mosfet sürücüleri, mikro kontrolcü ve kapasitör diyotlar yer almaktadır. Sürücüler türüne göre 80-90 Volta(Bu bilgi kelly için doğru olması gerekiyor değil ise güncelleyeceğim) kadar dayanabilmektedir. Aracımızda ise kelly marka oldukça güvenli bir hazır motor sürücüsü kullanmaktayızdır. 
+Mosfetler 6'lı yada 12'li olabilmektedir. Mosfet sürücüleri mosfetleri(MOSFET= METAL OKSİT YARI İLETKEN ALAN ELEKTİK TRANSİSTÖRÜ' LERDİR) anahtarlamakta önemli görevler üstlenmekteidr. Belirli anahtarlamalar ile sürücüye göndermiş olduğumuz elektrik bir mıknatısları tetikleyerek motoru döndürmemizi sağlamaktadır.
+Dataylı bilgi için bakabilirsiniz ama bunlar temel olarak neyin nasıl olduğunu bilmenizi istediğim için yazdım.
+
+* Biz aracımız üzerinde bir bldc motor kullanmaktayız aynı zamanda bu motor hazır olarak kullanılmaktadır. 
+* Kelly motor sürücü ise içerisinde bir yazılıma sahip olan ayarlanabilir ve sadece pwm vererek sürebildiğimiz bir sürücüdür. 
+
+**bldc.c &bldc.h** içerisinde bulunan **adjustBldc** komutu ile 10 a kadar hız vererek aracı sürebilirsiniz.
+
+- Bu kısımda **TIM14** kullanmaktayız
+
+**main.c** içerisinde bulunan wantedSpeed parametresi ile araca hız değerleri göndererek tekerlek haraketi sağlamaktayız.
+
+HAL_TIM_COMPARE komutu ile istediğimiz dutyCycle aralığında pwm üretebilmekteyizdir.
+
+```c
+__HAL_TIM_SET_COMPARE(&htim14,TIM_CHANNEL_1,speedValue);
+```
+Detaylı bilgi için lütfen kod içeriğini inceleyiniz.
+
+3. **Fren Motoru & Switchler**
 
 
 ## Yazarlar
