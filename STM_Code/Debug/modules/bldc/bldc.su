@@ -1,3 +1,0 @@
-../modules/bldc/bldc.c:12:6:bldcInit	8	static
-../modules/bldc/bldc.c:15:6:stopBldc	4	static
-../modules/bldc/bldc.c:20:6:adjustBldc	16	static
