@@ -12,9 +12,9 @@ from PIL import Image
 import copy
 import matplotlib.pyplot as plt
 import time
-#from threading import Thread, Lock
-#from STM_Communication import send_to_STM
-#import minimalmodbus
+from threading import Thread, Lock
+from STM_Communication import send_to_STM
+import minimalmodbus
 
 #konumlar her bilgisayar için düzeltilmeli satır 21,260,297
 
@@ -427,7 +427,7 @@ def cam_callback(data):
 #  """"""
     if True :
         try:
-            #send_to_STM(2,1)
+            send_to_STM(2,1, instrument)
             zaman = time.time()
             dt = time.time() - zaman
             if dt == 0:
@@ -445,7 +445,7 @@ def cam_callback(data):
                 print(pid)                                
                 pid = (pid / 3) # sağa döner
                 #csv_yaz(pid)#csv dosyasina, gönderilen tekerlek açısını, gönderildiği dakika ve saniyeyi yazacak fonksiyonu buraya yazınız. 
-                #send_to_STM(0,pid)
+                send_to_STM(0,pid, instrument)
                
 
             if uzaklik_x > 0:
@@ -456,7 +456,7 @@ def cam_callback(data):
                 print(-pid)
                 pid = -(pid / 3)  #sola döner
                 #csv_yaz(pid)#csv dosyasina, gönderilen tekerlek açısını, gönderildiği dakika ve saniyeyi yazacak fonksiyonu buraya yazınız. 
-                #send_to_STM(0,pid)
+                send_to_STM(0,pid, instrument)
 
         except ZeroDivisionError:
             dt = 1.0
@@ -471,7 +471,7 @@ def cam_callback(data):
                 print(pid)                    
                 pid = pid /3      #sağa döner 
                 #csv_yaz(pid)#csv dosyasina, gönderilen tekerlek açısını, gönderildiği dakika ve saniyeyi yazacak fonksiyonu buraya yazınız. 
-                #send_to_STM(0,pid)
+                send_to_STM(0,pid, instrument)
 
                  
 
@@ -482,7 +482,7 @@ def cam_callback(data):
                 print(-pid)    
                 pid = pid /3    #sola döner.
                 #csv_yaz(pid)#csv dosyasina, gönderilen tekerlek açısını, gönderildiği dakika ve saniyeyi yazacak fonksiyonu buraya yazınız. 
-                #send_to_STM(0,pid)
+                send_to_STM(0,pid, instrument)
     else:
         p = 0
         i = 0
@@ -499,9 +499,9 @@ def camera_subscriber():
 
 if __name__ == "__main__":
     try:
+        instrument = minimalmodbus.Instrument('/dev/ttyUSB0', slaveaddress=1)
+        instrument.serial.baudrate = 38400
+        send_to_STM(2, 2, instrument)
         camera_subscriber()
-        #instrument = minimalmodbus.Instrument('/dev/ttyUSB0', slaveaddress=1)
-        #instrument.serial.baudrate = 38400
-        #send_to_STM(2, 2)
     except rospy.ROSInterruptException:
         pass
