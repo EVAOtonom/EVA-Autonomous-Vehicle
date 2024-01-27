@@ -17,10 +17,10 @@ import minimalmodbus
 #register_adress = 11 -> Ön farların açılmasını sağlar. 1 Göndermelisiniz.
 #register_adress = 12 -> Aracın manuel sürüş moduna geçmesini sağlar.
 
-instrument = minimalmodbus.Instrument('/dev/ttyUSB0',slaveaddress=1) 
-instrument.serial.baudrate = 38400
+#instrument = minimalmodbus.Instrument('/dev/ttyUSB0',slaveaddress=1) 
+#instrument.serial.baudrate = 38400
 
-def send_to_STM(register_adress,data):
+def send_to_STM(register_adress,data,instrument):
     try:
         datatemp=data
         if data>-32769 and data<32768:
