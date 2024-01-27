@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="camera" type="camera_pub.py" name="camera_publisher" output="screen"></node>
+    <node pkg="camera" type="camera_sub.py" name="camera_subscriber" output="screen"></node>
+</launch>
+
