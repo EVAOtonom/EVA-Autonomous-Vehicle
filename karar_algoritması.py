@@ -15,6 +15,7 @@ def counter(wait_time):
         if gecen_vakit >= wait_time:
             break
 
+
 def turn_and_wait(angle, time_to_wait):
     write_read('t' + str(angle) + '\n')
     time.sleep(time_to_wait)
@@ -34,7 +35,10 @@ def karar(labellar,states,enkoder_veriler,lidaretkin,goruntuislemeetkin):
             #write_read('b1\n')
             states['aracdurdu']=True
             labellar['kirmizi']==999999
-           
+        
+    
+
+    
     if labellar['yesil'] <= 800:
         print("ARAC GIDIYOR")
         if states['aracdurdu']==True:
@@ -218,6 +222,7 @@ def karar(labellar,states,enkoder_veriler,lidaretkin,goruntuislemeetkin):
     """
     
     if labellar['durak'] <= 700: 
+        
         hareket_durak(enkoder_veriler,labellar,states,lidaretkin,goruntuislemeetkin)
         for i in labellar:
             labellar[i]=9999

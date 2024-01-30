@@ -12,6 +12,7 @@ def counter(wait_time):
         if gecen_vakit >= wait_time:
             break
 
+
 def hareket_durak(enkoder_veriler,labellar,states,lidaretkin,goruntuislemeetkin):
     if lidaretkin[0]==0:
         goruntuislemeetkin[0]=1

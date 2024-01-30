@@ -1,6 +1,0 @@
-../modules/break/break.c:9:6:breakInit	1
-../modules/break/break.c:15:13:stop_break	1
-../modules/break/break.c:23:13:press_break	2
-../modules/break/break.c:33:13:release_break	2
-../modules/break/break.c:48:6:breakCheckSwitchStatus	3
-../modules/break/break.c:71:6:breakAdjust	2
