@@ -5,6 +5,7 @@ from enkoder.ardunio import read
 #from OTONOM2023_TEST_KODLARI.goruntuisleme.triangulation import find_depth
 from karar_ver import hareket_durak
 
+
 def counter(wait_time):
     baslangic_zamani = time.time()
 
@@ -26,8 +27,11 @@ def turn_and_wait(angle, time_to_wait):
 
 
 def karar(labellar,states,enkoder_veriler,lidaretkin,goruntuislemeetkin):
-        
-    if labellar['kirmizi'] <= 800:
+
+    confidence_label=max(labellar, key=lambda key:labellar[key])
+    confidence_value=labellar[confidence_label]
+
+    if confidence_label== "kirmizi" and confidence_value>=0.75:
         print("ARAC DURDU")
         if states['aracdurdu']==False:
             write_read('w0\n')
@@ -35,7 +39,7 @@ def karar(labellar,states,enkoder_veriler,lidaretkin,goruntuislemeetkin):
             states['aracdurdu']=True
             labellar['kirmizi']==999999
            
-    if labellar['yesil'] <= 800:
+    if confidence_label== "yesil" and confidence_value>=0.80:
         print("ARAC GIDIYOR")
         if states['aracdurdu']==True:
             write_read('b0\n')
@@ -44,14 +48,14 @@ def karar(labellar,states,enkoder_veriler,lidaretkin,goruntuislemeetkin):
             labellar['yesil']==99999
         
     """   
-    if labellar['dur'] <= 1000:
+    if confidence_label== "dur" and confidence_value>=0.85:
         if states['aracdurdu']==False:
             write_read('w0\n')
             write_read('b1\n')
             print('arac beklemede')
     """
 
-    if labellar['sag']<800:
+    if confidence_label== "sag" and confidence_value>=0.7:   #degistirilecek.
         print("ARAC SAGA DONUYOR")
         
         if lidaretkin[0]==0:
@@ -61,7 +65,7 @@ def karar(labellar,states,enkoder_veriler,lidaretkin,goruntuislemeetkin):
         
             enkoder_veriler[1][0]=1
             counter(2)
-            while enkoder_veriler[2][0] < 450:
+            while enkoder_veriler[2][0] < 450:   #degistirilecek
                 continue 
             goruntuislemeetkin[0]=1
             write_read('t-95\n')
@@ -72,13 +76,13 @@ def karar(labellar,states,enkoder_veriler,lidaretkin,goruntuislemeetkin):
             
             enkoder_veriler[1][0]=1
             counter(2)
-            while enkoder_veriler[2][0] < 430:
+            while enkoder_veriler[2][0] < 430:    #degistirilecek
                 continue 
             write_read("t0\n")
         for i in labellar:
             labellar[i]=9999
 
-    if labellar['sol']<800:
+    if confidence_label== "sol" and confidence_value>=0.7:    #degistirilecek
         print("ARAC SOLA DONUYOR")
         
         if lidaretkin[0]==0:
@@ -88,7 +92,7 @@ def karar(labellar,states,enkoder_veriler,lidaretkin,goruntuislemeetkin):
         
             enkoder_veriler[1][0]=1
             counter(2)
-            while enkoder_veriler[2][0] < 450:
+            while enkoder_veriler[2][0] < 450:   #degistirilecek
                 continue 
             goruntuislemeetkin[0]=1
             write_read('t95\n')
@@ -99,17 +103,17 @@ def karar(labellar,states,enkoder_veriler,lidaretkin,goruntuislemeetkin):
             
             enkoder_veriler[1][0]=1
             counter(2)
-            while enkoder_veriler[2][0] < 400:
+            while enkoder_veriler[2][0] < 400:    #degistirilecek
                 continue 
             write_read("t0\n")
             for i in labellar:
                 labellar[i]=9999
 
 
-    if labellar['sol']>800 and labellar['sag']>800 :
-        print(labellar)
-        if labellar['girisyok'] <800:
-            if labellar['sagadonulmez']<800:
+    if (confidence_label== "sag" and confidence_value>=0.7) or (confidence_label== "sol" and confidence_value>=0.7):      #degistirilecek
+        print(confidence_label)
+        if confidence_label== "girisyok" and confidence_value>=0.82:
+            if confidence_label== "sagadonulmez" and confidence_value>=0.7:       #degistirilecek
 
                 print("ARAC SOLA DONUYOR")
                 
@@ -121,7 +125,7 @@ def karar(labellar,states,enkoder_veriler,lidaretkin,goruntuislemeetkin):
                 
                     enkoder_veriler[1][0]=1
                     counter(2)
-                    while enkoder_veriler[2][0] < 450:
+                    while enkoder_veriler[2][0] < 450:    #degistirilecek
                         continue 
                     goruntuislemeetkin[0]=1
                     write_read('t95\n')
@@ -132,11 +136,11 @@ def karar(labellar,states,enkoder_veriler,lidaretkin,goruntuislemeetkin):
                     
                     enkoder_veriler[1][0]=1
                     counter(2)
-                    while enkoder_veriler[2][0] < 400:
+                    while enkoder_veriler[2][0] < 400:     #degistirilecek
                         continue 
                     write_read("t0\n")
                 
-            elif labellar['soladonulmez']<1000:
+            elif confidence_label== "soladonulmez" and confidence_value>=0.7:     #degistirilecek
                 print("ARAC SAGA DONUYOR")
                 
                 if lidaretkin[0]==0:
@@ -146,7 +150,7 @@ def karar(labellar,states,enkoder_veriler,lidaretkin,goruntuislemeetkin):
                 
                     enkoder_veriler[1][0]=1
                     counter(2)
-                    while enkoder_veriler[2][0] < 450:
+                    while enkoder_veriler[2][0] < 450:     #degistirilecek
                         continue 
                     goruntuislemeetkin[0]=1
                     write_read('t-95\n')
@@ -157,7 +161,7 @@ def karar(labellar,states,enkoder_veriler,lidaretkin,goruntuislemeetkin):
                     
                     enkoder_veriler[1][0]=1
                     counter(2)
-                    while enkoder_veriler[2][0] < 400:
+                    while enkoder_veriler[2][0] < 400:     #degistirilecek
                         continue 
                     write_read("t0\n")
             else:
@@ -171,7 +175,7 @@ def karar(labellar,states,enkoder_veriler,lidaretkin,goruntuislemeetkin):
                 
                     enkoder_veriler[1][0]=1
                     counter(2)
-                    while enkoder_veriler[2][0] < 450:
+                    while enkoder_veriler[2][0] < 450:      #degistirilecek
                         continue 
                     goruntuislemeetkin[0]=1
                     write_read('t95\n')
@@ -182,7 +186,7 @@ def karar(labellar,states,enkoder_veriler,lidaretkin,goruntuislemeetkin):
                     
                     enkoder_veriler[1][0]=1
                     counter(2)
-                    while enkoder_veriler[2][0] < 400:
+                    while enkoder_veriler[2][0] < 400:       #degistirilecek
                         continue 
                     write_read("t0\n")
             for i in labellar:
@@ -191,7 +195,7 @@ def karar(labellar,states,enkoder_veriler,lidaretkin,goruntuislemeetkin):
 
             
     """
-    if labellar['park'] <= 1000:
+    if confidence_label== "park" and confidence_value>=0.82:
         time.sleep(1)  
 
         if states['aracdurdu']==False:     
@@ -216,11 +220,11 @@ def karar(labellar,states,enkoder_veriler,lidaretkin,goruntuislemeetkin):
             states['aracdurdu']=True
             labellar['park']==99999
     """
+
     
-    if labellar['durak'] <= 700: 
+    if confidence_label== "durak" and confidence_value>=0.90: 
         hareket_durak(enkoder_veriler,labellar,states,lidaretkin,goruntuislemeetkin)
         for i in labellar:
             labellar[i]=9999
         
     goruntuislemeetkin[0]=0
-    
