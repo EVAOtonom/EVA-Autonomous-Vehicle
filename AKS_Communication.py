@@ -6,7 +6,7 @@
  Usage example :
 >>> import AKS_Communication as aks
 >>> stm = aks.STM_Communication("COM10")
->>> stm.send_command(Register.STEERING_ANGLE,20)
+>>> stm.send_command(aks.Register.STEERING_ANGLE,20)
 
 '''
 
