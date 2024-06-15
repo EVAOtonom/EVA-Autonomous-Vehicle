@@ -1,0 +1,14 @@
+data_annotated adında bir dosya oluşturup içerisine json dosyalarıyla birlikte veri setini yükle.
+
+sonrasında dosyada cmd'yi aç ve aşağıdaki komutu yaz:
+python labelme2voc.py data_annotated data_dataset_voc --labels labels.txt
+
+sonrasında oluşan data_dataset_voc adındaki dosyanın içine gir ve burada train_voc adında bir dosya oluştur. Sonrasında bu dosyadan çık 
+ve voc_annotation dosyasının içerisinde değiştirmen gereken iki tane path yolu var, onları değiştir. Sonra cmd'yi aç ve aşağıdaki kodu çalıştır:
+python3 voc_annotation.py
+
+Bu işlemler bittikten sonra artık verin voc formatına çevrilmiş ve gerekli txt dosyaları oluşmuş olur. 
+
+unet.py adlı dosyaya girip onun içerisindeki değiştirmen gereken dosya yollarını da değiştir.
+Sonrasında cmd'yi aç ve aşağıdaki kodu yaz (bu kod eğitimi başlatacak):
+python unet.py
