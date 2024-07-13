@@ -1,0 +1,2 @@
+evaotonom
+-DCATKIN_DEVEL_PREFIX=/home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/devel -DCMAKE_INSTALL_PREFIX=/home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/install -G Unix Makefiles

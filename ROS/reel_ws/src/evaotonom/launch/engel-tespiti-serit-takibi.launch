@@ -1,0 +1,4 @@
+<launch>
+    <node name="obstacle_detect" pkg="audibot_gazebo" type="reel-obstacle-avoidance.py" output="screen"/>
+    <node name="lane_track_node" pkg="audibot_gazebo" type="reel-lane-track-yeni.py" output="screen"/>
+</launch>
