@@ -4,7 +4,7 @@
 # /stm/steering_angle (INT8), /stm/motor_power (INT8), /stm/reset_encoder (Bool), /stm/brake (Bool) topiclerini abone olur ve veri geldiğinde araca iletir. 
 
 import rospy
-from std_msgs.msg import Float64, Bool, Int8
+from std_msgs.msg import Float32, Bool, Int8
 import minimalmodbus
 from enum import Enum
 
@@ -37,9 +37,9 @@ class STM_Communication:
         self.stm.serial.baudrate = baudrate
 
         # Publishers
-        self.gps_latitude_pub = rospy.Publisher('/stm/gps_latitude', Float64, queue_size=10)
-        self.gps_longitude_pub = rospy.Publisher('/stm/gps_longitude', Float64, queue_size=10)
-        self.read_odometer_pub = rospy.Publisher('/stm/read_odometer', Float64, queue_size=10)
+        self.gps_latitude_pub = rospy.Publisher('/stm/gps_latitude', Float32, queue_size=10)
+        self.gps_longitude_pub = rospy.Publisher('/stm/gps_longitude', Float32, queue_size=10)
+        self.read_odometer_pub = rospy.Publisher('/stm/read_odometer', Float32, queue_size=10)
 
         # Subscribers
         rospy.Subscriber('/stm/steering_angle', Int8, self.steering_angle_callback)
