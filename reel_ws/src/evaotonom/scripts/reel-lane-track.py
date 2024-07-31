@@ -6,12 +6,10 @@ from PIL import Image
 import cv2
 import math
 import numpy as np
-from std_msgs.msg import Bool, Int32
+from std_msgs.msg import Bool, Int8, Float32, Int32
 import copy
 import time
 import tensorflow as tf
-import AKS_Communication as aks
-stm =  aks.STM_Communication("/dev/ttyUSB1")
 
 def obstacle_callback(msg):
     global obstacle_detected
@@ -104,71 +102,49 @@ def annotate_image (blended_image_array, prediction):
     return blended_image_array, midpoints, endpoints, areas
 
 def steering_control(image, midpoints, endpoints, areas):
-        global tooclose, current_lane_number
+        global current_lane_number
         if areas['sol'] <= 50: # sol şerit pikseli 50'den fazla ise orta noktasını alıyor
             midpoints['sol'] = (0, 0)
         if areas['sag'] <= 50: # sag şerit pikseli 50'den fazla ise orta noktasını alıyor
             midpoints['sag'] = (0, 0)
         #image = image[:, :, ::-1].copy() # renk kanallarını tersine çevirir, muhtemelen başka kütüphanede işlemek için düzenleme işlemidir
-        if midpoints['sol'] != (0, 0) and midpoints['sag'] != (0, 0):
-            if tooclose == 1:
-                road_mid = (midpoints['sol'][0] + midpoints['sag'][0]) / 2          # iki şeridin ortasını buluyor
-                if endpoints['sag']['max'][0] - endpoints['sag']['min'][0] < 0:     # viraj sola doğruysa 
-                    mid_line_x = +400 + road_mid                                    # orta x'i 100px sağa kaydırıyor
-                    mid_line_y = (midpoints['sol'][1] + midpoints['sag'][1]) / 2    # orta y'yi uzaklığınıda iki şeridin orta noktalarının ortalamasına göre çiziyor
-                    print("BURDAYIM11111111")
-                if endpoints['sag']['max'][0] - endpoints['sag']['min'][0] > 0:   # viraj sağa doğruysa
-                    mid_line_x = -400 + road_mid                                    # orta noktayı 100px sola kaydırıyor
-                    mid_line_y = (midpoints['sol'][1] + midpoints['sag'][1]) / 2    # aynı
-                    print("BURDAYIM222222222")
-                if road_mid > image.shape[1] / 2:
-                    mid_line_x = -400 + road_mid
-                    mid_line_y = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
-                    print("BURDAYIM333333333")
-                if road_mid < image.shape[1] / 2:
-                    mid_line_x = -400 + road_mid
-                    mid_line_y = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
-                    print("BURDAYIM4444444444")
-            else:
-                mid_line_y = (midpoints['sol'][1] + midpoints['sag'][1]) / 2
-                mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
-                print("BURDAYIM55555555555")
-        
+        if midpoints['sol'] != (0, 0) and midpoints['sag'] != (0, 0): # şeritlerin orta noktası hesaplanabiliyorsa koşulu
+            mid_line_y = (midpoints['sol'][1] + midpoints['sag'][1]) / 2
+            mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2       
         elif midpoints['sag'] == (0, 0) and midpoints['sol'] != (0, 0): # sagın orta noktası yok solun orta noktası var koşulu
             mid_line_y = midpoints['sol'][1]
-            mid_line_x = midpoints['sol'][0] + 150                      # sol şeride 400 ekleyerek sag şeritsiz yolun ortasını buluyor
-            #cv2.circle(image,( mid_line_x, mid_line_y), 10, (255,255,255), -1) #TEK SERİTLİ YOLDA DENE
-            print("BURDAYIM66666666666")
+            mid_line_x = midpoints['sol'][0] + 150                      # sol şeride 150 ekleyerek sag şeritsiz yolun ortasını buluyor
 
         elif midpoints['sol'] == (0, 0) and midpoints['sag'] != (0, 0): # solun orta noktası yok sagın orta noktası var koşulu
-            mid_line_y = midpoints['sag'][1]
-            mid_line_x = midpoints['sag'][0] - 150                     # sag seridin orta noktasından 400 piksel çıkartarak yolun ortasını buluyor
-            #cv2.circle(image, (mid_line_x, mid_line_y), 10, (255,255,255), -1) #TEK SERİTLİ YOLDA DENE SONUCA PİKSEL SAYISINI 400DEN DEĞİŞTİR
-            print("BURDAYIM77777777777")
+            if int(endpoints['sag']['max'][0] - endpoints['sag']['min'][0]) > 230:
+                mid_line_y = midpoints['sag'][1]
+                mid_line_x = midpoints['sag'][0] - 250 # sag seridin orta noktasından 250 piksel çıkartarak yolun ortasını buluyor
+            else:
+                mid_line_y = midpoints['sag'][1]
+                mid_line_x = midpoints['sag'][0] - 150 # sag seridin orta noktasından 150 piksel çıkartarak yolun ortasını buluyor
         else:
             cv2.putText(image, 'UCGEN CIZILEMEDI',(15, 40), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
             print("UCGEN CIZILEMEDI")
 
-        image = cv2.line(image, ((int(image.shape[1] / 2)), 270),
-                        ((int(image.shape[1] / 2)), int(mid_line_y)), (0, 255, 0),
-                        2)                                                                                  # düz çizgiyi çekiyor
-        image = cv2.line(image, ((int(image.shape[1] / 2)), 270),
-                        (int(mid_line_x), int(mid_line_y)), (0, 255, 0), 2)                                 # çapraz çizgiyi çekiyor
-        image = cv2.line(image, ((int(image.shape[1] / 2)), int(mid_line_y)),
-                        (int(mid_line_x), int(mid_line_y)), (0, 255, 0), 2)                                 # yatay çizgiyi çekiyor
+        image = cv2.line(image, ((int(image.shape[1] / 2))-15, 332),
+                        ((int(image.shape[1] / 2))-15, int(mid_line_y)), (0, 255, 0), 2)                       # düz çizgiyi çekiyor
+        image = cv2.line(image, ((int(image.shape[1] / 2))-15, 332),
+                        (int(mid_line_x)-15, int(mid_line_y)), (0, 255, 0), 2)                                 # çapraz çizgiyi çekiyor
+        image = cv2.line(image, ((int(image.shape[1] / 2))-15, int(mid_line_y)),
+                        (int(mid_line_x)-15, int(mid_line_y)), (0, 255, 0), 2)                                     # yatay çizgiyi çekiyor
         uzaklik_y = (image.shape[0] - mid_line_y)                                                         # cizgi uzunlugunu bulmaya yarar
-        uzaklik_x = (((image.shape[1] / 2)) - mid_line_x)                                                 # yolun ortasına aracın uzaklığı
+        uzaklik_x = (((image.shape[1] / 2)) - mid_line_x) - 15                                            # yolun ortasına aracın uzaklığı
         degree = (180 * math.atan(abs(uzaklik_x / uzaklik_y))) / (3.14)                                 # sapma bir açıya dönüştürülür
-        steering_data = int(degree)                                                          # araç için oranlanmış değer
+        steering = int(degree * 1)                                                          # araç için oranlanmış değer
 
         if uzaklik_x < 0:                                 #saga döndürür
-            steering_data = steering_data
+            steering = -steering
         elif uzaklik_x > 0:                               #sola döndürür
-            steering_data = -steering_data
-        stm.send_command(aks.Register.STEERING_ANGLE,steering_data)
-        #steeringdatagonder
+            steering = steering
 
-        cv2.putText(image, f"tekerlek acisi: {steering_data}", (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
+        steering_angle_pub.publish(1)
+
+        cv2.putText(image, f"tekerlek acisi: {steering}", (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
         cv2.putText(image, f"ucgen aci: {degree}", (15, 55), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
         if areas['ensol'] > areas['ensag']: # Mevcut şerit bilgisini ekrana yazdırır
             cv2.putText(image, 'arac SAG seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
@@ -177,13 +153,19 @@ def steering_control(image, midpoints, endpoints, areas):
             cv2.putText(image, 'arac SOL seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
             current_lane_number = 0
         else:
-            cv2.putText(image, 'arac XXX seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
+            if current_lane_number == 0:
+                cv2.putText(image, 'arac SOL seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
+            elif current_lane_number == 1:
+                cv2.putText(image, 'arac SAG seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
 
-        tooclose = 0
+        lane_publisher.publish(current_lane_number)    
 
         #print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
         cv2.imshow("EVA OTONOM LANE TRACK", image)
         cv2.waitKey(1)
+
+
+
 
 def callback():
     try:
@@ -195,10 +177,15 @@ def callback():
         if obstacle_detected:
             stm.send_command(aks.Register.MOTOR_POWER, 0)
             stm.send_command(aks.Register.BRAKE, 1)
+
     except Exception as e:
         print(e)
     
 if __name__ == "__main__":
+    motor_power_pub = rospy.Publisher('/motor_power', Int8 , queue_size = 1)
+    steering_angle_pub = rospy.Publisher('/stm/steering_angle', Int8 , queue_size = 1)
+    break_pub = rospy.Publisher('/stm/brake', Bool, queue_size = 1)
+
     rospy.init_node('lane_track_node', anonymous=True) 
     model = load_model('/home/eva/tumVeriSetiyleSeritTakibiModeli.h5', compile=False)
     colors = [(0, 0, 0), (128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128)]
@@ -219,7 +206,7 @@ if __name__ == "__main__":
     initialize_detection_variables()
     steering_data = 0
     cam = cv2.VideoCapture(2)
-    stm.send_command(aks.Register.MOTOR_POWER,1)
+    motor_power_pub.publish(1)
     lane_publisher = rospy.Publisher('/current_lane', Int32, queue_size=10)
     rospy.Subscriber('/obstacle/obstacledetection_cmd', Bool, obstacle_callback)
     obstacle_detected = False
