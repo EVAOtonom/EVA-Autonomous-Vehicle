@@ -1,19 +1,23 @@
 #!/usr/bin/env python3.9
-##  SOL SERIT 0, SAG SERIT 1
 import rospy
+from cv_bridge import CvBridge
+from sensor_msgs.msg import Image as ros_Image
+from std_msgs.msg import Bool, Int8
 from keras.models import load_model
 from PIL import Image
 import cv2
 import math
 import numpy as np
-from std_msgs.msg import Bool, Int8, Float32, Int32
 import copy
 import time
-import tensorflow as tf
 
 def obstacle_callback(msg):
     global obstacle_detected
     obstacle_detected = msg.data
+
+def decision_callback(msg):
+    global sign_detected
+    sign_detected = msg.data
 
 def initialize_detection_variables():
     midpoints = {label: (0, 0) for label in ['ensol', 'sol', 'sag', 'ensag']}
@@ -55,7 +59,7 @@ def segment_image(msg):
     image_data = normalize(np.array(image_data, np.float32)) # 32 bit float tipine ve numpy dizisine dönüştürür. Ardından modelde çalıştırmak için normalize eder
     image_data = np.expand_dims(image_data, 0) # bir batch haline getirilir
 
-    prediction = model.predict(image_data)[0]
+    prediction = model.predict(image_data, verbose=0)[0]
     prediction = prediction[int((INPUT_SHAPE[0] - new_img_height) // 2):int((INPUT_SHAPE[0] - new_img_height) // 2 + new_img_height),
             int((INPUT_SHAPE[1] - new_img_width) // 2):int((INPUT_SHAPE[1] - new_img_width) // 2 + new_img_width)] # model tahminini orjinal görüntüye oranlar
     prediction = cv2.resize(prediction, (orj_img_width, orj_img_height), interpolation=cv2.INTER_LINEAR)
@@ -68,17 +72,13 @@ def segment_image(msg):
     return blended_image_array, prediction
 
 def annotate_image (blended_image_array, prediction):
-    global tooclose, show
     midpoints, endpoints, areas = initialize_detection_variables()
-    for label in range(1, 5): # 5 class için 5 kere döner, bu sayede her class için görüntüde maskeleme yapılır
+    for label in range(1, 5): # 4 class için 4 kere döner, bu sayede her class için görüntüde maskeleme yapılır
         label_name = label_names[label]
         y_coordinates, x_coordinates = np.where(prediction == label)
         if len(y_coordinates) == 0 or len(x_coordinates) == 0: # etikete ait hiç bir piksel yoksa for döngüsünü atlar
             continue
-        area = len(y_coordinates) # Bu döngü sayesinde bir classın 500'den az pikseli varsa atlar noktalama yapmaz
-        if area < 400:
-            continue
-
+        
         areas[label_name] = len(y_coordinates) # kaç piksel varsa o kadar alan
         midpoints[label_name] = ( int(np.mean(x_coordinates)), int(np.mean(y_coordinates)) ) # her etiketin x ve y'de ortalaması bulunur 
         max_y_idx = np.argmax(y_coordinates) 
@@ -91,14 +91,8 @@ def annotate_image (blended_image_array, prediction):
         cv2.putText(blended_image_array, str(label_name),(endpoints[label_name]['max'][0], endpoints[label_name]['max'][1]+20),cv2.FONT_HERSHEY_SIMPLEX, 0.5, labels_color[label_name], 2)
         cv2.circle(blended_image_array, (endpoints[label_name]['min'][0], endpoints[label_name]['min'][1]), 10, labels_color[label_name], -1) #şerit sonuna bi nokta
         cv2.putText(blended_image_array, str(label_name),(endpoints[label_name]['min'][0], endpoints[label_name]['min'][1]+20),cv2.FONT_HERSHEY_SIMPLEX, 0.5, labels_color[label_name], 2)
-        cv2.circle(blended_image_array, (midpoints[label_name][0], midpoints[label_name][1]), 10, labels_color[label_name], -1)
+        cv2.circle(blended_image_array, (midpoints[label_name][0], midpoints[label_name][1]), 10, labels_color[label_name], -1) # şeritlerin orta noktasına bi nokta
         cv2.putText(blended_image_array, f"orta {str(label_name)}",(midpoints[label_name][0], midpoints[label_name][1]+20),cv2.FONT_HERSHEY_SIMPLEX, 0.5, labels_color[label_name], 2)
-
-    distance = abs(midpoints['sol'][1] - midpoints['sag'][1]) # işlem sayesinde orta noktaların y ekseninde uzaklıkları bulunur
-    if distance > 100: # iki seritten birinin ortadan kaybolduğu durumu tetikleyen koşul
-        tooclose = 1
-        cv2.putText(blended_image_array, 'middle points are too close',(15, 40), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 255, 0), 2)
-
     return blended_image_array, midpoints, endpoints, areas
 
 def steering_control(image, midpoints, endpoints, areas):
@@ -110,18 +104,14 @@ def steering_control(image, midpoints, endpoints, areas):
         #image = image[:, :, ::-1].copy() # renk kanallarını tersine çevirir, muhtemelen başka kütüphanede işlemek için düzenleme işlemidir
         if midpoints['sol'] != (0, 0) and midpoints['sag'] != (0, 0): # şeritlerin orta noktası hesaplanabiliyorsa koşulu
             mid_line_y = (midpoints['sol'][1] + midpoints['sag'][1]) / 2
-            mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2       
+            mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2        
         elif midpoints['sag'] == (0, 0) and midpoints['sol'] != (0, 0): # sagın orta noktası yok solun orta noktası var koşulu
             mid_line_y = midpoints['sol'][1]
             mid_line_x = midpoints['sol'][0] + 150                      # sol şeride 150 ekleyerek sag şeritsiz yolun ortasını buluyor
 
         elif midpoints['sol'] == (0, 0) and midpoints['sag'] != (0, 0): # solun orta noktası yok sagın orta noktası var koşulu
-            if int(endpoints['sag']['max'][0] - endpoints['sag']['min'][0]) > 230:
-                mid_line_y = midpoints['sag'][1]
-                mid_line_x = midpoints['sag'][0] - 250 # sag seridin orta noktasından 250 piksel çıkartarak yolun ortasını buluyor
-            else:
-                mid_line_y = midpoints['sag'][1]
-                mid_line_x = midpoints['sag'][0] - 150 # sag seridin orta noktasından 150 piksel çıkartarak yolun ortasını buluyor
+            mid_line_y = midpoints['sag'][1]
+            mid_line_x = midpoints['sag'][0] - 150                     # sag seridin orta noktasından 150 piksel çıkartarak yolun ortasını buluyor
         else:
             cv2.putText(image, 'UCGEN CIZILEMEDI',(15, 40), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
             print("UCGEN CIZILEMEDI")
@@ -135,14 +125,14 @@ def steering_control(image, midpoints, endpoints, areas):
         uzaklik_y = (image.shape[0] - mid_line_y)                                                         # cizgi uzunlugunu bulmaya yarar
         uzaklik_x = (((image.shape[1] / 2)) - mid_line_x) - 15                                            # yolun ortasına aracın uzaklığı
         degree = (180 * math.atan(abs(uzaklik_x / uzaklik_y))) / (3.14)                                 # sapma bir açıya dönüştürülür
-        steering = int(degree * 1)                                                          # araç için oranlanmış değer
+        steering = int(degree)                                                          # araç için oranlanmış değer
 
         if uzaklik_x < 0:                                 #saga döndürür
             steering = -steering
         elif uzaklik_x > 0:                               #sola döndürür
             steering = steering
 
-        steering_angle_pub.publish(1)
+        steering_pub.publish(steering)
 
         cv2.putText(image, f"tekerlek acisi: {steering}", (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
         cv2.putText(image, f"ucgen aci: {degree}", (15, 55), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
@@ -164,38 +154,25 @@ def steering_control(image, midpoints, endpoints, areas):
         cv2.imshow("EVA OTONOM LANE TRACK", image)
         cv2.waitKey(1)
 
-
-
-
 def callback():
     try:
-        ret, frame = cam.read()
-        if ret and not obstacle_detected:
-            image, pr = segment_image(frame)
-            image, midpoints, endpoints, areas = annotate_image(image, pr)
-            steering_control(image, midpoints, endpoints, areas)
-        if obstacle_detected:
-            stm.send_command(aks.Register.MOTOR_POWER, 0)
-            stm.send_command(aks.Register.BRAKE, 1)
-
+        ret, msg = cam.read()
+        image, pr = segment_image(msg)
+        image, midpoints, endpoints, areas = annotate_image(image, pr)
+        steering_control(image, midpoints, endpoints, areas)
     except Exception as e:
-        print(e)
+        print("SERIT TAKIBI HATASI: " + str(e))
     
 if __name__ == "__main__":
-    motor_power_pub = rospy.Publisher('/stm/motor_power', Int8 , queue_size = 1)
-    steering_angle_pub = rospy.Publisher('/stm/steering_angle', Int8 , queue_size = 1)
-    break_pub = rospy.Publisher('/stm/brake', Bool, queue_size = 1)
+    rospy.init_node('lane_track_node') 
 
-    rospy.init_node('lane_track_node', anonymous=True) 
+    #Variables
     model = load_model('/home/eva/tumVeriSetiyleSeritTakibiModeli.h5', compile=False)
     colors = [(0, 0, 0), (128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128)]
     INPUT_SHAPE = [480, 640, 3]  # (Height, Width , Color Format) 
     current_lane_number = None
-    distance = 0
-    scan = None
-    tooclose = 0
-    show = False
-    passing_state = 0
+    obstacle_detected, sign_detected = (False,) *2
+    cam = cv2.VideoCapture(2)
     label_names = ['background', 'ensol', 'sol', 'sag', 'ensag']
     labels_color = {
         'ensol': (255, 0, 0),  # Kırmızı
@@ -204,13 +181,18 @@ if __name__ == "__main__":
         'ensag': (0, 0, 255)   # Mavi
     }
     initialize_detection_variables()
-    steering_data = 0
-    cam = cv2.VideoCapture(2)
-    motor_power_pub.publish(1)
-    lane_publisher = rospy.Publisher('/current_lane', Int32, queue_size=10)
-    rospy.Subscriber('/obstacle/obstacledetection_cmd', Bool, obstacle_callback)
-    obstacle_detected = False
+    
+    #Subscribers
+    rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback)
+    rospy.Subscriber('/decision_algorithm/detection_control', Bool, decision_callback)
 
+    #Publishers
+    motor_power_pub = rospy.Publisher('/stm/motor_power', Int8, queue_size=10)
+    steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=10)
+    lane_publisher = rospy.Publisher("/lane_track/current_lane", Int8, queue_size=10)
+    brake_publisher = rospy.Publisher('/stm/brake', Bool, queue_size=10)
+
+    obstacle_detected = False
+    motor_power_pub.publish(1)
     while not rospy.is_shutdown():
         callback()
-        rospy.sleep(0.001)
