@@ -182,7 +182,7 @@ def callback():
         print(e)
     
 if __name__ == "__main__":
-    motor_power_pub = rospy.Publisher('/motor_power', Int8 , queue_size = 1)
+    motor_power_pub = rospy.Publisher('/stm/motor_power', Int8 , queue_size = 1)
     steering_angle_pub = rospy.Publisher('/stm/steering_angle', Int8 , queue_size = 1)
     break_pub = rospy.Publisher('/stm/brake', Bool, queue_size = 1)
 
