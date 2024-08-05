@@ -185,7 +185,7 @@ if __name__ == "__main__":
                     while distance - distance_temp < 250:
                         print(distance)
                     steering_pub.publish(0)
-                    throttle_stop_pub.publish(0)
+                    motor_pub.publish(0)
                 
                 elif current_lane == 0: # sol seritten
                     rospy.loginfo("soldan sola donus basladı")
@@ -200,7 +200,7 @@ if __name__ == "__main__":
                     while distance - distance_temp < 280:
                         print(distance)
                     steering_pub.publish(0)
-                    throttle_stop_pub.publish(0)                    
+                    motor_pub.publish(0)                    
 
                 detection_control.publish(False)               
 
@@ -218,7 +218,7 @@ if __name__ == "__main__":
                     while distance - distance_temp < 250:
                         print(distance)
                     steering_pub.publish(0)
-                    throttle_stop_pub.publish(0)
+                    motor_pub.publish(0)
                     
                 elif current_lane == 0: # sol seritten
                         distance_temp = distance
@@ -233,7 +233,7 @@ if __name__ == "__main__":
                         while distance - distance_temp < 280:
                             print(distance)
                         steering_pub.publish(0)
-                        throttle_stop_pub.publish(0)
+                        motor_pub.publish(0)
 
                 detection_control.publish(False)
 
