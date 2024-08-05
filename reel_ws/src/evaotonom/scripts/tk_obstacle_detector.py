@@ -1,4 +1,5 @@
 #!/usr/bin/env python3.9
+#Bu kod engel gördüğünde engelden kaçar!
 import rospy
 from sensor_msgs.msg import LaserScan
 from std_msgs.msg import Bool, Float32, Int8, Float64
