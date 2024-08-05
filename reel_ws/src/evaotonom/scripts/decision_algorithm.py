@@ -169,49 +169,66 @@ if __name__ == "__main__":
                 if current_lane == 1: # sag seritten
                     rospy.loginfo("sagdan sola donus basladı")
                     distance_temp = distance
-                    while distance - distance_temp <600:
-                        pass
+                    while distance - distance_temp <550:
+                        print(distance)
+                    print("dist bitti")
+                    time.sleep(1.5)
                     detection_control.publish(True)
                     steering_pub.publish(-40)
+                    time.sleep(1.5)
                     distance_temp = distance
                     while distance - distance_temp < 250:
-                        pass
+                        print(distance)
+                    steering_pub.publish(0)
+                    throttle_stop_pub.publish(0)
                 
                 elif current_lane == 0: # sol seritten
                     rospy.loginfo("soldan sola donus basladı")
                     distance_temp = distance
-                    while distance - distance_temp <850:
-                        pass
+                    while distance - distance_temp <650:
+                        print(distance)
+                    print("dist bitti")
+                    time.sleep(1.5)
                     detection_control.publish(True)
                     steering_pub.publish(-40)
                     distance_temp = distance
                     while distance - distance_temp < 280:
-                        pass                     
+                        print(distance)
+                    steering_pub.publish(0)
+                    throttle_stop_pub.publish(0)                    
 
                 detection_control.publish(False)               
 
             if detected_sign_number == 10: # saga donus
                 if current_lane == 1: # sag seritten
-                    distance_temp = distance
-                    while distance - distance_temp <840:
-                        pass
                     rospy.loginfo("sagdan saga donus basladı")
+                    distance_temp = distance
+                    while distance - distance_temp <550:
+                        print(distance)
+                    print("dist bitti")
+                    time.sleep(1.5)
                     detection_control.publish(True)                       
                     steering_pub.publish(40)
                     distance_temp = distance
-                    while distance - distance_temp < 280:
-                        pass
+                    while distance - distance_temp < 250:
+                        print(distance)
+                    steering_pub.publish(0)
+                    throttle_stop_pub.publish(0)
                     
                 elif current_lane == 0: # sol seritten
                         distance_temp = distance
-                        while distance - distance_temp <750:
-                            pass
+                        while distance - distance_temp <650:
+                            print(distance)
+                        print("dist bitti")
+                        time.sleep(1.5)
                         rospy.loginfo("soldan saga donus basladı")
                         detection_control.publish(True)
                         steering_pub.publish(40)
                         distance_temp = distance
                         while distance - distance_temp < 280:
-                            pass  
+                            print(distance)
+                        steering_pub.publish(0)
+                        throttle_stop_pub.publish(0)
 
                 detection_control.publish(False)
 
