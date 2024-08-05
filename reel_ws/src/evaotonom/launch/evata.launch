@@ -8,6 +8,6 @@
     <param name="required" value="true"/>
   </node>
   <node name="decision_node" pkg="evaotonom" type="decision_algorithm.py" output="screen"/>
-  <node name="obstacle_detector_node" pkg="evaotonom" type="obstacle_detector.py" output="screen"/>
+  <node name="obstacle_detector_node" pkg="evaotonom" type="tk_obstacle_detector.py" output="screen"/>
   <node name="zed_object_detection" pkg="evaotonom" type="sign_detector.py" output="screen"/>
 </launch>
