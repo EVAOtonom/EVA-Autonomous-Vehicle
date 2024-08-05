@@ -33,7 +33,7 @@ class Register(Enum):
     GPS_ALTITUDE = 19
     GPS_IS_LAVID = 20
 
-def send_command(num_of_registers, data):
+def send_command(num_of_registers, data): 
     global stm
     try:
         datatemp = data
@@ -119,7 +119,7 @@ def publish_data():
                 read_odometer_pub.publish(read_odometer)
             rate.sleep()
         except Exception as e:
-            rospy.logwarn(f"GPS HATASI : {e}")
+            rospy.logwarn(f" STMPUBLİSH HATASI : {e}")
 
 def handle_subscribers():
     # Subscribers
@@ -158,6 +158,6 @@ if __name__ == '__main__':
         publisher_thread.join()
         subscriber_thread.join()
 
-    except rospy.ROSInterruptException as e:
+    except Exception as e:
         rospy.logwarn(f"AKS COMMUNICATION HATASI: {e}")
         pass

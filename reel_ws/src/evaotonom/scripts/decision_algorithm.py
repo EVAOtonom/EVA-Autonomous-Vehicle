@@ -39,20 +39,15 @@ if __name__ == "__main__":
 
     #Veriables
     detected_sign_number = None
-
     distance = 0
-
     current_lane = 1
-
     x1, y1, x2, y2, size, depth = (None,)*6
-
     kavsak_girisi = None
-
 
     #Subscribers
     rospy.Subscriber("/sign_detector/detected_sign_number", Int8, sign_callback)
     rospy.Subscriber('/stm/read_odometer', Float32, read_odometer)
-   # rospy.Subscriber('/lane_track/current_lane', Int8, lane_callback)
+   #rospy.Subscriber('/lane_track/current_lane', Int8, lane_callback)
     rospy.Subscriber('/tabela', Int8, sign_callback , queue_size=10)
     rospy.Subscriber('/position', Float32MultiArray,position_callback ,queue_size=10)
     rospy.Subscriber("/sign_detector/roundabout", Int8 , kavsak_callback)
@@ -62,7 +57,6 @@ if __name__ == "__main__":
     brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=100)
     detection_control = rospy.Publisher("/decision_algorithm/detection_control", Bool, queue_size=10)
     throttle_stop_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=100)
-
 
     throttle_stop_pub.publish(False)
     detection_control.publish(False)

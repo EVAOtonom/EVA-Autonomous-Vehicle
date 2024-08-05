@@ -9,7 +9,7 @@ import cv2
 import math
 import numpy as np
 import copy
-import time
+import os
 
 def obstacle_callback(msg):
     global obstacle_detected
@@ -167,7 +167,7 @@ if __name__ == "__main__":
     rospy.init_node('lane_track_node') 
 
     #Variables
-    model = load_model('/home/eva/tumVeriSetiyleSeritTakibiModeli.h5', compile=False)
+    model = load_model(f'{os.path.dirname(os.path.abspath(__file__))}/tumVeriSetiyleSeritTakibiModeli.h5', compile=False)
     colors = [(0, 0, 0), (128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128)]
     INPUT_SHAPE = [480, 640, 3]  # (Height, Width , Color Format) 
     current_lane_number = None

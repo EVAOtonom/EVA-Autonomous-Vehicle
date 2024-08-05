@@ -1,29 +1,14 @@
+#!/usr/bin/env python3.9
+
 import rospy
 from std_msgs.msg import Float32, Int8
 
-# Dikdörtgen alanı belirleyen koordinatlar
-rect_area = [
-    (41.057495, 28.820268),
-    (41.057487, 28.820335),
-    (41.057452, 28.820263),
-    (41.057432, 28.820311)
-]
-
-# Yardımcı fonksiyon: Bir noktanın belirli bir alan içinde olup olmadığını kontrol eder
-def is_within_area(lat, lon, area):
+def is_within_area(lat, lon, area): # Yardımcı fonksiyon: Bir noktanın belirli bir alan içinde olup olmadığını kontrol eder
     min_lat = min(point[0] for point in area)
     max_lat = max(point[0] for point in area)
     min_lon = min(point[1] for point in area)
     max_lon = max(point[1] for point in area)
     return min_lat <= lat <= max_lat and min_lon <= lon <= max_lon
-
-# Global değişkenler
-latitude = None
-longitude = None
-
-# Sapma düzeltme faktörleri
-lat_correction = -0.0001
-lon_correction = -0.000032
 
 def latitude_callback(msg):
     global latitude
@@ -35,6 +20,18 @@ def longitude_callback(msg):
 
 if __name__ == "__main__":
     rospy.init_node('gps_checker', anonymous=True)
+
+    # Veriables
+    latitude = None
+    longitude = None
+    lat_correction = -0.0001    # Sapma düzeltme faktörleri
+    lon_correction = -0.000032  # Sapma düzeltme faktörleri
+    rect_area = [
+        (41.057495, 28.820268),
+        (41.057487, 28.820335),
+        (41.057452, 28.820263),
+        (41.057432, 28.820311)
+    ]   # Dikdörtgen alanı belirleyen koordinatlar
 
     # Subscribers
     rospy.Subscriber('gps_latitude', Float32, latitude_callback)
