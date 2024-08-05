@@ -118,6 +118,7 @@ def calculate_depth(point_cloud, boundingbox):
         tabela_pub.publish(23)
 
 def tabela_bilgi(class_name, depth_in_meters):
+    global x1, y1, x2, y2, size
     if obstacle_detected == 1:  # ENGEL TESPİT EDİLDİĞİ DURUMDA ÇALIŞMASI GEREKEN KARAR ALGORİTMALARI
         if class_name == "kirmizi" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(7)
