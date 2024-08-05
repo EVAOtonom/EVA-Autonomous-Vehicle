@@ -67,6 +67,7 @@ def avoidance_obstacle(current_lane, kacinma):
         distance_temp = traveled_distance
         while traveled_distance - distance_temp < 150:
             EscapeLeft()
+            print(traveled_distance-distance)
         time.sleep(1)
         right_signal.publish(False)
         while traveled_distance - distance_temp < 250:
@@ -105,33 +106,41 @@ def avoidance_obstacle(current_lane, kacinma):
     elif current_lane == 1 and kacinma == 0:
         rospy.loginfo(f"SAGDAN KACIS BASLIYOR")
         brake_pub.publish(1)
-        time.sleep(0.2)
+        time.sleep(1.5)
         rospy.loginfo(f"TEKER SOLA DONDU")
-        steering_pub.publish(-40)
-        time.sleep(0.2)
-        left_signal.publish(True)
+        steering_pub.publish(-35)
+        time.sleep(1.5)
+        #left_signal.publish(True)
+        time.sleep(2)
         brake_pub.publish(0)
-
+        time.sleep(1)
         distance_temp = traveled_distance
-        while traveled_distance - distance_temp < 1500:
+        while traveled_distance - distance_temp < 150:
             EscapeRight()
-        time.sleep(1)
+            print(traveled_distance-distance_temp)
+        time.sleep(1.5)
         left_signal.publish(False)
+        time.sleep(1)
         distance_temp = traveled_distance
-        while traveled_distance - distance_temp < 2500:
+        while traveled_distance - distance_temp < 250:
             rospy.loginfo("Beklemeye girdi 2.5M ----  1-0")
-        time.sleep(1)
-        steering_pub.publish(40)
+        time.sleep(1.5)
+        steering_pub.publish(30)
+        time.sleep(3)
         right_signal.publish(True)
-        time.sleep(1)
+        time.sleep(2)
         distance_temp = traveled_distance
-        while traveled_distance - distance_temp < 2500:
+        while traveled_distance - distance_temp < 250:
             rospy.loginfo("Beklemeye girdi 2.5M AMA ALT TARAFTA ----  1-0")
         time.sleep(2)
         steering_pub.publish(0)
+        time.sleep(1)
         right_signal.publish(False)
+        time.sleep(1)
         obstacle_detected = False
         obstacle_publisher.publish(obstacle_detected)
+        time.sleep(1)
+
 
 
 
@@ -180,10 +189,10 @@ if __name__ == "__main__":
     throttle_pub.publish(1)
     obstacle_publisher.publish(obstacle_detected)
 
-    #Şerit Takibi Bekleme
-    rospy.loginfo("Waiting for 'lane_track_node' service...")
-    rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
-    rospy.loginfo("'lane_track_node' service is now available.")    
+    # #Şerit Takibi Bekleme
+    # rospy.loginfo("Waiting for 'lane_track_node' service...")
+    # rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
+    # rospy.loginfo("'lane_track_node' service is now available.")    
 
     while not rospy.is_shutdown():
         if not sign_detected:

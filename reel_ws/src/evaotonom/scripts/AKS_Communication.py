@@ -45,6 +45,7 @@ def send_command(num_of_registers, data):
         else:
             rospy.logwarn("Fonksiyon icerisine 32767 ila -32768 araliginda deger giriniz.")
     except Exception as e:
+        rospy.logwarn(f'{num_of_registers.name} degeri {datatemp} olarak GONDERILEMEDI.')
         rospy.logwarn(f"AKS COMMUNICATION GONDERME HATASI: {e}")
         pass
 
@@ -135,7 +136,7 @@ if __name__ == '__main__':
     try:
         rospy.init_node('stm32_node')
         os.system("sudo chmod 777 /dev/ttyUSB*") # Butun portlara izin verir
-        port = '/dev/ttyUSB1'
+        port = '/dev/ttyUSB0'
 
         # Veriables
         gps_longitude = 0

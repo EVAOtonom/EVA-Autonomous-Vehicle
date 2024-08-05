@@ -5,11 +5,6 @@ from std_msgs.msg import Int8, Float64, Bool, Float32MultiArray, Float32
 import time
 import os
 
-
-def kavsak_callback(msg):
-    global kavsak_girisi
-    kavsak_girisi = msg.data
-
 def sign_callback(msg):
     global detected_sign_number
     detected_sign_number= msg.data
@@ -39,15 +34,25 @@ if __name__ == "__main__":
 
     #Veriables
     detected_sign_number = None
+
     distance = 0
+
     current_lane = 1
+
     x1, y1, x2, y2, size, depth = (None,)*6
+
     kavsak_girisi = None
+
+    #ŞERİT TAKİBİ BEKLEME
+    # rospy.loginfo("Waiting for 'lane_track_node' service...")
+    # rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
+    # rospy.loginfo("'lane_track_node' service is now available.")
+
 
     #Subscribers
     rospy.Subscriber("/sign_detector/detected_sign_number", Int8, sign_callback)
     rospy.Subscriber('/stm/read_odometer', Float32, read_odometer)
-   #rospy.Subscriber('/lane_track/current_lane', Int8, lane_callback)
+   # rospy.Subscriber('/lane_track/current_lane', Int8, lane_callback)
     rospy.Subscriber('/tabela', Int8, sign_callback , queue_size=10)
     rospy.Subscriber('/position', Float32MultiArray,position_callback ,queue_size=10)
     rospy.Subscriber("/sign_detector/roundabout", Int8 , kavsak_callback)
@@ -56,9 +61,10 @@ if __name__ == "__main__":
     steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=100)
     brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=100)
     detection_control = rospy.Publisher("/decision_algorithm/detection_control", Bool, queue_size=10)
-    throttle_stop_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=100)
+    motor_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=100)
 
-    throttle_stop_pub.publish(False)
+
+    motor_pub.publish(False)
     detection_control.publish(False)
 
     while not rospy.is_shutdown():
@@ -71,42 +77,42 @@ if __name__ == "__main__":
                     while distance - distance_temp < 120:  
                         pass
                     detection_control.publish(True) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
-                    throttle_stop_pub.publish(1)
+                    motor_pub.publish(1)
                     time.sleep(2)
                     brake_pub.publish(1)
-                    steering_pub.publish(Float64(-28))
+                    steering_pub.publish(Float64(28))
                     time.sleep(0.5)
-                    throttle_stop_pub.publish(0)
+                    motor_pub.publish(0)
 
                     distance_temp = distance  
                     while distance - distance_temp < 300:  
                         pass
 
-                    throttle_stop_pub.publish(1)
-                    steering_pub.publish(40)
+                    motor_pub.publish(1)
+                    steering_pub.publish(-40)
                     time.sleep(0.5)
-                    throttle_stop_pub.publish(0)
+                    motor_pub.publish(0)
 
                     distance_temp = distance 
                     while distance - distance_temp < 200:
                         pass
 
-                    throttle_stop_pub.publish(1)
+                    motor_pub.publish(1)
                     brake_pub.publish(1)
                     steering_pub.publish(Float64(0))
                     time.sleep(10)
-                    steering_pub.publish(28)
+                    steering_pub.publish(-28)
                     time.sleep(0.5)
-                    throttle_stop_pub.publish(0)
+                    motor_pub.publish(0)
 
                     distance_temp = distance
                     while distance - distance_temp < 270:
                         pass
 
-                    throttle_stop_pub.publish(1)
-                    steering_pub.publish(Float64(-32))
+                    motor_pub.publish(1)
+                    steering_pub.publish(Float64(32))
                     time.sleep(0.5)
-                    throttle_stop_pub.publish(0)
+                    motor_pub.publish(0)
 
                     distance_temp = distance
                     while distance - distance_temp < 185:
@@ -121,18 +127,18 @@ if __name__ == "__main__":
             elif detected_sign_number == 2: # DUR
                 detection_control.publish(True)
                 time.sleep(1)
-                throttle_stop_pub.publish(True)
+                motor_pub.publish(True)
                 brake_pub.publish(1)
                 time.sleep(5)
-                throttle_stop_pub.publish(False)
+                motor_pub.publish(False)
                 time.sleep(5)
                 detection_control.publish(False)
 
             elif detected_sign_number == 23 or detected_sign_number == 15: # YEŞİL IŞIK
-                throttle_stop_pub.publish(False)
+                motor_pub.publish(False)
 
             elif detected_sign_number == 7: # KIRMIZI IŞIK
-                throttle_stop_pub.publish(True)
+                motor_pub.publish(True)
 
             elif detected_sign_number == 8: # PARK 
                 if depth is not None:
@@ -149,7 +155,7 @@ if __name__ == "__main__":
                         steering_angle = (im_midpoint - sign_midpoint)*0.016 # -640 ile 640 arasında olan değer tekerlek açısı için -10 ile 10 arasına çevrilir
                         steering_pub.publish(steering_angle) 
                     time.sleep(0.1)
-                    throttle_stop_pub.publish(1)
+                    motor_pub.publish(1)
                     time.sleep(0.1)
                     brake_pub.publish(1)
                     detected_sign_number = True
@@ -165,7 +171,7 @@ if __name__ == "__main__":
                 if current_lane == 1: # sag seritten
                     rospy.loginfo("sagdan sola donus basladı")
                     distance_temp = distance
-                    while distance - distance_temp <550:
+                    while distance - distance_temp <5500:
                         print(distance)
                     print("dist bitti")
                     time.sleep(1.5)
@@ -173,46 +179,58 @@ if __name__ == "__main__":
                     steering_pub.publish(-40)
                     time.sleep(1.5)
                     distance_temp = distance
-                    while distance - distance_temp < 250:
-                        print(distance)
+                    while distance - distance_temp < 2500:
+                        print(distance - distance_temp)
                     steering_pub.publish(0)
-                    throttle_stop_pub.publish(0)
+                    motor_pub.publish(0)
                 
                 elif current_lane == 0: # sol seritten
                     rospy.loginfo("soldan sola donus basladı")
                     distance_temp = distance
                     while distance - distance_temp <650:
-                        pass
+                        print(distance)
+                    print("dist bitti")
+                    time.sleep(1.5)
                     detection_control.publish(True)
                     steering_pub.publish(-40)
                     distance_temp = distance
                     while distance - distance_temp < 280:
-                        pass                     
+                        print(distance - distance_temp)
+                    steering_pub.publish(0)
+                    motor_pub.publish(0)                    
 
                 detection_control.publish(False)               
 
             if detected_sign_number == 10: # saga donus
                 if current_lane == 1: # sag seritten
-                    distance_temp = distance
-                    while distance - distance_temp <840:
-                        pass
                     rospy.loginfo("sagdan saga donus basladı")
-                    detection_control.publish(True)                       
-                    steering_pub.publish(-40)
                     distance_temp = distance
-                    while distance - distance_temp < 280:
-                        pass
+                    while distance - distance_temp <550:
+                        print(distance)
+                    print("dist bitti")
+                    time.sleep(1.5)
+                    detection_control.publish(True)                       
+                    steering_pub.publish(40)
+                    distance_temp = distance
+                    while distance - distance_temp < 250:
+                        print(distance - distance_temp)
+                    steering_pub.publish(0)
+                    motor_pub.publish(0)
                     
                 elif current_lane == 0: # sol seritten
                         distance_temp = distance
-                        while distance - distance_temp <750:
-                            pass
+                        while distance - distance_temp <650:
+                            print(distance)
+                        print("dist bitti")
+                        time.sleep(1.5)
                         rospy.loginfo("soldan saga donus basladı")
                         detection_control.publish(True)
-                        steering_pub.publish(-40)
+                        steering_pub.publish(40)
                         distance_temp = distance
                         while distance - distance_temp < 280:
-                            pass  
+                            print(distance - distance_temp)
+                        steering_pub.publish(0)
+                        motor_pub.publish(0)
 
                 detection_control.publish(False)
 
@@ -225,15 +243,15 @@ if __name__ == "__main__":
                         distance_temp = distance
                         while distance - distance_temp < 450:
                             pass
-                        steering_pub.publish(-36)
+                        steering_pub.publish(36)
                         distance_temp = distance
                         while distance - distance_temp < 250:  
                             pass
-                        steering_pub.publish(16)
+                        steering_pub.publish(-16)
                         distance_temp = distance
                         while distance - distance_temp < 1200:  
                             pass
-                        steering_pub.publish(-24.30)
+                        steering_pub.publish(24.28)
                         distance_temp = distance
                         while distance - distance_temp < 350:  
                             pass
@@ -243,19 +261,19 @@ if __name__ == "__main__":
                         distance_temp = distance
                         while distance - distance_temp < 450:
                             pass
-                        steering_pub.publish(-36)
+                        steering_pub.publish(36)
                         distance_temp = distance
                         while distance - distance_temp < 300: 
                             pass
-                        steering_pub.publish(-16)
+                        steering_pub.publish(16)
                         distance_temp = distance
                         while distance - distance_temp < 100: 
                             pass
-                        steering_pub.publish(16)
+                        steering_pub.publish(-16)
                         distance_temp = distance
                         while distance - distance_temp < 1250:  
                             pass
-                        steering_pub.publish(-12)
+                        steering_pub.publish(12)
                         distance_temp = distance
                         while distance - distance_temp < 300:  
                             pass
@@ -266,15 +284,15 @@ if __name__ == "__main__":
                         distance_temp = distance
                         while distance - distance_temp < 450:
                             pass
-                        steering_pub.publish(-36)
+                        steering_pub.publish(36)
                         distance_temp = distance
                         while distance - distance_temp < 300:  
                             pass
-                        steering_pub.publish(20)
+                        steering_pub.publish(-20)
                         distance_temp = distance
                         while distance - distance_temp < 500:  
                             pass
-                        steering_pub.publish(-20.30)
+                        steering_pub.publish(20.28)
                         distance_temp = distance
                         while distance - distance_temp < 360:  
                             pass
@@ -284,15 +302,15 @@ if __name__ == "__main__":
                         distance_temp = distance
                         while distance - distance_temp < 450:
                             pass
-                        steering_pub.publish(-36)
+                        steering_pub.publish(36)
                         distance_temp = distance
                         while distance - distance_temp < 360: 
                             pass
-                        steering_pub.publish(20)
+                        steering_pub.publish(-20)
                         distance_temp = distance
                         while distance - distance_temp < 550:  
                             pass
-                        steering_pub.publish(-20)
+                        steering_pub.publish(20)
                         distance_temp = distance
                         while distance - distance_temp < 360:  
                             pass
@@ -307,11 +325,11 @@ if __name__ == "__main__":
                         distance_temp = distance
                         while distance - distance_temp < 250:  
                             pass
-                        steering_pub.publish(16)
+                        steering_pub.publish(-16)
                         distance_temp = distance
                         while distance - distance_temp < 1200:  
                             pass
-                        steering_pub.publish(-24.28)
+                        steering_pub.publish(24.28)
                         distance_temp = distance
                         while distance - distance_temp < 350:  
                             pass
@@ -321,19 +339,19 @@ if __name__ == "__main__":
                         distance_temp = distance
                         while distance - distance_temp < 450:
                             pass
-                        steering_pub.publish(-36)
+                        steering_pub.publish(36)
                         distance_temp = distance
                         while distance - distance_temp < 300: 
                             pass
-                        steering_pub.publish(-16)
+                        steering_pub.publish(16)
                         distance_temp = distance
                         while distance - distance_temp < 100: 
                             pass
-                        steering_pub.publish(16)
+                        steering_pub.publish(-16)
                         distance_temp = distance
                         while distance - distance_temp < 1280:  
                             pass
-                        steering_pub.publish(-12)
+                        steering_pub.publish(12)
                         distance_temp = distance
                         while distance - distance_temp < 300:  
                             pass
@@ -344,15 +362,15 @@ if __name__ == "__main__":
                         distance_temp = distance
                         while distance - distance_temp < 450:
                             pass
-                        steering_pub.publish(-36)
+                        steering_pub.publish(36)
                         distance_temp = distance
                         while distance - distance_temp < 250:  
                             pass
-                        steering_pub.publish(16)
+                        steering_pub.publish(-16)
                         distance_temp = distance
                         while distance - distance_temp < 120:  
                             pass
-                        steering_pub.publish(-24.28)
+                        steering_pub.publish(24.28)
                         distance_temp = distance
                         while distance - distance_temp < 350:  
                             pass
@@ -362,19 +380,19 @@ if __name__ == "__main__":
                         distance_temp = distance
                         while distance - distance_temp < 450:
                             pass
-                        steering_pub.publish(-36)
+                        steering_pub.publish(36)
                         distance_temp = distance
                         while distance - distance_temp < 300: 
                             pass
-                        steering_pub.publish(-16)
+                        steering_pub.publish(16)
                         distance_temp = distance
                         while distance - distance_temp < 100: 
                             pass
-                        steering_pub.publish(16)
+                        steering_pub.publish(-16)
                         distance_temp = distance
                         while distance - distance_temp < 1280:  
                             pass
-                        steering_pub.publish(-12)
+                        steering_pub.publish(12)
                         distance_temp = distance
                         while distance - distance_temp < 300:  
                             pass

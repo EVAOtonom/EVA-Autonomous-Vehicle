@@ -24,18 +24,19 @@ if __name__ == "__main__":
     # Veriables
     latitude = None
     longitude = None
-    lat_correction = -0.0001    # Sapma düzeltme faktörleri
-    lon_correction = -0.000032  # Sapma düzeltme faktörleri
+    lat_correction = 0.0001    # Sapma düzeltme faktörleri
+    lon_correction = -0.00132  # Sapma düzeltme faktörleri
     rect_area = [
-        (41.057495, 28.820268),
-        (41.057487, 28.820335),
-        (41.057452, 28.820263),
-        (41.057432, 28.820311)
-    ]   # Dikdörtgen alanı belirleyen koordinatlar
+        (41.05758748779297, 28.819002036743164),
+        (41.05753789672852, 28.818994407348633),
+        (41.05753789672852, 28.819002036743164),
+        (41.05751119384766, 28.81903446166992)
+    ]
+       # Dikdörtgen alanı belirleyen koordinatlar
 
     # Subscribers
-    rospy.Subscriber('gps_latitude', Float32, latitude_callback)
-    rospy.Subscriber('gps_longitude', Float32, longitude_callback)
+    rospy.Subscriber('/stm/gps_latitude', Float32, latitude_callback)
+    rospy.Subscriber('/stm/gps_longitude', Float32, longitude_callback)
 
     # Publishers
     kavsak_noktasi_pub = rospy.Publisher("/sign_detector/roundabout", Int8, queue_size=10)
@@ -52,4 +53,7 @@ if __name__ == "__main__":
                 rospy.loginfo("Kavşak")
             else:
                 kavsak_noktasi_pub.publish(0)  # Kavşak değilse 0 yayınla
+        else:
+            print("veri alınamıyor")
+            
         rate.sleep()
