@@ -1,4 +1,13 @@
 <launch>
-    <node name="obstacle_detect" pkg="audibot_gazebo" type="reel-obstacle-avoidance.py" output="screen"/>
-    <node name="lane_track_node" pkg="audibot_gazebo" type="reel-lane-track-yeni.py" output="screen"/>
+
+  <!-- Önce 5. düğüm başlatılır -->
+  <node name="stm32_node" pkg="evaotonom" type="AKS_Communication.py" output="screen"/>
+
+  <!-- 1. düğüm, 5. düğümün başlatılmasını bekler -->
+  <node name="lane_track_node" pkg="evaotonom" type="reel-lane-track.py" output="screen">
+    <param name="required" value="true"/>
+  </node>
+  <node name="decision_node" pkg="evaotonom" type="decision_algorithm.py" output="screen"/>
+  <node name="obstacle_detector_node" pkg="evaotonom" type="obstacle_detector.py" output="screen"/>
+  <node name="zed_object_detection" pkg="evaotonom" type="sign_detector.py" output="screen"/>
 </launch>
