@@ -64,21 +64,25 @@ def avoidance_obstacle(current_lane, kacinma):
         time.sleep(0.2)
         rospy.loginfo(f"TEKER SAGA DONDU")
         steering_pub.publish(40)
+        right_signal.publish(True)
         time.sleep(0.2)
         brake_pub.publish(0)
         distance_temp = traveled_distance
         while traveled_distance - distance_temp < 150:
             EscapeLeft()
         time.sleep(1)
+        right_signal.publish(False)
         while traveled_distance - distance_temp < 250:
             rospy.loginfo("beklemeye girdi 2.5 ---- 0-0")
         time.sleep(1)
         steering_pub.publish(-40)
+        left_signal.publish(True)
         time.sleep(1)
         distance_temp = traveled_distance
         while traveled_distance - distance_temp < 250:
             rospy.loginfo("Beklemeye girdi 2.5 AMA ALT TARAF ----  0-0")
         time.sleep(2)
+        left_signal.publish(False)
         obstacle_detected = False
         obstacle_publisher.publish(obstacle_detected)
 
@@ -87,6 +91,7 @@ def avoidance_obstacle(current_lane, kacinma):
     elif current_lane == 0 and kacinma == 1:
         rospy.loginfo(f"SOLDAN Büyük KACIS BASLIYOR")
         time.sleep(0.2)
+        left_signal.publish(True)
         steering_pub.publish(-40)
         time.sleep(0.5)
         brake_pub.publish(0)
@@ -94,7 +99,7 @@ def avoidance_obstacle(current_lane, kacinma):
         while traveled_distance - distance_temp < 2.2:
             rospy.loginfo("Beklemeye girdi 2.2M ----  0-1")
         time.sleep(1)
-
+        left_signal.publish(False)
         obstacle_detected = False
         obstacle_publisher.publish(obstacle_detected)
 
@@ -107,23 +112,27 @@ def avoidance_obstacle(current_lane, kacinma):
         rospy.loginfo(f"TEKER SOLA DONDU")
         steering_pub.publish(-40)
         time.sleep(0.2)
+        left_signal.publish(True)
         brake_pub.publish(0)
 
         distance_temp = traveled_distance
         while traveled_distance - distance_temp < 1500:
             EscapeRight()
         time.sleep(1)
+        left_signal.publish(False)
         distance_temp = traveled_distance
         while traveled_distance - distance_temp < 2500:
             rospy.loginfo("Beklemeye girdi 2.5M ----  1-0")
         time.sleep(1)
         steering_pub.publish(40)
+        right_signal.publish(True)
         time.sleep(1)
         distance_temp = traveled_distance
         while traveled_distance - distance_temp < 2500:
             rospy.loginfo("Beklemeye girdi 2.5M AMA ALT TARAFTA ----  1-0")
         time.sleep(2)
         steering_pub.publish(0)
+        right_signal.publish(False)
         obstacle_detected = False
         obstacle_publisher.publish(obstacle_detected)
 
@@ -131,6 +140,7 @@ def avoidance_obstacle(current_lane, kacinma):
 
     elif current_lane == 1 and kacinma == 1:
         rospy.loginfo(f"SAGDAN 2. KACIS BASLIYOR")
+        left_signal.publish(True)
         steering_pub.publish(-40)
         time.sleep(0.2)
         brake_pub.publish(0)
@@ -138,7 +148,7 @@ def avoidance_obstacle(current_lane, kacinma):
         while traveled_distance - distance_temp < 2.6:
             rospy.loginfo("Beklemeye girdi 2.6M ----  1-1")
         time.sleep(0.5)
-
+        left_signal.publish(False)
         obstacle_detected = False
         obstacle_publisher.publish(obstacle_detected)
 HelperArray3 = []
@@ -165,6 +175,8 @@ if __name__ == "__main__":
     rospy.Subscriber("/sign_detector/detected_sign_number", Int8, sign_callback)
 
     #Publishers
+    left_signal = rospy.Publisher('/stm/left_signal', Bool, queue_size= 10)
+    right_signal = rospy.Publisher('/stm/right_signal', Bool, queue_size=10)
     obstacle_publisher = rospy.Publisher("/obstacle_detector/obstacle_detection", Bool, queue_size=10)
     steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=100)
     throttle_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=100)
