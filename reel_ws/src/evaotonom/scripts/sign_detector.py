@@ -253,5 +253,8 @@ def listener():
     rospy.spin()
 
 if __name__ == '__main__':
+    rospy.loginfo("Waiting for 'lane_track_node' service...")
+    rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
+    rospy.loginfo("'lane_track_node' service is now available.")
     listener()
 
