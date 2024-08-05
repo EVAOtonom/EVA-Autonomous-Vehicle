@@ -183,7 +183,7 @@ if __name__ == "__main__":
                     time.sleep(1.5)
                     distance_temp = distance
                     while distance - distance_temp < 250:
-                        print(distance)
+                        print(distance - distance_temp)
                     steering_pub.publish(0)
                     motor_pub.publish(0)
                 
@@ -214,9 +214,10 @@ if __name__ == "__main__":
                     time.sleep(1.5)
                     detection_control.publish(True)                       
                     steering_pub.publish(40)
+                    time.sleep(1.5)
                     distance_temp = distance
                     while distance - distance_temp < 250:
-                        print(distance)
+                        print(distance - distance_temp)
                     steering_pub.publish(0)
                     motor_pub.publish(0)
                     
