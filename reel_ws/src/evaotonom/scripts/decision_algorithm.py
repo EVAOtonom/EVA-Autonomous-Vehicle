@@ -177,12 +177,14 @@ if __name__ == "__main__":
                     time.sleep(1.5)
                     detection_control.publish(True)
                     steering_pub.publish(-40)
-                    time.sleep(1.5)
+                    time.sleep(5)
                     distance_temp = distance
                     while distance - distance_temp < 2500:
                         print(distance - distance_temp)
                     steering_pub.publish(0)
+                    time.sleep(5)
                     motor_pub.publish(0)
+                    time.sleep(5)
                 
                 elif current_lane == 0: # sol seritten
                     rospy.loginfo("soldan sola donus basladı")
