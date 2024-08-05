@@ -154,7 +154,7 @@ def tabela_bilgi(class_name, depth_in_meters):
         elif class_name == "park" and depth_in_meters is not None and depth_in_meters < 18.0:
             tabela_pub.publish(8)
 
-            data = [float(x1), float(y1), float(x2), float(y2), float(size[1]), float(depth_in_meters)]
+            data = [float(x1), float(y1), float(x2), float(y2), float(size), float(depth_in_meters)]
 
             # Float32MultiArray message
             msg = Float32MultiArray()
