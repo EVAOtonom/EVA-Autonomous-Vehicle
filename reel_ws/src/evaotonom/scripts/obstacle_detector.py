@@ -153,6 +153,10 @@ if __name__ == "__main__":
     obstacle_detected = False
     sign_detected = False
     detected_sign_number = False
+    #Şerit Takibi Bekleme
+    rospy.loginfo("Waiting for 'lane_track_node' service...")
+    rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
+    rospy.loginfo("'lane_track_node' service is now available.")    
     #Subscribers
     rospy.Subscriber('/scan', LaserScan, callback, queue_size=10)
     rospy.Subscriber("/lane_track/current_lane", Int8, current_lane_check) # 0 sol 1 sağ
