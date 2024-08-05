@@ -1,4 +1,5 @@
 #!/usr/bin/env python3.9
+#Bu kod engel gördüğünde aracı durdurur
 import rospy
 from sensor_msgs.msg import LaserScan
 from std_msgs.msg import Bool, Int32
