@@ -114,23 +114,23 @@ def avoidance_obstacle(current_lane, kacinma):
         time.sleep(0.2)
         brake_pub.publish(0)
         time.sleep(0.2)
-        distance_temp = traveled_distance
-        while traveled_distance - distance_temp < 150:
+        reset_odom.publish(1)
+        while traveled_distance < 150:
             EscapeRight()
-            print(traveled_distance-distance_temp)
+            print(traveled_distance)
         time.sleep(0.2)
         left_signal.publish(False)
         time.sleep(0.2)
-        distance_temp = traveled_distance
-        while traveled_distance - distance_temp < 250:
+        reset_odom.publish(1)
+        while traveled_distance < 250:
             rospy.loginfo("Beklemeye girdi 2.5M ----  1-0")
         time.sleep(0.2)
         steering_pub.publish(30)
         time.sleep(0.2)
         right_signal.publish(True)
         time.sleep(0.2)
-        distance_temp = traveled_distance
-        while traveled_distance - distance_temp < 250:
+        reset_odom.publish(1)
+        while traveled_distance < 250:
             rospy.loginfo("Beklemeye girdi 2.5M AMA ALT TARAFTA ----  1-0")
         time.sleep(0.2)
         steering_pub.publish(0)
@@ -180,6 +180,7 @@ if __name__ == "__main__":
     rospy.Subscriber("/sign_detector/detected_sign_number", Int8, sign_callback)
 
     #Publishers
+    reset_odom = rospy.Publisher('/stm/reset_odometer', Bool, queue_size=10)
     left_signal = rospy.Publisher('/stm/left_signal', Bool, queue_size= 10)
     right_signal = rospy.Publisher('/stm/right_signal', Bool, queue_size=10)
     obstacle_publisher = rospy.Publisher("/obstacle_detector/obstacle_detection", Bool, queue_size=10)
