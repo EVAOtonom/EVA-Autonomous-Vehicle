@@ -5,6 +5,8 @@ from std_msgs.msg import Int8, Float64, Bool, Float32MultiArray, Float32
 import time
 import os
 
+#sağa ve sola dönüş değiştirildi diğerleride değiştirilecek
+
 def sign_callback(msg):
     global detected_sign_number
     detected_sign_number= msg.data
@@ -62,7 +64,7 @@ if __name__ == "__main__":
     brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=100)
     detection_control = rospy.Publisher("/decision_algorithm/detection_control", Bool, queue_size=10)
     motor_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=100)
-
+    reset_odom = rospy.Publisher('/stm/reset_odometer', Bool, queue_size=10)
 
     motor_pub.publish(False)
     detection_control.publish(False)
@@ -170,21 +172,19 @@ if __name__ == "__main__":
             if detected_sign_number == 13: # sola dönüş
                 if current_lane == 1: # sag seritten
                     rospy.loginfo("sagdan sola donus basladı")
-                    distance_temp = distance
-                    while distance - distance_temp <5500:
+                    while distance < 550:
                         print(distance)
                     print("dist bitti")
-                    time.sleep(1.5)
+                    time.sleep(0.5)
                     detection_control.publish(True)
                     steering_pub.publish(-40)
-                    time.sleep(5)
-                    distance_temp = distance
-                    while distance - distance_temp < 2500:
-                        print(distance - distance_temp)
+                    time.sleep(0.5)
+                    reset_odom.publish(13)
+                    while distance < 250:
+                        print(distance)
                     steering_pub.publish(0)
-                    time.sleep(5)
-                    motor_pub.publish(0)
-                    time.sleep(5)
+                    time.sleep(0.5)
+                    reset_odom.publish(13)
                 
                 elif current_lane == 0: # sol seritten
                     rospy.loginfo("soldan sola donus basladı")
@@ -206,18 +206,19 @@ if __name__ == "__main__":
             if detected_sign_number == 10: # saga donus
                 if current_lane == 1: # sag seritten
                     rospy.loginfo("sagdan saga donus basladı")
-                    distance_temp = distance
                     while distance - distance_temp <550:
                         print(distance)
                     print("dist bitti")
-                    time.sleep(1.5)
+                    time.sleep(0.5)
                     detection_control.publish(True)                       
                     steering_pub.publish(40)
-                    distance_temp = distance
-                    while distance - distance_temp < 250:
-                        print(distance - distance_temp)
+                    time.sleep(0.5)
+                    reset_odom.publish(13)
+                    while distance < 250:
+                        print(distance)
                     steering_pub.publish(0)
-                    motor_pub.publish(0)
+                    time.sleep(0.5)
+                    reset_odom.publish(13)
                     
                 elif current_lane == 0: # sol seritten
                         distance_temp = distance
