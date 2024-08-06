@@ -179,12 +179,12 @@ if __name__ == "__main__":
                     detection_control.publish(True)
                     steering_pub.publish(-40)
                     time.sleep(0.5)
-                    reset_odom.publish(13)
+                    reset_odom.publish(1)
                     while distance < 250:
                         print(distance)
                     steering_pub.publish(0)
                     time.sleep(0.5)
-                    reset_odom.publish(13)
+                    reset_odom.publish(1)
                 
                 elif current_lane == 0: # sol seritten
                     rospy.loginfo("soldan sola donus basladı")
@@ -213,12 +213,12 @@ if __name__ == "__main__":
                     detection_control.publish(True)                       
                     steering_pub.publish(40)
                     time.sleep(0.5)
-                    reset_odom.publish(13)
+                    reset_odom.publish(1)
                     while distance < 250:
                         print(distance)
                     steering_pub.publish(0)
                     time.sleep(0.5)
-                    reset_odom.publish(13)
+                    reset_odom.publish(1)
                     
                 elif current_lane == 0: # sol seritten
                         distance_temp = distance
