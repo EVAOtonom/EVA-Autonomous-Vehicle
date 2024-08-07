@@ -1,8 +1,13 @@
 # CMake generated Testfile for 
-# Source directory: /home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/src
-# Build directory: /home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/build
+# Source directory: /home/eva/EVA-Autonomous-Vehicle/reel_ws/src
+# Build directory: /home/eva/EVA-Autonomous-Vehicle/reel_ws/build
 # 
 # This file includes the relevant testing commands required for 
 # testing this directory and lists subdirectories to be tested as well.
 subdirs("gtest")
+subdirs("rplidar_ros")
 subdirs("evaotonom")
+subdirs("zed-ros-wrapper/zed-ros-interfaces")
+subdirs("zed-ros-wrapper/zed_nodelets")
+subdirs("zed-ros-wrapper/zed_ros")
+subdirs("zed-ros-wrapper/zed_wrapper")

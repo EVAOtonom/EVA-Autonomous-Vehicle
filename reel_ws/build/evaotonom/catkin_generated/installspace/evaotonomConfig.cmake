@@ -67,14 +67,14 @@ set(evaotonom_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
-  set(evaotonom_SOURCE_PREFIX /home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/src/evaotonom)
-  set(evaotonom_DEVEL_PREFIX /home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/devel)
+  set(evaotonom_SOURCE_PREFIX /home/eva/EVA-Autonomous-Vehicle/reel_ws/src/evaotonom)
+  set(evaotonom_DEVEL_PREFIX /home/eva/EVA-Autonomous-Vehicle/reel_ws/devel)
   set(evaotonom_INSTALL_PREFIX "")
   set(evaotonom_PREFIX ${evaotonom_DEVEL_PREFIX})
 else()
   set(evaotonom_SOURCE_PREFIX "")
   set(evaotonom_DEVEL_PREFIX "")
-  set(evaotonom_INSTALL_PREFIX /home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/install)
+  set(evaotonom_INSTALL_PREFIX /home/eva/EVA-Autonomous-Vehicle/reel_ws/install)
   set(evaotonom_PREFIX ${evaotonom_INSTALL_PREFIX})
 endif()
 
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/install/lib;/home/eva/ros_ws/devel/lib;/opt/ros/noetic/lib)
+    foreach(path /home/eva/EVA-Autonomous-Vehicle/reel_ws/install/lib;/opt/ros/noetic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)

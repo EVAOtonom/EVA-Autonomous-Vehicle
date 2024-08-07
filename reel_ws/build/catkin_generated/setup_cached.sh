@@ -7,9 +7,10 @@
 # new environment variables
 
 # modified environment variables
-export CMAKE_PREFIX_PATH="/home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/devel:$CMAKE_PREFIX_PATH"
-export LD_LIBRARY_PATH="/home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/devel/lib:$LD_LIBRARY_PATH"
-export PKG_CONFIG_PATH="/home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/devel/lib/pkgconfig:$PKG_CONFIG_PATH"
-export PWD='/home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/build'
-export ROSLISP_PACKAGE_DIRECTORIES="/home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/devel/share/common-lisp:$ROSLISP_PACKAGE_DIRECTORIES"
-export ROS_PACKAGE_PATH="/home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/src:$ROS_PACKAGE_PATH"
+export CMAKE_PREFIX_PATH='/home/eva/EVA-Autonomous-Vehicle/reel_ws/devel:/opt/ros/noetic'
+export LD_LIBRARY_PATH='/opt/ros/noetic/lib:/usr/local/cuda-12.1/lib64:/usr/local/TensorRT-8.6.1.6/lib:/usr/lib/x86_64-linux-gnu/gazebo-11/plugins'
+export PKG_CONFIG_PATH='/opt/ros/noetic/lib/pkgconfig'
+export PWD='/home/eva/EVA-Autonomous-Vehicle/reel_ws/build'
+export PYTHONPATH='/opt/ros/noetic/lib/python3/dist-packages'
+export ROSLISP_PACKAGE_DIRECTORIES='/home/eva/EVA-Autonomous-Vehicle/reel_ws/devel/share/common-lisp'
+export ROS_PACKAGE_PATH='/home/eva/EVA-Autonomous-Vehicle/reel_ws/src:/opt/ros/noetic/share'

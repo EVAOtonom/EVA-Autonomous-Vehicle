@@ -16,6 +16,3 @@ catkin_package(
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
-catkin_install_python(PROGRAMS scripts/reel-obstacle-detection.py scripts/reel-lane-track.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)

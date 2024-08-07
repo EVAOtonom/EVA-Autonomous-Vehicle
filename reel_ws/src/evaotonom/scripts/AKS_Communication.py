@@ -2,7 +2,11 @@
 # BU KOD YAPAY ZEKA İŞLEMLERİ SONUCUNDA ARACIN KONTROL EDİLEBİLMESİ İÇİN YAZILMIŞTIR.
 # gps_latitude, gps_longitude, read_odometer verileri Float32 tipinde yayınlanmaktadır.
 # /stm/steering_angle (INT8), /stm/motor_power (INT8), /stm/reset_encoder (Bool), /stm/brake (Bool) topiclerini abone olur ve veri geldiğinde araca iletir. 
+<<<<<<< HEAD
 # /stm/left_signal, /stm/right_signal topicleri aracın sağa veya sola sinyal lambalarını yakmasını sağlar. 0 -> YAKAR, 1 -> SÖNDÜRÜR. BU TOPİC'E GÖNDERDİĞİNİZ SAYI KADAR YANIP SÖNER.
+=======
+# /stm/left_signal, /stm/right_signal topicleri aracın sağa veya sola sinyal lambalarını yakmasını sağlar. BU TOPİC'E GÖNDERDİĞİNİZ SAYI KADAR YANIP SÖNER.
+>>>>>>> 3b2f27aa573807df24472cdc6bfe3197823b06c2
 
 import rospy
 from std_msgs.msg import Float32, Bool, Int8
@@ -109,16 +113,28 @@ class STM_Communication:
         
     def right_signal(self, x=5):
         for i in range (0,x):
+<<<<<<< HEAD
             self.send_command(Register.RIGHT_TURN_SIGNAL,0)
             time.sleep(0.6)
             self.send_command(Register.RIGHT_TURN_SIGNAL,1)
+=======
+            self.send_command(Register.RIGHT_TURN_SIGNAL,0) #0 -> YAKAR, 1 -> SÖNDÜRÜR. 
+            time.sleep(0.6)
+            self.send_command(Register.RIGHT_TURN_SIGNAL,1) #0 -> YAKAR, 1 -> SÖNDÜRÜR. 
+>>>>>>> 3b2f27aa573807df24472cdc6bfe3197823b06c2
             time.sleep(0.6)
 
     def left_signal(self, x=5):
         for i in range (0,x):
+<<<<<<< HEAD
             self.send_command(Register.LEFT_TURN_SIGNAL,0)
             time.sleep(0.6)
             self.send_command(Register.LEFT_TURN_SIGNAL,1)
+=======
+            self.send_command(Register.LEFT_TURN_SIGNAL,0) #0 -> YAKAR, 1 -> SÖNDÜRÜR. 
+            time.sleep(0.6)
+            self.send_command(Register.LEFT_TURN_SIGNAL,1) #0 -> YAKAR, 1 -> SÖNDÜRÜR. 
+>>>>>>> 3b2f27aa573807df24472cdc6bfe3197823b06c2
             time.sleep(0.6)
 
     def r_signal_callback(self, msg):
@@ -173,4 +189,8 @@ if __name__ == '__main__':
             stm_node = STM_Communication(port,slave_address=1)
         else:
             rospy.logwarn(f"AKS COMMUNICATION HATASI: {e}")
+<<<<<<< HEAD
         pass    
+=======
+        pass    
+>>>>>>> 3b2f27aa573807df24472cdc6bfe3197823b06c2

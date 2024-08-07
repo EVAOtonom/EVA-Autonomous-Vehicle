@@ -1,2 +1,2 @@
 - setup-file:
-    local-name: /home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/install/setup.sh
+    local-name: /home/eva/EVA-Autonomous-Vehicle/reel_ws/install/setup.sh

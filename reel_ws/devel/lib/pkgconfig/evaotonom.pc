@@ -1,8 +1,8 @@
-prefix=/home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/devel
+prefix=/home/eva/EVA-Autonomous-Vehicle/reel_ws/devel
 
 Name: evaotonom
 Description: Description of evaotonom
 Version: 0.0.0
-Cflags: -I/home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/src/evaotonom/include
+Cflags: -I/home/eva/EVA-Autonomous-Vehicle/reel_ws/src/evaotonom/include
 Libs: -L${prefix}/lib -levaotonom
 Requires: roscpp rospy std_msgs sensor_msgs

@@ -1,8 +1,8 @@
-# Install script for directory: /home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/src/evaotonom
+# Install script for directory: /home/eva/EVA-Autonomous-Vehicle/reel_ws/src/evaotonom
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/install")
+  set(CMAKE_INSTALL_PREFIX "/home/eva/EVA-Autonomous-Vehicle/reel_ws/install")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -38,25 +38,17 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/build/evaotonom/catkin_generated/installspace/evaotonom.pc")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/eva/EVA-Autonomous-Vehicle/reel_ws/build/evaotonom/catkin_generated/installspace/evaotonom.pc")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/evaotonom/cmake" TYPE FILE FILES
-    "/home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/build/evaotonom/catkin_generated/installspace/evaotonomConfig.cmake"
-    "/home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/build/evaotonom/catkin_generated/installspace/evaotonomConfig-version.cmake"
+    "/home/eva/EVA-Autonomous-Vehicle/reel_ws/build/evaotonom/catkin_generated/installspace/evaotonomConfig.cmake"
+    "/home/eva/EVA-Autonomous-Vehicle/reel_ws/build/evaotonom/catkin_generated/installspace/evaotonomConfig-version.cmake"
     )
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/evaotonom" TYPE FILE FILES "/home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/src/evaotonom/package.xml")
-endif()
-
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/evaotonom" TYPE PROGRAM FILES "/home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/build/evaotonom/catkin_generated/installspace/reel-obstacle-avoidance.py")
-endif()
-
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/evaotonom" TYPE PROGRAM FILES "/home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/build/evaotonom/catkin_generated/installspace/reel-lane-track-yeni.py")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/evaotonom" TYPE FILE FILES "/home/eva/EVA-Autonomous-Vehicle/reel_ws/src/evaotonom/package.xml")
 endif()
 

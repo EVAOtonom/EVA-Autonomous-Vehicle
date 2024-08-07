@@ -1,4 +1,4 @@
-prefix=/home/eva/reel/EVA-Autonomous-Vehicle/ROS/reel_ws/install
+prefix=/home/eva/EVA-Autonomous-Vehicle/reel_ws/install
 
 Name: evaotonom
 Description: Description of evaotonom
