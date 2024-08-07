@@ -142,21 +142,15 @@ def avoidance_obstacle(current_lane, kacinma):
 
     elif current_lane == 1 and kacinma == 1:
         rospy.loginfo(f"SAGDAN 2. KACIS BASLIYOR")
-        left_signal.publish(1)
-        time.sleep(0.2)
-        left_signal.publish(0)
-        time.sleep(0.2)
-        left_signal.publish(1)
-        time.sleep(0.2)
-        left_signal.publish(0)
-        time.sleep(0.2)
-        steering_pub.publish(40)
+        left_signal.publish(3)
+        time.sleep(1)
+        steering_pub.publish(35)
         time.sleep(0.2)
         brake_pub.publish(0)
         reset_odom.publish(1)
         while traveled_distance < 260:
             rospy.loginfo("Beklemeye girdi 2.6M ----  1-1")
-        time.sleep(0.5)
+        time.sleep(1)
         obstacle_detected = False
         obstacle_publisher.publish(obstacle_detected)
 
