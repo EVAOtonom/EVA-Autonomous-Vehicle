@@ -44,10 +44,10 @@ def EscapeRight():
     global obstacle_detected
     if scan is not None:
         obstacle_detected = False
-        for angle_index in range (428,152):
+        for angle_index in range (428,543):
             distance = scan[angle_index]
             if distance != float('inf'):
-                if (120 <= angle_index <= 543 and distance < 450 ):
+                if (428 <= angle_index <= 543 and distance < 450 ):
                     rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
                     obstacle_publisher.publish(True)
                     obstacle_detected = True
