@@ -2,12 +2,13 @@
 # BU KOD YAPAY ZEKA İŞLEMLERİ SONUCUNDA ARACIN KONTROL EDİLEBİLMESİ İÇİN YAZILMIŞTIR.
 # gps_latitude, gps_longitude, read_odometer verileri Float32 tipinde yayınlanmaktadır.
 # /stm/steering_angle (INT8), /stm/motor_power (INT8), /stm/reset_encoder (Bool), /stm/brake (Bool) topiclerini abone olur ve veri geldiğinde araca iletir. 
+# /stm/left_signal, /stm/right_signal topicleri aracın sağa veya sola sinyal lambalarını yakmasını sağlar. 0 -> YAKAR, 1 -> SÖNDÜRÜR. BU TOPİC'E GÖNDERDİĞİNİZ SAYI KADAR YANIP SÖNER.
 
 import rospy
 from std_msgs.msg import Float32, Bool, Int8
 import minimalmodbus
 from enum import Enum
-
+import time
 class Register(Enum):
     STEERING_ANGLE = 0
     BRAKE = 1
@@ -53,8 +54,8 @@ class STM_Communication:
         rospy.Subscriber('/stm/motor_power', Int8, self.motor_power_callback)
         rospy.Subscriber('/stm/reset_odometer', Bool, self.reset_odometer_callback)
         rospy.Subscriber('/stm/brake', Bool, self.brake_callback)
-        rospy.Subscriber('/stm/left_signal', Bool, self.l_signal_callback)
-        rospy.Subscriber('/stm/right_signal', Bool, self.r_signal_callback)
+        rospy.Subscriber('/stm/left_signal', Int8, self.l_signal_callback)
+        rospy.Subscriber('/stm/right_signal', Int8, self.r_signal_callback)
 
     def send_command(self, num_of_registers, data):
         try:
@@ -106,20 +107,34 @@ class STM_Communication:
             rospy.logwarn(f"AKS COMMUNICATION RESET ENCODER GONDERME HATASI: {e}")
             return None
         
+    def right_signal(self, x=5):
+        for i in range (0,x):
+            self.send_command(Register.RIGHT_TURN_SIGNAL,0)
+            time.sleep(0.6)
+            self.send_command(Register.RIGHT_TURN_SIGNAL,1)
+            time.sleep(0.6)
+
+    def left_signal(self, x=5):
+        for i in range (0,x):
+            self.send_command(Register.LEFT_TURN_SIGNAL,0)
+            time.sleep(0.6)
+            self.send_command(Register.LEFT_TURN_SIGNAL,1)
+            time.sleep(0.6)
+
     def r_signal_callback(self, msg):
         try:
-            self.send_command(Register.LEFT_TURN_SIGNAL, msg.data)
+            self.right_signal(msg.data)
         except Exception as e:
             rospy.logwarn(f"SAG SINYAL GONDERME HATASI: {e}")
             return None
         
     def l_signal_callback(self, msg):
         try:
-            self.send_command(Register.RIGHT_TURN_SIGNAL, msg.data)
+            self.left_signal(msg.data)
         except Exception as e:
             rospy.logwarn(f"SOL SINYAL GONDERME HATASI: {e}")
             return None
-        
+
     def publish_data(self):
         global pub_rate
         self.gps_latitude_1 = self.read_data(Register.GPS_LATITUDE)
@@ -146,12 +161,16 @@ if __name__ == '__main__':
         rospy.init_node('stm32_node')
         
         # Veriables
-        port = '/dev/ttyUSB0' 
+        port = '/dev/ttyUSB1' 
         stm_node = STM_Communication(port,slave_address=1)
         pub_rate = rospy.Rate(1)
         
         stm_node.spin()
 
-    except rospy.ROSInterruptException as e:
-        rospy.logwarn(f"AKS COMMUNICATION HATASI: {e}")
+    except Exception as e:
+        if "No communication with the instrument (no answer)" in str(e):
+            rospy.logwarn("BAGLANTI KOPTU, BAGLANMAYA CALISIYOR")
+            stm_node = STM_Communication(port,slave_address=1)
+        else:
+            rospy.logwarn(f"AKS COMMUNICATION HATASI: {e}")
         pass    
