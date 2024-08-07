@@ -5,11 +5,13 @@ from sensor_msgs.msg import Image as ros_Image
 from std_msgs.msg import Bool, Int8
 from keras.models import load_model
 from PIL import Image
+import message_filters
 import cv2
 import math
 import numpy as np
 import copy
-import os
+import time
+
 
 def obstacle_callback(msg):
     global obstacle_detected
@@ -103,29 +105,36 @@ def steering_control(image, midpoints, endpoints, areas):
             midpoints['sag'] = (0, 0)
         #image = image[:, :, ::-1].copy() # renk kanallarını tersine çevirir, muhtemelen başka kütüphanede işlemek için düzenleme işlemidir
         if midpoints['sol'] != (0, 0) and midpoints['sag'] != (0, 0): # şeritlerin orta noktası hesaplanabiliyorsa koşulu
-            mid_line_y = (midpoints['sol'][1] + midpoints['sag'][1]) / 2
-            mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2        
+            if int(endpoints['sag']['max'][0] - endpoints['sag']['min'][0]) > 300:
+                mid_line_y = midpoints['sag'][1]
+                mid_line_x = midpoints['sag'][0] -280    # sag seridin orta noktasından 150 piksel çıkartarak yolun ortasını buluyor
+            else:
+                mid_line_y = (midpoints['sol'][1] + midpoints['sag'][1]) / 2
+                mid_line_x = midpoints['sag'][0] - 150
         elif midpoints['sag'] == (0, 0) and midpoints['sol'] != (0, 0): # sagın orta noktası yok solun orta noktası var koşulu
             mid_line_y = midpoints['sol'][1]
             mid_line_x = midpoints['sol'][0] + 150                      # sol şeride 150 ekleyerek sag şeritsiz yolun ortasını buluyor
-
         elif midpoints['sol'] == (0, 0) and midpoints['sag'] != (0, 0): # solun orta noktası yok sagın orta noktası var koşulu
-            mid_line_y = midpoints['sag'][1]
-            mid_line_x = midpoints['sag'][0] - 150                     # sag seridin orta noktasından 150 piksel çıkartarak yolun ortasını buluyor
+            if int(endpoints['sag']['max'][0] - endpoints['sag']['min'][0]) > 230:
+                mid_line_y = midpoints['sag'][1]
+                mid_line_x = midpoints['sag'][0] -250
+            else:
+                mid_line_y = 290
+                mid_line_x = midpoints['sag'][0] - 150           # sag seridin orta noktasından 150 piksel çıkartarak yolun ortasını buluyor
         else:
             cv2.putText(image, 'UCGEN CIZILEMEDI',(15, 40), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
             print("UCGEN CIZILEMEDI")
 
-        image = cv2.line(image, ((int(image.shape[1] / 2))-15, 332),
+        image = cv2.line(image, ((int(image.shape[1] / 2))-15, 422),
                         ((int(image.shape[1] / 2))-15, int(mid_line_y)), (0, 255, 0), 2)                       # düz çizgiyi çekiyor
-        image = cv2.line(image, ((int(image.shape[1] / 2))-15, 332),
+        image = cv2.line(image, ((int(image.shape[1] / 2))-15, 422),
                         (int(mid_line_x)-15, int(mid_line_y)), (0, 255, 0), 2)                                 # çapraz çizgiyi çekiyor
         image = cv2.line(image, ((int(image.shape[1] / 2))-15, int(mid_line_y)),
                         (int(mid_line_x)-15, int(mid_line_y)), (0, 255, 0), 2)                                     # yatay çizgiyi çekiyor
         uzaklik_y = (image.shape[0] - mid_line_y)                                                         # cizgi uzunlugunu bulmaya yarar
-        uzaklik_x = (((image.shape[1] / 2)) - mid_line_x)                                          # yolun ortasına aracın uzaklığı
+        uzaklik_x = (((image.shape[1] / 2)) - mid_line_x) - 15                                            # yolun ortasına aracın uzaklığı
         degree = (180 * math.atan(abs(uzaklik_x / uzaklik_y))) / (3.14)                                 # sapma bir açıya dönüştürülür
-        steering = int(degree* 1.12)                                                          # araç için oranlanmış değer
+        steering = int(degree*1.12)                                                          # araç için oranlanmış değer
 
         if uzaklik_x > 0:                                 #saga döndürür
             steering = -steering
@@ -154,27 +163,28 @@ def steering_control(image, midpoints, endpoints, areas):
         cv2.imshow("EVA OTONOM LANE TRACK", image)
         cv2.waitKey(1)
 
-def callback():
+def callback(data):
     try:
-        ret, msg = cam.read()
+        # ret, msg = cam.read()
+        msg = bridge.imgmsg_to_cv2(data, "bgr8")
         image, pr = segment_image(msg)
         image, midpoints, endpoints, areas = annotate_image(image, pr)
         steering_control(image, midpoints, endpoints, areas)
-        rate.sleep()
     except Exception as e:
         print("SERIT TAKIBI HATASI: " + str(e))
-    
+  
 if __name__ == "__main__":
-    rospy.init_node('lane_track_node') 
+    rospy.init_node('lane_track_node')
+
 
     #Variables
-    rate = rospy.Rate(2)
-    model = load_model(f'{os.path.dirname(os.path.abspath(__file__))}/tumVeriSetiyleSeritTakibiModeli.h5', compile=False)
+    model = load_model('/home/eva/EVA-Autonomous-Vehicle/reel_ws/src/evaotonom/scripts/tumVeriSetiyleSeritTakibiModeli.h5', compile=False)
+    bridge = CvBridge()
     colors = [(0, 0, 0), (128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128)]
     INPUT_SHAPE = [480, 640, 3]  # (Height, Width , Color Format) 
     current_lane_number = None
     obstacle_detected, sign_detected = (False,) *2
-    cam = cv2.VideoCapture(2)
+    # cam = cv2.VideoCapture(2)
     label_names = ['background', 'ensol', 'sol', 'sag', 'ensag']
     labels_color = {
         'ensol': (255, 0, 0),  # Kırmızı
@@ -185,6 +195,7 @@ if __name__ == "__main__":
     initialize_detection_variables()
     
     #Subscribers
+    rospy.Subscriber("/zed2i/zed_node/left_raw/image_raw_color", ros_Image, callback)
     rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback)
     rospy.Subscriber('/decision_algorithm/detection_control', Bool, decision_callback)
 
@@ -194,7 +205,10 @@ if __name__ == "__main__":
     lane_publisher = rospy.Publisher("/lane_track/current_lane", Int8, queue_size=10)
     brake_publisher = rospy.Publisher('/stm/brake', Bool, queue_size=10)
 
+ 
+
     obstacle_detected = False
     motor_power_pub.publish(1)
-    while not rospy.is_shutdown():
-        callback()
+    # while not rospy.is_shutdown():
+    #     callback()
+    rospy.spin()

@@ -137,8 +137,8 @@ if __name__ == "__main__":
                 detection_control.publish(False)
 
             elif detected_sign_number == 23 or detected_sign_number == 15: # YEŞİL IŞIK
-                motor_pub.publish(False)
-
+                    pass
+            
             elif detected_sign_number == 7: # KIRMIZI IŞIK
                 motor_pub.publish(True)
 

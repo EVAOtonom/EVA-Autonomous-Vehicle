@@ -79,6 +79,7 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
                 cv2.putText(left_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)    
                 left_detected = True
                 detected_boxes.append((x1, y1, x2, y2, class_name))
+
     if left_detected:
         # Detect objects in right image
         results_right = model(right_image)
@@ -116,9 +117,8 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
                                 grid = gray_region[i*grid_size_y:(i+1)*grid_size_y, j*grid_size_x:(j+1)*grid_size_x]
                                 white_pixels = np.sum((grid >= white_lower_bound) & (grid <= white_upper_bound))
                                 total_pixels = grid.size
-                                if total_pixels > 0:
-                                    white_pixel_ratio = white_pixels / total_pixels
-                                    white_pixel_ratios.append(white_pixel_ratio)
+                                white_pixel_ratio = white_pixels / total_pixels
+                                white_pixel_ratios.append(white_pixel_ratio)
 
                         # Görüntüyü göster (debug için)
                         cv2.imshow("Binary Region", gray_region)
@@ -147,8 +147,6 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
                     cv2.putText(right_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                     print(f"LEVHA: {class_name} UZAKLIK: {depth:.2f}m")
                     tabela_bilgi(class_name, depth)
-    else:
-        tabela_pub.publish(23)
 
 def calculate_depth(point_cloud, boundingbox):
 
@@ -165,6 +163,10 @@ def calculate_depth(point_cloud, boundingbox):
         if point is not None:
             distance = math.sqrt(point[0]**2 + point[1]**2 + point[2]**2)
             return distance
+    else:
+        
+        rospy.logwarn("No depth data available at the bounding box center.")
+        tabela_pub.publish(23)
 
 def tabela_bilgi(class_name, depth_in_meters):
     global x1, y1, x2, y2, size
@@ -280,7 +282,7 @@ def decision_callback(msg):
 
 def listener():
     rospy.init_node('zed_object_detection', anonymous=True)
-    rate = rospy.Rate(1)
+    
     left_image_sub = message_filters.Subscriber("/zed2i/zed_node/left_raw/image_raw_color", Image)
     right_image_sub = message_filters.Subscriber("/zed2i/zed_node/right_raw/image_raw_color", Image)
     point_cloud_sub = message_filters.Subscriber("/zed2i/zed_node/point_cloud/cloud_registered", PointCloud2)
@@ -300,7 +302,7 @@ def listener():
     display_thread = threading.Thread(target=display_images)
     display_thread.start()
     
-    rate.sleep()
+    rospy.spin()
 
 if __name__ == '__main__':
     # rospy.loginfo("Waiting for 'lane_track_node' service...")
