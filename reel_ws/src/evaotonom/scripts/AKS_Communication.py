@@ -1,15 +1,14 @@
-#!/usr/bin/env python3.9
+
 # BU KOD YAPAY ZEKA İŞLEMLERİ SONUCUNDA ARACIN KONTROL EDİLEBİLMESİ İÇİN YAZILMIŞTIR.
 # gps_latitude, gps_longitude, read_odometer verileri Float32 tipinde yayınlanmaktadır.
 # /stm/steering_angle (INT8), /stm/motor_power (INT8), /stm/reset_encoder (Bool), /stm/brake (Bool) topiclerini abone olur ve veri geldiğinde araca iletir. 
+# /stm/left_signal, /stm/right_signal topicleri aracın sağa veya sola sinyal lambalarını yakmasını sağlar. 0 -> YAKAR, 1 -> SÖNDÜRÜR. BU TOPİC'E GÖNDERDİĞİNİZ SAYI KADAR YANIP SÖNER.
 
 import rospy
 from std_msgs.msg import Float32, Bool, Int8
 import minimalmodbus
 from enum import Enum
-import threading
-import os
-
+import time
 class Register(Enum):
     STEERING_ANGLE = 0
     BRAKE = 1
@@ -33,132 +32,145 @@ class Register(Enum):
     GPS_ALTITUDE = 19
     GPS_IS_LAVID = 20
 
-def send_command(num_of_registers, data): 
-    global stm
-    try:
-        datatemp = data
-        if -32769 < data < 32768:
-            if data < 0:
-                data = 65536 + data
-            stm.write_register(num_of_registers.value, int(data), functioncode=6)
-            rospy.loginfo(f'{num_of_registers.name} degeri {datatemp} olarak gonderildi.')
-        else:
-            rospy.logwarn("Fonksiyon icerisine 32767 ila -32768 araliginda deger giriniz.")
-    except Exception as e:
-        rospy.logwarn(f'{num_of_registers.name} degeri {datatemp} olarak GONDERILEMEDI.')
-        rospy.logwarn(f"AKS COMMUNICATION GONDERME HATASI: {e}")
-        pass
+class STM_Communication:
+    def __init__(self, port, slave_address=1, baudrate=38400):
+        self.stm = minimalmodbus.Instrument(port, slave_address)
+        self.stm.serial.baudrate = baudrate
+        self.gps_latitude = None
+        self.gps_latitude_1 = None
+        self.gps_latitude_2 = None
+        self.gps_longitude = None
+        self.gps_longitude_1 = None
+        self.gps_longitude_2 = None
+        self.read_odometer = None
 
-def read_data(num_of_registers):
-    global stm
-    try:
-        data = stm.read_register(num_of_registers.value)
-        return data
-    except Exception as e:
-        rospy.logwarn(f"AKS COMMUNICATION OKUMA HATASI: {e}")
-        return None
+        # Publishers
+        self.gps_latitude_pub = rospy.Publisher('/stm/gps_latitude', Float32, queue_size=10)
+        self.gps_longitude_pub = rospy.Publisher('/stm/gps_longitude', Float32, queue_size=10)
+        self.read_odometer_pub = rospy.Publisher('/stm/read_odometer', Float32, queue_size=10)
 
-def steering_angle_callback(msg):
-    try:
-        send_command(Register.STEERING_ANGLE, msg.data)
-    except Exception as e:
-        rospy.logwarn(f"AKS COMMUNICATION STEERING ANGLE GONDERME HATASI: {e}")
-        return None
+        # Subscribers
+        rospy.Subscriber('/stm/steering_angle', Int8, self.steering_angle_callback)
+        rospy.Subscriber('/stm/motor_power', Int8, self.motor_power_callback)
+        rospy.Subscriber('/stm/reset_odometer', Bool, self.reset_odometer_callback)
+        rospy.Subscriber('/stm/brake', Bool, self.brake_callback)
+        rospy.Subscriber('/stm/left_signal', Int8, self.l_signal_callback)
+        rospy.Subscriber('/stm/right_signal', Int8, self.r_signal_callback)
 
-def brake_callback(msg):
-    try:
-        send_command(Register.BRAKE, msg.data)
-    except Exception as e:
-        rospy.logwarn(f"AKS COMMUNICATION BRAKE GONDERME HATASI: {e}")
-        return None
-
-def motor_power_callback(msg):
-    try:
-        send_command(Register.MOTOR_POWER, msg.data)
-    except Exception as e:
-        rospy.logwarn(f"AKS COMMUNICATION MOTOR POWER GONDERME HATASI: {e}")
-        return None
-
-def reset_encoder_callback(msg):
-    try:
-        send_command(Register.RESET_ENCODER, msg.data)
-    except Exception as e:
-        rospy.logwarn(f"AKS COMMUNICATION RESET ENCODER GONDERME HATASI: {e}")
-        return None
-
-def left_signal_callback(msg):
-    try:
-        send_command(Register.LEFT_TURN_SIGNAL, msg.data)
-    except Exception as e:
-        rospy.logwarn(f"AKS COMMUNICATION LEFT SIGNAL GONDERME HATASI: {e}")
-        return None
-
-def right_signal_callback(msg):
-    try:
-        send_command(Register.RIGHT_TURN_SIGNAL, msg.data)
-    except Exception as e:
-        rospy.logwarn(f"AKS COMMUNICATION RIGHT SIGNAL GONDERME HATASI: {e}")
-        return None
-    
-def publish_data():
-    global gps_latitude_pub, gps_longitude_pub, read_odometer_pub, gps_latitude, gps_longitude
-    rate = rospy.Rate(0.5)  # 2 SANIYEDE 1 KEZ VERI OKUMAYA YARAR
-    while not rospy.is_shutdown():
+    def send_command(self, num_of_registers, data):
         try:
-            gps_latitude_1 = read_data(Register.GPS_LATITUDE)
-            gps_latitude_2 = read_data(Register.GPS_LATITUDE_2)
-            gps_longitude_1 = read_data(Register.GPS_LONGITUDE)
-            gps_longitude_2 = read_data(Register.GPS_LONGITUDE_2)
-            read_odometer = read_data(Register.READ_ODOMETER)
-            if gps_latitude_1 is not None and gps_latitude_2 is not None:
-                gps_latitude = ((gps_latitude_1 * 10000) + gps_latitude_2) / 1000000
-                gps_latitude_pub.publish(gps_latitude)
-            if gps_longitude_1 is not None and gps_longitude_2 is not None:
-                gps_longitude = ((gps_longitude_1 * 100000) + (gps_longitude_2 * 10)) / 100000000
-                gps_longitude_pub.publish(gps_longitude)
-            if read_odometer is not None:
-                read_odometer_pub.publish(read_odometer)
-            rate.sleep()
+            datatemp = data
+            if -32769 < data < 32768:
+                if data < 0:
+                    data = 65536 + data
+                self.stm.write_register(num_of_registers.value, int(data), functioncode=6)
+                rospy.loginfo(f'{num_of_registers.name} degeri {datatemp} olarak gonderildi.')
+            else:
+                rospy.logwarn("Fonksiyon icerisine 32767 ila -32768 araliginda deger giriniz.")
         except Exception as e:
-            rospy.logwarn(f" STMPUBLİSH HATASI : {e}")
+            rospy.logwarn(f"AKS COMMUNICATION GONDERME HATASI: {e}")
+            pass
 
-def handle_subscribers():
-    # Subscribers
-    rospy.Subscriber('/stm/steering_angle', Int8, steering_angle_callback)
-    rospy.Subscriber('/stm/motor_power', Int8, motor_power_callback)
-    rospy.Subscriber('/stm/reset_encoder', Bool, reset_encoder_callback)
-    rospy.Subscriber('/stm/brake', Bool, brake_callback)
-    rospy.Subscriber('/stm/left_signal', Bool, left_signal_callback)
-    rospy.Subscriber('/stm/right_signal', Bool, right_signal_callback)
-    rospy.spin()  # MESAJ GELDIKCE DONGU CALISIR
+    def read_data(self, num_of_registers):
+        try:
+            data = self.stm.read_register(num_of_registers.value)
+            return data
+        except Exception as e:
+            rospy.logwarn(f"AKS COMMUNICATION OKUMA HATASI: {e}")
+            return None
+        
+    def steering_angle_callback(self, msg):
+        try:
+            self.send_command(Register.STEERING_ANGLE, msg.data)
+        except Exception as e:
+            rospy.logwarn(f"AKS COMMUNICATION STEERING ANGLE GONDERME HATASI: {e}")
+            return None
 
+    def brake_callback(self, msg):
+        try:
+            self.send_command(Register.BRAKE, msg.data)
+        except Exception as e:
+            rospy.logwarn(f"AKS COMMUNICATION BRAKE GONDERME HATASI: {e}")
+            return None
+
+    def motor_power_callback(self, msg):
+        try:
+            self.send_command(Register.MOTOR_POWER, msg.data)
+        except Exception as e:
+            rospy.logwarn(f"AKS COMMUNICATION MOTOW POWER GONDERME HATASI: {e}")
+            return None
+
+    def reset_odometer_callback(self, msg):
+        try:
+            self.send_command(Register.RESET_ENCODER, msg.data)
+        except Exception as e:
+            rospy.logwarn(f"AKS COMMUNICATION RESET ENCODER GONDERME HATASI: {e}")
+            return None
+        
+    def right_signal(self, x=5):
+        for i in range (0,x):
+            self.send_command(Register.RIGHT_TURN_SIGNAL,0)
+            time.sleep(0.6)
+            self.send_command(Register.RIGHT_TURN_SIGNAL,1)
+            time.sleep(0.6)
+
+    def left_signal(self, x=5):
+        for i in range (0,x):
+            self.send_command(Register.LEFT_TURN_SIGNAL,0)
+            time.sleep(0.6)
+            self.send_command(Register.LEFT_TURN_SIGNAL,1)
+            time.sleep(0.6)
+
+    def r_signal_callback(self, msg):
+        try:
+            self.right_signal(msg.data)
+        except Exception as e:
+            rospy.logwarn(f"SAG SINYAL GONDERME HATASI: {e}")
+            return None
+        
+    def l_signal_callback(self, msg):
+        try:
+            self.left_signal(msg.data)
+        except Exception as e:
+            rospy.logwarn(f"SOL SINYAL GONDERME HATASI: {e}")
+            return None
+
+    def publish_data(self):
+        global pub_rate
+        self.gps_latitude_1 = self.read_data(Register.GPS_LATITUDE)
+        self.gps_latitude_2 = self.read_data(Register.GPS_LATITUDE_2)
+        self.gps_longitude_1 = self.read_data(Register.GPS_LONGITUDE)
+        self.gps_longitude_2 = self.read_data(Register.GPS_LONGITUDE_2)
+        self.read_odometer = self.read_data(Register.READ_ODOMETER)
+        if self.gps_latitude_1 is not None and self.gps_latitude_2 is not None:
+            self.gps_latitude = ((self.gps_latitude_1 * 10000) + self.gps_latitude_2) / 1000000
+            self.gps_latitude_pub.publish(self.gps_latitude)
+        if self.gps_longitude_1 is not None and self.gps_longitude_2 is not None:
+            self.gps_longitude = ((self.gps_longitude_1 * 100000) + (self.gps_longitude_2 * 10)) / 100000000
+            self.gps_longitude_pub.publish(self.gps_longitude)
+        if self.read_odometer is not None:
+            self.read_odometer_pub.publish(self.read_odometer)
+        pub_rate.sleep()
+        
+    def spin(self):
+        while not rospy.is_shutdown():
+            self.publish_data()
+            
 if __name__ == '__main__':
     try:
         rospy.init_node('stm32_node')
-        os.system("sudo chmod 777 /dev/ttyUSB*") # Butun portlara izin verir
-        port = '/dev/ttyUSB0'
-
+        
         # Veriables
-        gps_longitude = 0
-        gps_latitude = 0
-        stm = minimalmodbus.Instrument(port, slaveaddress=1) # Modbus tanımlaması
-        stm.serial.baudrate = 38400
-
-        # Publishers
-        gps_latitude_pub = rospy.Publisher('/stm/gps_latitude', Float32, queue_size=10)
-        gps_longitude_pub = rospy.Publisher('/stm/gps_longitude', Float32, queue_size=10)
-        read_odometer_pub = rospy.Publisher('/stm/read_odometer', Float32, queue_size=10)
-
-        # Aynı anda okuma ve gönderme yapılabilmesi için
-        publisher_thread = threading.Thread(target=publish_data)
-        subscriber_thread = threading.Thread(target=handle_subscribers)
-
-        publisher_thread.start()
-        subscriber_thread.start()
-
-        publisher_thread.join()
-        subscriber_thread.join()
+        port = '/dev/ttyUSB1' 
+        stm_node = STM_Communication(port,slave_address=1)
+        pub_rate = rospy.Rate(1)
+        
+        stm_node.spin()
 
     except Exception as e:
-        rospy.logwarn(f"AKS COMMUNICATION HATASI: {e}")
-        pass
+        if "No communication with the instrument (no answer)" in str(e):
+            rospy.logwarn("BAGLANTI KOPTU, BAGLANMAYA CALISIYOR")
+            stm_node = STM_Communication(port,slave_address=1)
+        else:
+            rospy.logwarn(f"AKS COMMUNICATION HATASI: {e}")
+        pass    
