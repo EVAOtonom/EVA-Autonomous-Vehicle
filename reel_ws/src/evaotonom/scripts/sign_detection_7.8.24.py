@@ -1,5 +1,5 @@
 #!/usr/bin/env python3.9
-
+import time
 import rospy
 from sensor_msgs.msg import Image, PointCloud2
 from std_msgs.msg import Int8, Float32MultiArray
@@ -11,39 +11,33 @@ from ultralytics import YOLO
 import message_filters
 import threading
 import math
+from collections import defaultdict
 import logging
-
+import os
 logging.getLogger('ultralytics').setLevel(logging.ERROR)
 
-# YOLO model path
-model_path = '/home/eva/EVA-Autonomous-Vehicle/reel_ws/src/evaotonom/scripts/sol300best.pt'
-model = YOLO(model_path)
-bridge = CvBridge()
+def display_images():
+    global left_image, right_image
+    while not rospy.is_shutdown():
+        if left_image is not None and right_image is not None:
+            cv2.imshow("EVA OTONOM SOL KAMERA", left_image)
+            cv2.imshow("EVA OTONOM SAG KAMERA", right_image)
+            cv2.waitKey(1)
 
-# Global variables
-left_image = None
-right_image = None
-point_cloud = None
-original_height = None
-original_width = None
-camera_info = None
-obstacle_detected = 0
-decision_control = None
+def camera_info_callback(msg):
+    global camera_info
+    camera_info = msg
 
-x1, y1, x2, y2, size = (0,) *5
+def obstacle_callback(msg):
+    global obstacle_detected
+    obstacle_detected = msg.data
 
-class_names = {
-        0: '20', 1: '30', 2: 'dur', 3: 'durak', 4: 'girisyok',
-        5: 'ilerisag', 6: 'ilerisol', 7: 'kirmizi', 8: 'park',
-        9: 'parkyasak', 10: 'sag', 11: 'sagadonulmez', 12: 'sari',
-        13: 'sol', 14: 'soladonulmez', 15: 'yesil', 16: 'engellipark',
-        17: 'tasitrafiginekapali', 18: 'yayagecidi', 19: 'kavsak',
-        20: 'ikiliyon', 21: 'tersengellipark', 22: 'parkYapilmaz'
-    }
+def decision_callback(msg):
+    global decision_control
+    decision_control = msg.data
 
 def callback(left_image_msg, right_image_msg, point_cloud_msg):
-    global left_image, right_image, point_cloud, original_height, original_width, sign_detected, x1 ,x2 ,y1 ,y2
-
+    global left_image, right_image, point_cloud, original_height, original_width, sign_detected, x1, x2, y1, y2, current_detections, cumulative_counters, last_publish_time, size, detection_limit
     
     # Convert images
     original_left_image = bridge.imgmsg_to_cv2(left_image_msg, "bgr8")
@@ -79,64 +73,38 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
                 cv2.putText(left_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)    
                 left_detected = True
                 detected_boxes.append((x1, y1, x2, y2, class_name))
-
+    
     if left_detected:
         # Detect objects in right image
         results_right = model(right_image)
         for result in results_right:
             for box in result.boxes:
-                sign_detected = False
                 if box.conf > 0.7:  # Adjust threshold as needed
                     # Get box coordinates
                     x1, y1, x2, y2 = map(int, box.xyxy[0])
                     class_id = int(box.cls[0])
                     class_name = class_names.get(class_id, 'Unknown')
 
-
-                    if class_name in ['park', 'engellipark']:
-                        # Tespit edilen bölgeyi al
-                        detected_region = right_image[y1:y2, x1:x2]
-
-                        # Bölgeyi 3x3 parçaya böl
-                        h, w = detected_region.shape[:2]
-                        grid_size_y = h // 5
-                        grid_size_x = w // 5
-
-                        # Sağ alt köşeyi gri tonlamalı ve ikili görüntüye çevir
-                        bottom_right_region = detected_region[3*grid_size_y:4*grid_size_y, 3*grid_size_x:4*grid_size_x]
-                        gray_region = cv2.cvtColor(bottom_right_region, cv2.COLOR_BGR2GRAY)
-
-                        # Beyaza yakın pikseller için eşik değerlerini tanımla
-                        white_lower_bound = 230
-                        white_upper_bound = 255
-
-                        # beyaz piksel oranını hesapla
-                        white_pixel_ratios = []
-                        for i in range(3):
-                            for j in range(3):
-                                grid = gray_region[i*grid_size_y:(i+1)*grid_size_y, j*grid_size_x:(j+1)*grid_size_x]
-                                white_pixels = np.sum((grid >= white_lower_bound) & (grid <= white_upper_bound))
-                                total_pixels = grid.size
-                                white_pixel_ratio = white_pixels / total_pixels
-                                white_pixel_ratios.append(white_pixel_ratio)
-
-                        # Görüntüyü göster (debug için)
-                        cv2.imshow("Binary Region", gray_region)
-
-                        # beyaz piksel oranına göre sınıfı güncelle
-                        if max(white_pixel_ratios) > 0.1:  # Eşik değeri yeniden ayarlanabilir
-                            class_name = 'engellipark'
-                            print("EEEEEEEEE")
-                        else:
-                            class_name = 'park'
-                            print("PPPPPPPPPP")
-
-                    
-
-
-
-
                     sign_detected = True     
+                    
+                    # Güvenlik önlemi: Anahtarın sözlükte var olduğundan emin olun
+                    if class_name not in cumulative_counters:
+                        cumulative_counters[class_name] = 0
+                    cumulative_counters[class_name] += 1
+                    current_detections += 1
+
+                    # Algılama sayısı limitine ulaşıldığında kontrol
+                    if current_detections >= detection_limit:
+                        # En sık tespit edilen işareti bul
+                        class_name = max(cumulative_counters, key=cumulative_counters.get)
+
+                        # En sık tespit edilen sınıfı tabela_bilgi fonksiyonuna gönder
+                        tabela_bilgi(class_name, calculate_depth(point_cloud, (x1, y1, x2, y2)))
+
+                        # Sayaçları ve algılama sayısını sıfırla
+                        cumulative_counters = {class_name: 0 for class_name in class_names.values()}
+                        current_detections = 0
+
                     # Calculate the depth using the point cloud
                     depth = calculate_depth(point_cloud, (x1, y1, x2, y2))
 
@@ -146,10 +114,18 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
 
                     cv2.putText(right_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                     print(f"LEVHA: {class_name} UZAKLIK: {depth:.2f}m")
-                    tabela_bilgi(class_name, depth)
+                # Ekstra: Her sınıfın sayısını ekrana bas
+        for class_name, count in cumulative_counters.items():
+            if count > 0:
+                print(f"Class: {class_name}, Count: {count}")
+    else:
+        # 23 kodunu yayınlamak için zaman kontrolü
+        current_time = time.time()
+        if current_time - last_publish_time >= 1.0:  # 1 saniyede bir kontrol
+            tabela_pub.publish(23)
+            last_publish_time = current_time
 
 def calculate_depth(point_cloud, boundingbox):
-
     if sign_detected == True:
 
         # Scale bounding box coordinates back to the original image size
@@ -163,10 +139,6 @@ def calculate_depth(point_cloud, boundingbox):
         if point is not None:
             distance = math.sqrt(point[0]**2 + point[1]**2 + point[2]**2)
             return distance
-    else:
-        
-        rospy.logwarn("No depth data available at the bounding box center.")
-        tabela_pub.publish(23)
 
 def tabela_bilgi(class_name, depth_in_meters):
     global x1, y1, x2, y2, size
@@ -257,55 +229,55 @@ def tabela_bilgi(class_name, depth_in_meters):
         elif class_name == "parkyapilmaz" and depth_in_meters is not None and depth_in_meters < 9.5:
             tabela_pub.publish(22)
 
+if __name__ == '__main__':
+    rospy.init_node('zed_object_detection')
 
-def display_images():
-    global left_image, right_image
-    while not rospy.is_shutdown():
-        if left_image is not None and right_image is not None:
-            cv2.imshow("EVA OTONOM SOL KAMERA", left_image)
-            cv2.imshow("EVA OTONOM SAG KAMERA", right_image)
-            cv2.waitKey(1)
-
-
-def camera_info_callback(msg):
-    global camera_info
-    camera_info = msg
-
-def obstacle_callback(msg):
-    global obstacle_detected
-    obstacle_detected = msg.data
-
-def decision_callback(msg):
-    global decision_control
-    decision_control = msg.data
-
-
-def listener():
-    rospy.init_node('zed_object_detection', anonymous=True)
-    
+    # Subscribers
     left_image_sub = message_filters.Subscriber("/zed2i/zed_node/left_raw/image_raw_color", Image)
     right_image_sub = message_filters.Subscriber("/zed2i/zed_node/right_raw/image_raw_color", Image)
     point_cloud_sub = message_filters.Subscriber("/zed2i/zed_node/point_cloud/cloud_registered", PointCloud2)
 
-    obstacle_detected_sub = rospy.Subscriber('/obstacle_detected', Int8, obstacle_callback)
-    decision_control_sub = rospy.Subscriber('/decision_control', Int8, decision_callback)
-
+    # Publishers
+    obstacle_detected_sub = rospy.Subscriber('/obstacle_detector/obstacle_detection', Int8, obstacle_callback)
+    decision_control_sub = rospy.Subscriber('/decision_algorithm/detection_control', Int8, decision_callback)
     ts = message_filters.TimeSynchronizer([left_image_sub, right_image_sub, point_cloud_sub], 10)
     ts.registerCallback(callback)
-    
-    # Publishers
-    global tabela_pub, position_pub
-    tabela_pub = rospy.Publisher('/tabela', Int8, queue_size=10)
-    position_pub = rospy.Publisher('/position', Float32MultiArray, queue_size=10)
-    
-    # Start image display thread
-    display_thread = threading.Thread(target=display_images)
-    display_thread.start()
-    
-    rospy.spin()
+    tabela_pub = rospy.Publisher('/sign_detection/tabela', Int8, queue_size=10)
+    position_pub = rospy.Publisher('/sign_detection/position', Float32MultiArray, queue_size=10)
 
-if __name__ == '__main__':
     # rospy.loginfo("Waiting for 'lane_track_node' service...")
     # rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
     # rospy.loginfo("'lane_track_node' service is now available.")
-    listener()
+    
+    # Veriables
+    model = YOLO(f'{os.path.dirname(os.path.abspath(__file__))}/sol300best.pt')
+    bridge = CvBridge()
+    left_image = None
+    right_image = None
+    point_cloud = None
+    original_height = None
+    original_width = None
+    camera_info = None
+    obstacle_detected = 0
+    decision_control = None
+    x1, y1, x2, y2, size = (0,) *5
+    class_names = {
+            0: '20', 1: '30', 2: 'dur', 3: 'durak', 4: 'girisyok',
+            5: 'ilerisag', 6: 'ilerisol', 7: 'kirmizi', 8: 'park',
+            9: 'parkyasak', 10: 'sag', 11: 'sagadonulmez', 12: 'sari',
+            13: 'sol', 14: 'soladonulmez', 15: 'yesil', 16: 'engellipark',
+            17: 'tasitrafiginekapali', 18: 'yayagecidi', 19: 'kavsak',
+            20: 'ikiliyon', 21: 'tersengellipark', 22: 'parkYapilmaz'
+        }
+    
+    cumulative_counters = defaultdict(int)    # Kümülatif sayaçlar
+    # Algılama sayısı limiti
+    detection_limit = 100 # 25 algılamada bir kontrol edilecek
+    current_detections = 0  # Mevcut algılama sayısı
+    cumulative_counters = {class_name: 0 for class_name in class_names.values()}  # Her bir sınıf için sayaç
+    last_publish_time = time.time()  # İlk zaman
+    rate = rospy.Rate(1)
+
+    display_thread = threading.Thread(target=display_images)
+    display_thread.start()
+    rate.sleep()

@@ -32,11 +32,12 @@ def escapeLeft():
         for angle_index in range (89,160):
             distance = scan[angle_index]
             if distance != float('inf'):
-                if (89 <= angle_index <= 160 and distance < 450 ) :
+                if (89 <= angle_index <= 160 and distance < 6 ) :
                     rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
                     obstacle_publisher.publish(True)
                     obstacle_detected = True
                     avoidance_obstacle(current_lane, 1)
+                    break
 
 
 
@@ -47,11 +48,12 @@ def escapeRight():
         for angle_index in range (1000,1179):
             distance = scan[angle_index]
             if distance != float('inf'):
-                if (1000 <= angle_index <= 1179 and distance < 450 ):
+                if (1000 <= angle_index <= 1179 and distance < 20 ):
                     rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
                     obstacle_publisher.publish(True)
                     obstacle_detected = True
                     avoidance_obstacle(1, 1)
+                    break
 
 def avoidance_obstacle(current_lane, kacinma):
 
@@ -104,56 +106,100 @@ def avoidance_obstacle(current_lane, kacinma):
 
 
     elif current_lane == 1 and kacinma == 0:
-        rospy.loginfo(f"SAGDAN KACIS BASLIYOR")
+        rospy.loginfo("SAGDAN KACIS")
         brake_pub.publish(1)
         time.sleep(2)
-        rospy.loginfo(f"TEKER SOLA DONDU")
-        steering_pub.publish(-35)
-        time.sleep(2)
-        left_signal.publish(3)
-        time.sleep(1)
         reset_odom.publish(1)
         time.sleep(0.5)
-        while traveled_distance < 150:
-            escapeRight()
-            print(traveled_distance)
-        time.sleep(1)
+        steering_pub.publish(-40)
+        time.sleep(2.5)
+        escapeRight()
+        #left_signal.publish(5)
+        #time.sleep(0.5)
         brake_pub.publish(0)
         time.sleep(2)
-        reset_odom.publish(1)
-        time.sleep(0.5)
-        while traveled_distance < 250:
-            rospy.loginfo("Beklemeye girdi 2.5M ----  1-0")
-        time.sleep(1)
-        steering_pub.publish(30)
+        while traveled_distance < 200:
+            print("SOL SERIDE GECIYORUM")
+            pass
+        brake_pub.publish(1)
         time.sleep(2)
-        left_signal.publish(3)
-        time.sleep(1)
         reset_odom.publish(1)
         time.sleep(0.5)
-        while traveled_distance < 250:
-            rospy.loginfo("Beklemeye girdi 2.5M AMA ALT TARAFTA ----  1-0")
-        time.sleep(1)
+        steering_pub.publish(40)
+        time.sleep(4)
+        brake_pub.publish(0)
+        time.sleep(2)
+        while traveled_distance < 200:
+            print("KENDIMI DUZLUYORUM")
+            pass
+        brake_pub.publish(1)
+        time.sleep(2)
+        reset_odom.publish(1)
+        time.sleep(0.5)
         steering_pub.publish(0)
+        time.sleep(2.5)
+        brake_pub.publish(0)
         time.sleep(2)
-        obstacle_detected = False
-        obstacle_publisher.publish(obstacle_detected)
-        time.sleep(1)
+        while traveled_distance < 100:
+            print("BITIRDIM SOL SERITTE DEVAM EDIYORUM")
+            pass
+        brake_pub.publish(1)
+        time.sleep(2)
+        # rospy.loginfo(f"SAGDAN KACIS BASLIYOR")
+        # brake_pub.publish(1)
+        # time.sleep(2)
+        # steering_pub.publish(-40)
+        # rospy.loginfo(f"TEKER SOLA DONDU")
+        # time.sleep(2)
+        # left_signal.publish(5)
+        # time.sleep(0.5)
+        # reset_odom.publish(1)
+        # time.sleep(0.5)
+        # brake_pub.publish(0)
+        # time.sleep(2)
+        # while traveled_distance < 150:
+        #     rospy.loginfo("SAĞDAN KAÇIŞA GİRDİ")
+        #     escapeRight()
+        #     print(traveled_distance)
+        # time.sleep(0.5)
+        # brake_pub.publish(0)
+        # time.sleep(2)
+        # reset_odom.publish(1)
+        # time.sleep(0.5)
+        # while traveled_distance < 100:
+        #     rospy.loginfo("Beklemeye girdi 2.5M ----  1-0")
+        # time.sleep(0.5)
+        # brake_pub.publish(1)
+        # time.sleep(2)
+        # steering_pub.publish(30)
+        # time.sleep(2)
+        # left_signal.publish(5)
+        # time.sleep(0.5)
+        # reset_odom.publish(1)
+        # time.sleep(0.5)
+        # while traveled_distance < 250:
+        #     rospy.loginfo("Beklemeye girdi 2.5M AMA ALT TARAFTA ----  1-0")
+        # time.sleep(0.5)
+        # steering_pub.publish(0)
+        # time.sleep(2)
+        # obstacle_detected = False
+        # obstacle_publisher.publish(obstacle_detected)
+        # time.sleep(0.5)
 
 
 
 
     elif current_lane == 1 and kacinma == 1:
         rospy.loginfo(f"SAGDAN 2. KACIS BASLIYOR")
-        left_signal.publish(3)
-        time.sleep(1)
-        steering_pub.publish(35)
-        time.sleep(0.2)
-        brake_pub.publish(0)
         reset_odom.publish(1)
+        time.sleep(2)
+        brake_pub.publish(0)
+        time.sleep(2)
         while traveled_distance < 260:
             rospy.loginfo("Beklemeye girdi 2.6M ----  1-1")
-        time.sleep(1)
+        time.sleep(0.5)
+        steering_pub.publish(0)
+        time.sleep(2)
         obstacle_detected = False
         obstacle_publisher.publish(obstacle_detected)
 
@@ -201,13 +247,13 @@ if __name__ == "__main__":
                 for angle_index in range (0,1285):
                     distance = scan[angle_index]
                     if distance != float('inf'):
-                        if angle_index <= 72 and angle_index >= 0 and distance < 2.5:
+                        if angle_index <= 72 and angle_index >= 0 and distance < 3.20:
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
                             obstacle_detected = True
                             obstacle_publisher.publish(True)
                             avoidance_obstacle(1, 0)
                             break
-                        if angle_index <= 1285 and angle_index > 1180 and distance < 2.5:
+                        if angle_index <= 1285 and angle_index > 1180 and distance < 3.20:
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
                             obstacle_detected = True
                             obstacle_publisher.publish(True)

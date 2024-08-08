@@ -9,6 +9,7 @@ from std_msgs.msg import Float32, Bool, Int8
 import minimalmodbus
 from enum import Enum
 import time
+
 class Register(Enum):
     STEERING_ANGLE = 0
     BRAKE = 1
@@ -31,6 +32,7 @@ class Register(Enum):
     GPS_SPEED = 18
     GPS_ALTITUDE = 19
     GPS_IS_LAVID = 20
+    DRIVING_OTONOM = 21
 
 class STM_Communication:
     def __init__(self, port, slave_address=1, baudrate=38400):
@@ -43,11 +45,14 @@ class STM_Communication:
         self.gps_longitude_1 = None
         self.gps_longitude_2 = None
         self.read_odometer = None
+        self.check_otonom = None
 
         # Publishers
-        self.gps_latitude_pub = rospy.Publisher('/stm/gps_latitude', Float32, queue_size=10)
-        self.gps_longitude_pub = rospy.Publisher('/stm/gps_longitude', Float32, queue_size=10)
-        self.read_odometer_pub = rospy.Publisher('/stm/read_odometer', Float32, queue_size=10)
+        self.gps_latitude_pub = rospy.Publisher('/stm/gps_latitude', Float32, queue_size=1)
+        self.gps_longitude_pub = rospy.Publisher('/stm/gps_longitude', Float32, queue_size=1)
+        self.read_odometer_pub = rospy.Publisher('/stm/read_odometer', Float32, queue_size=1)
+        self.check_otonom_pub = rospy.Publisher('/stm/check_otonom', Bool, queue_size=1)
+        self.brake_status_pub = rospy.Publisher('/stm/brake_status', Bool, queue_size=1)
 
         # Subscribers
         rospy.Subscriber('/stm/steering_angle', Int8, self.steering_angle_callback)
@@ -68,7 +73,7 @@ class STM_Communication:
             else:
                 rospy.logwarn("Fonksiyon icerisine 32767 ila -32768 araliginda deger giriniz.")
         except Exception as e:
-            rospy.logwarn(f"AKS COMMUNICATION GONDERME HATASI: {e}")
+            rospy.logwarn(f"AKS COMMUNICATION {num_of_registers.name} GONDERME HATASI: {e}")
             pass
 
     def read_data(self, num_of_registers):
@@ -76,8 +81,7 @@ class STM_Communication:
             data = self.stm.read_register(num_of_registers.value)
             return data
         except Exception as e:
-            rospy.logwarn(f"AKS COMMUNICATION OKUMA HATASI: {e}")
-            return None
+            rospy.logwarn(f"AKS COMMUNICATION {num_of_registers.name} OKUMA HATASI: {e}")
         
     def steering_angle_callback(self, msg):
         try:
@@ -109,18 +113,19 @@ class STM_Communication:
         
     def right_signal(self, x=5):
         for i in range (0,x):
-            self.send_command(Register.RIGHT_TURN_SIGNAL,0)
-            time.sleep(0.6)
-            self.send_command(Register.RIGHT_TURN_SIGNAL,1)
-            time.sleep(0.6)
+            self.send_command(Register.RIGHT_TURN_SIGNAL, 1)
+            time.sleep(0.8)
+            self.send_command(Register.RIGHT_TURN_SIGNAL, 0)
+            time.sleep(0.8)
+        print("SAG SINYAL BITTI")
 
     def left_signal(self, x=5):
         for i in range (0,x):
-            self.send_command(Register.LEFT_TURN_SIGNAL,0)
-            time.sleep(0.6)
-            self.send_command(Register.LEFT_TURN_SIGNAL,1)
-            time.sleep(0.6)
-
+            self.send_command(Register.LEFT_TURN_SIGNAL, 1)
+            time.sleep(0.8)
+            self.send_command(Register.LEFT_TURN_SIGNAL, 0)
+            time.sleep(0.8)
+        print("SOL SINYAL BITTI")
     def r_signal_callback(self, msg):
         try:
             self.right_signal(msg.data)
@@ -134,7 +139,7 @@ class STM_Communication:
         except Exception as e:
             rospy.logwarn(f"SOL SINYAL GONDERME HATASI: {e}")
             return None
-
+        
     def publish_data(self):
         global pub_rate
         self.gps_latitude_1 = self.read_data(Register.GPS_LATITUDE)
@@ -142,6 +147,7 @@ class STM_Communication:
         self.gps_longitude_1 = self.read_data(Register.GPS_LONGITUDE)
         self.gps_longitude_2 = self.read_data(Register.GPS_LONGITUDE_2)
         self.read_odometer = self.read_data(Register.READ_ODOMETER)
+        self.check_otonom = self.read_data(Register.DRIVING_OTONOM )
         if self.gps_latitude_1 is not None and self.gps_latitude_2 is not None:
             self.gps_latitude = ((self.gps_latitude_1 * 10000) + self.gps_latitude_2) / 1000000
             self.gps_latitude_pub.publish(self.gps_latitude)
@@ -150,6 +156,8 @@ class STM_Communication:
             self.gps_longitude_pub.publish(self.gps_longitude)
         if self.read_odometer is not None:
             self.read_odometer_pub.publish(self.read_odometer)
+        if self.check_otonom is not None:
+            self.check_otonom_pub.publish(self.check_otonom)
         pub_rate.sleep()
         
     def spin(self):
@@ -168,9 +176,5 @@ if __name__ == '__main__':
         stm_node.spin()
 
     except Exception as e:
-        if "No communication with the instrument (no answer)" in str(e):
-            rospy.logwarn("BAGLANTI KOPTU, BAGLANMAYA CALISIYOR")
-            stm_node = STM_Communication(port,slave_address=1)
-        else:
-            rospy.logwarn(f"AKS COMMUNICATION HATASI: {e}")
+        rospy.logwarn(f"AKS COMMUNICATION HATASI: {e}")
         pass    

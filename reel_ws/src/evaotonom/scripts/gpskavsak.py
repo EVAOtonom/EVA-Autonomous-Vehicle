@@ -24,8 +24,6 @@ if __name__ == "__main__":
     # Veriables
     latitude = None
     longitude = None
-    lat_correction = 0.0001    # Sapma düzeltme faktörleri
-    lon_correction = -0.00132  # Sapma düzeltme faktörleri
     rect_area = [
         (41.05758748779297, 28.819002036743164),
         (41.05753789672852, 28.818994407348633),
@@ -45,8 +43,8 @@ if __name__ == "__main__":
 
     while not rospy.is_shutdown():
         if latitude is not None and longitude is not None:
-            corrected_latitude = latitude + lat_correction
-            corrected_longitude = longitude + lon_correction
+            corrected_latitude = latitude 
+            corrected_longitude = longitude 
             print(corrected_latitude, corrected_longitude)
             if is_within_area(corrected_latitude, corrected_longitude, rect_area):
                 kavsak_noktasi_pub.publish(1)

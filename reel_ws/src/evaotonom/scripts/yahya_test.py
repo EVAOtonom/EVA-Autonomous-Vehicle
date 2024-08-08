@@ -132,7 +132,7 @@ def steering_control(image, midpoints, endpoints, areas):
         image = cv2.line(image, ((int(image.shape[1] / 2))-15, int(mid_line_y)),
                         (int(mid_line_x)-15, int(mid_line_y)), (0, 255, 0), 2)                                     # yatay çizgiyi çekiyor
         uzaklik_y = (image.shape[0] - mid_line_y)                                                         # cizgi uzunlugunu bulmaya yarar
-        uzaklik_x = (((image.shape[1] / 2)) - mid_line_x) - 15                                            # yolun ortasına aracın uzaklığı
+        uzaklik_x = (((image.shape[1] / 2)) - mid_line_x)                                            # yolun ortasına aracın uzaklığı
         degree = (180 * math.atan(abs(uzaklik_x / uzaklik_y))) / (3.14)                                 # sapma bir açıya dönüştürülür
         steering = int(degree*1.12)                                                          # araç için oranlanmış değer
 
@@ -163,10 +163,10 @@ def steering_control(image, midpoints, endpoints, areas):
         cv2.imshow("EVA OTONOM LANE TRACK", image)
         cv2.waitKey(1)
 
-def callback(data):
+def callback():
     try:
-        # ret, msg = cam.read()
-        msg = bridge.imgmsg_to_cv2(data, "bgr8")
+        ret, msg = cam.read()
+        #msg = bridge.imgmsg_to_cv2(data, "bgr8")
         image, pr = segment_image(msg)
         image, midpoints, endpoints, areas = annotate_image(image, pr)
         steering_control(image, midpoints, endpoints, areas)
@@ -184,7 +184,7 @@ if __name__ == "__main__":
     INPUT_SHAPE = [480, 640, 3]  # (Height, Width , Color Format) 
     current_lane_number = None
     obstacle_detected, sign_detected = (False,) *2
-    # cam = cv2.VideoCapture(2)
+    cam = cv2.VideoCapture(2)
     label_names = ['background', 'ensol', 'sol', 'sag', 'ensag']
     labels_color = {
         'ensol': (255, 0, 0),  # Kırmızı
@@ -195,7 +195,7 @@ if __name__ == "__main__":
     initialize_detection_variables()
     
     #Subscribers
-    rospy.Subscriber("/zed2i/zed_node/left_raw/image_raw_color", ros_Image, callback)
+    #rospy.Subscriber("/zed2i/zed_node/left_raw/image_raw_color", ros_Image, callback)
     rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback)
     rospy.Subscriber('/decision_algorithm/detection_control', Bool, decision_callback)
 
@@ -205,10 +205,8 @@ if __name__ == "__main__":
     lane_publisher = rospy.Publisher("/lane_track/current_lane", Int8, queue_size=10)
     brake_publisher = rospy.Publisher('/stm/brake', Bool, queue_size=10)
 
- 
-
+    time.sleep(5)
     obstacle_detected = False
     motor_power_pub.publish(1)
-    # while not rospy.is_shutdown():
-    #     callback()
-    rospy.spin()
+    while not rospy.is_shutdown():
+        callback()
