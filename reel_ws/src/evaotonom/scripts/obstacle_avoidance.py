@@ -29,30 +29,32 @@ def escapeLeft():
     global obstacle_detected
     if scan is not None:
         obstacle_detected = False
-        for angle_index in range (89,160):
+        for angle_index in range (1001,1240):
             distance = scan[angle_index]
             if distance != float('inf'):
-                if (89 <= angle_index <= 160 and distance < 6 ) :
+                if (distance < 6) :
                     rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
                     obstacle_publisher.publish(True)
                     obstacle_detected = True
                     avoidance_obstacle(current_lane, 1)
-                    break
-
+                    return True
+                else:
+                    return False
+        return False
 
 
 def escapeRight():
     global obstacle_detected
     if scan is not None:
         obstacle_detected = False
-        for angle_index in range (105,200):
+        for angle_index in range (105,250):
             distance = scan[angle_index]
             if distance != float('inf'):
-                if (105 <= angle_index <= 200 and distance < 10 ):
+                if (distance < 10 ):
                     rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
                     obstacle_publisher.publish(True)
                     obstacle_detected = True
-                    avoidance_obstacle(1, 1)
+                    avoidance_obstacle(current_lane, 1)
                     return True
                 else:
                     return False
@@ -61,52 +63,64 @@ def escapeRight():
 def avoidance_obstacle(current_lane, kacinma):
 
     if current_lane == 0 and kacinma == 0:
-        rospy.loginfo(f"SOLDAN KACIS BASLIYOR")
         brake_pub.publish(1)
-        time.sleep(0.2)
-        rospy.loginfo(f"TEKER SAGA DONDU")
+        time.sleep(2)
+        rospy.loginfo("SOLDAN KACIS 0-0")
+        reset_odom.publish(1)
+        time.sleep(0.5)
         steering_pub.publish(40)
-        right_signal.publish(True)
-        time.sleep(0.2)
+        time.sleep(2.5)
+        right_signal.publish(5)
+        time.sleep(0.5)
+        if not escapeLeft():
+            brake_pub.publish(0)
+            time.sleep(2)
+            while traveled_distance < 220:
+                print("SAĞ SERIDE GECIYORUM  0-0")
+            brake_pub.publish(1)
+            time.sleep(2)
+            reset_odom.publish(1)
+            time.sleep(0.5)
+            steering_pub.publish(-40)
+            time.sleep(4)
+            right_signal.publish(5)
+            time.sleep(0.5)
+            brake_pub.publish(0)
+            time.sleep(2)
+            while traveled_distance < 200:
+                print("KENDIMI DUZLUYORUM 0-0")
+            brake_pub.publish(1)
+            time.sleep(2)
+            reset_odom.publish(1)
+            time.sleep(0.5)
+            steering_pub.publish(0)
+            time.sleep(2.5)
+            brake_pub.publish(0)
+            time.sleep(2)
+            while traveled_distance < 100:
+                print("BITIRDIM SOL SERITTE DEVAM EDIYORUM 0-0")
+            brake_pub.publish(1)
+            time.sleep(2)
+            obstacle_detected = False
+            obstacle_publisher.publish(obstacle_detected)
+
+
+    elif current_lane == 0 and kacinma == 1:
+        rospy.loginfo(f"SOLDAN BÜYÜK KAÇIŞ BAŞLIYOR 0-1")
+        reset_odom.publish(1)
+        time.sleep(2)
+        left_signal.publish(2)
+        time.sleep(4)
         brake_pub.publish(0)
-        distance_temp = traveled_distance
-        while traveled_distance - distance_temp < 150:
-            escapeLeft()
-            print(traveled_distance-distance)
-        time.sleep(1)
-        right_signal.publish(False)
-        while traveled_distance - distance_temp < 250:
-            rospy.loginfo("beklemeye girdi 2.5 ---- 0-0")
-        time.sleep(1)
-        steering_pub.publish(-40)
-        left_signal.publish(True)
-        time.sleep(1)
-        distance_temp = traveled_distance
-        while traveled_distance - distance_temp < 250:
-            rospy.loginfo("Beklemeye girdi 2.5 AMA ALT TARAF ----  0-0")
+        time.sleep(2)
+        while traveled_distance < 400:
+            rospy.loginfo("Beklemeye girdi 4M ----  0-1")
+        time.sleep(0.5)
+        steering_pub.publsih(0)
         time.sleep(2)
         left_signal.publish(False)
         obstacle_detected = False
         obstacle_publisher.publish(obstacle_detected)
-
-
-
-    elif current_lane == 0 and kacinma == 1:
-        rospy.loginfo(f"SOLDAN Büyük KACIS BASLIYOR")
-        time.sleep(0.2)
-        left_signal.publish(True)
-        steering_pub.publish(-40)
-        time.sleep(0.5)
-        brake_pub.publish(0)
-        distance_temp = traveled_distance
-        while traveled_distance - distance_temp < 2.2:
-            rospy.loginfo("Beklemeye girdi 2.2M ----  0-1")
-        time.sleep(1)
-        left_signal.publish(False)
-        obstacle_detected = False
-        obstacle_publisher.publish(obstacle_detected)
-
-
 
     elif current_lane == 1 and kacinma == 0:
         brake_pub.publish(1)
@@ -116,7 +130,6 @@ def avoidance_obstacle(current_lane, kacinma):
         time.sleep(0.5)
         steering_pub.publish(-40)
         time.sleep(2.5)
-        #hasan = escapeRight()
         left_signal.publish(5)
         time.sleep(0.5)
         if not escapeRight():
@@ -132,7 +145,7 @@ def avoidance_obstacle(current_lane, kacinma):
             time.sleep(4)
             brake_pub.publish(0)
             time.sleep(2)
-            while traveled_distance < 200:
+            while traveled_distance < 220:
                 print("KENDIMI DUZLUYORUM")
             brake_pub.publish(1)
             time.sleep(2)
@@ -146,48 +159,8 @@ def avoidance_obstacle(current_lane, kacinma):
                 print("BITIRDIM SOL SERITTE DEVAM EDIYORUM")
             brake_pub.publish(1)
             time.sleep(2)
-        # rospy.loginfo(f"SAGDAN KACIS BASLIYOR")
-        # brake_pub.publish(1)
-        # time.sleep(2)
-        # steering_pub.publish(-40)
-        # rospy.loginfo(f"TEKER SOLA DONDU")
-        # time.sleep(2)
-        # left_signal.publish(5)
-        # time.sleep(0.5)
-        # reset_odom.publish(1)
-        # time.sleep(0.5)
-        # brake_pub.publish(0)
-        # time.sleep(2)
-        # while traveled_distance < 150:
-        #     rospy.loginfo("SAĞDAN KAÇIŞA GİRDİ")
-        #     escapeRight()
-        #     print(traveled_distance)
-        # time.sleep(0.5)
-        # brake_pub.publish(0)
-        # time.sleep(2)
-        # reset_odom.publish(1)
-        # time.sleep(0.5)
-        # while traveled_distance < 100:
-        #     rospy.loginfo("Beklemeye girdi 2.5M ----  1-0")
-        # time.sleep(0.5)
-        # brake_pub.publish(1)
-        # time.sleep(2)
-        # steering_pub.publish(30)
-        # time.sleep(2)
-        # left_signal.publish(5)
-        # time.sleep(0.5)
-        # reset_odom.publish(1)
-        # time.sleep(0.5)
-        # while traveled_distance < 250:
-        #     rospy.loginfo("Beklemeye girdi 2.5M AMA ALT TARAFTA ----  1-0")
-        # time.sleep(0.5)
-        # steering_pub.publish(0)
-        # time.sleep(2)
-        # obstacle_detected = False
-        # obstacle_publisher.publish(obstacle_detected)
-        # time.sleep(0.5)
-
-
+            obstacle_detected = False
+            obstacle_publisher.publish(obstacle_detected)
 
 
     elif current_lane == 1 and kacinma == 1:
@@ -254,12 +227,12 @@ if __name__ == "__main__":
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
                             obstacle_detected = True
                             obstacle_publisher.publish(True)
-                            avoidance_obstacle(1, 0)
+                            avoidance_obstacle(current_lane, 0)
                             break
                         if angle_index <= 1285 and angle_index > 1180 and distance < 4.50:
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
                             obstacle_detected = True
                             obstacle_publisher.publish(True)
-                            avoidance_obstacle(1, 0)
+                            avoidance_obstacle(current_lane, 0)
                             break
             rate.sleep()
