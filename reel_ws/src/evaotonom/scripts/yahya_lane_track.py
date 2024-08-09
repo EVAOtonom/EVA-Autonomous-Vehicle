@@ -107,17 +107,26 @@ def steering_control(image, midpoints, endpoints, areas):
         if midpoints['sol'] != (0, 0) and midpoints['sag'] != (0, 0): # şeritlerin orta noktası hesaplanabiliyorsa koşulu
             if int(endpoints['sag']['max'][0] - endpoints['sag']['min'][0]) > 300:
                 mid_line_y = midpoints['sag'][1]
-                mid_line_x = midpoints['sag'][0] -280    # sag seridin orta noktasından 150 piksel çıkartarak yolun ortasını buluyor
+                mid_line_x = midpoints['sag'][0] - 250
+            elif int(endpoints['sol']['min'][0] - endpoints['sol']['max'][0]) > 300:
+                mid_line_y = midpoints['sol'][1]
+                mid_line_x = midpoints['sol'][0] + 250
             else:
                 mid_line_y = (midpoints['sol'][1] + midpoints['sag'][1]) / 2
-                mid_line_x = midpoints['sag'][0] - 150
+                mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
+
         elif midpoints['sag'] == (0, 0) and midpoints['sol'] != (0, 0): # sagın orta noktası yok solun orta noktası var koşulu
-            mid_line_y = midpoints['sol'][1]
-            mid_line_x = midpoints['sol'][0] + 150                      # sol şeride 150 ekleyerek sag şeritsiz yolun ortasını buluyor
-        elif midpoints['sol'] == (0, 0) and midpoints['sag'] != (0, 0): # solun orta noktası yok sagın orta noktası var koşulu
+            if int(endpoints['sol']['min'][0] - endpoints['sol']['max'][0]) > 230:
+                mid_line_y = midpoints['sol'][1]
+                mid_line_x = midpoints['sol'][0] + 230
+            else:
+                mid_line_y = 290
+                mid_line_x = midpoints['sol'][0] + 150    # sol şeride 150 ekleyerek sag şeritsiz yolun ortasını buluyor
+
+        elif midpoints['sol'] == (0, 0) and midpoints['sag'] != (0, 0):     # solun orta noktası yok sagın orta noktası var koşulu
             if int(endpoints['sag']['max'][0] - endpoints['sag']['min'][0]) > 230:
                 mid_line_y = midpoints['sag'][1]
-                mid_line_x = midpoints['sag'][0] -250
+                mid_line_x = midpoints['sag'][0] - 230
             else:
                 mid_line_y = 290
                 mid_line_x = midpoints['sag'][0] - 150           # sag seridin orta noktasından 150 piksel çıkartarak yolun ortasını buluyor
@@ -160,6 +169,7 @@ def steering_control(image, midpoints, endpoints, areas):
         lane_publisher.publish(current_lane_number)    
 
         #print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+        kayit.write(image)
         cv2.imshow("EVA OTONOM LANE TRACK", image)
         cv2.waitKey(1)
 
@@ -208,5 +218,8 @@ if __name__ == "__main__":
     time.sleep(5)
     obstacle_detected = False
     motor_power_pub.publish(1)
+    kayit = cv2.VideoWriter("/home/eva/Downloads/kayit/output_yahya_2.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 7.0, (640, 360))
     while not rospy.is_shutdown():
         callback()
+
+kayit.release()

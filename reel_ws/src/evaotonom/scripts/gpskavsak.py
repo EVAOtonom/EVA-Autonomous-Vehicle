@@ -25,10 +25,10 @@ if __name__ == "__main__":
     latitude = None
     longitude = None
     rect_area = [
-        (41.05758748779297, 28.819002036743164),
-        (41.05753789672852, 28.818994407348633),
-        (41.05753789672852, 28.819002036743164),
-        (41.05751119384766, 28.81903446166992)
+        (41.05751419067383, 28.820289611816406),
+        (41.057472229003906, 28.820341110229492),
+        (41.057464599609375, 28.82032585144043),
+        (41.05746078491211, 28.820268630981445)
     ]
        # Dikdörtgen alanı belirleyen koordinatlar
 
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     rospy.Subscriber('/stm/gps_longitude', Float32, longitude_callback)
 
     # Publishers
-    kavsak_noktasi_pub = rospy.Publisher("/sign_detector/roundabout", Int8, queue_size=10)
+    kavsak_noktasi_pub = rospy.Publisher("/sign_detection/roundabout", Int8, queue_size=10)
 
     rate = rospy.Rate(1)  # 1 Hz
 

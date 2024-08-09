@@ -38,6 +38,9 @@ class STM_Communication:
     def __init__(self, port, slave_address=1, baudrate=38400):
         self.stm = minimalmodbus.Instrument(port, slave_address)
         self.stm.serial.baudrate = baudrate
+        self.stm.serial.timeout = 1  # 1 saniye
+        self.stm.clear_buffers_before_each_transaction = True
+
         self.gps_latitude = None
         self.gps_latitude_1 = None
         self.gps_latitude_2 = None
@@ -71,18 +74,20 @@ class STM_Communication:
                 self.stm.write_register(num_of_registers.value, int(data), functioncode=6)
                 rospy.loginfo(f'{num_of_registers.name} degeri {datatemp} olarak gonderildi.')
             else:
-                rospy.logwarn("Fonksiyon icerisine 32767 ila -32768 araliginda deger giriniz.")
+                rospy.logwarn(f"Fonksiyon icerisine 32767 ila -32768 araliginda deger giriniz. {datatemp}")
         except Exception as e:
-            rospy.logwarn(f"AKS COMMUNICATION {num_of_registers.name} GONDERME HATASI: {e}")
-            pass
+            rospy.loginfo(f"TEKRAR GONDERME CALISTI")
+            time.sleep(0.2)
+            self.send_command(num_of_registers, datatemp)
 
     def read_data(self, num_of_registers):
         try:
             data = self.stm.read_register(num_of_registers.value)
             return data
         except Exception as e:
-            rospy.logwarn(f"AKS COMMUNICATION {num_of_registers.name} OKUMA HATASI: {e}")
-        
+            rospy.loginfo(f"OKUMA HATASI")
+            pass
+
     def steering_angle_callback(self, msg):
         try:
             self.send_command(Register.STEERING_ANGLE, msg.data)
@@ -154,7 +159,7 @@ class STM_Communication:
         if self.gps_longitude_1 is not None and self.gps_longitude_2 is not None:
             self.gps_longitude = ((self.gps_longitude_1 * 100000) + (self.gps_longitude_2 * 10)) / 100000000
             self.gps_longitude_pub.publish(self.gps_longitude)
-        if self.read_odometer is not None:
+        if self.read_odometer is not None and self.read_odometer < 64000 :
             self.read_odometer_pub.publish(self.read_odometer)
         if self.check_otonom is not None:
             self.check_otonom_pub.publish(self.check_otonom)
