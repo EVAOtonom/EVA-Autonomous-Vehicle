@@ -150,31 +150,64 @@ if __name__ == "__main__":
                 brake_pub.publish(1)
                 time.sleep(2)
                 
+            # elif detected_sign_number == 8: # PARK 
+            #     if depth is not None:
+            #         #os.system("rosnode kill "+ "lane_track_node")
+            #         #os.system("rosnode kill "+ "obstacle_detector_node")
+            #         while depth > 3.37:
+            #             if x1 == None or x2 == None or size == None:
+            #                 print("None")
+            #                 continue
+            #             sign_midpoint = (x1 + x2) / 2 # Tespit edilen Levhanın orta noktası alınır
+            #             im_midpoint = size / 2 # Görselin orta noktası alınır
+            #             steering_angle = ((im_midpoint - sign_midpoint + 208)*0.192) - 40 # -208 ile 208 arasında olan değer tekerlek açısı için -40 ile 40 arasına çevrilir
+            #             steering_pub.publish((int(steering_angle)) * -1)
+            #             print(steering_angle)
+            #             time.sleep(0.5)
+            #         time.sleep(2)
+            #         brake_pub.publish(1)
+            #         time.sleep(2)
+            #         detected_sign_number = True
+            #         rospy.loginfo("Park edildi")
+            #         detection_control.publish(True)
+
+            #         #os.system("rosnode kill "+ "stabil_throttle_node")
+            #         #os.system("rosnode kill "+ "sign_detector_node")
+                    
+            #         #time.sleep(5)
+
             elif detected_sign_number == 8: # PARK 
                 if depth is not None:
                     #os.system("rosnode kill "+ "lane_track_node")
                     #os.system("rosnode kill "+ "obstacle_detector_node")
-                    while depth > 3.37:
+                    while depth > 9.0 :
+                        #print (depth)
                         if x1 == None or x2 == None or size == None:
                             print("None")
                             continue
                         sign_midpoint = (x1 + x2) / 2 # Tespit edilen Levhanın orta noktası alınır
-                        im_midpoint = size / 2 # Görselin orta noktası alınır
-                        steering_angle = ((im_midpoint - sign_midpoint + 208)*0.192) - 40 # -208 ile 208 arasında olan değer tekerlek açısı için -40 ile 40 arasına çevrilir
-                        steering_pub.publish((int(steering_angle)) * -1)
-                        print(steering_angle)
-                        time.sleep(0.5)
-                    time.sleep(2)
+                        #im_midpoint = size * 5 / 6 # Görselin orta noktası alınır
+                        hedef = size * 5 / 6
+                        steering_angle = (hedef - sign_midpoint) * -40/346
+                        print("yay")
+                        steering_pub.publish(steering_angle) 
+                        time.sleep(0.25)
+                    while depth > 3.37:
+                        if x1 == None or x2 == None or size == None:
+                            print("None")
+                            continue
+                        sign_midpoint = (x1 + x2) / 2
+                        hedef = size / 2
+                        steering_angle = (((hedef - sign_midpoint + 208)*0.192) - 40) * -1
+                        print("düz")
+                        steering_pub.publish(steering_angle) 
+                        time.sleep(0.25)
+                    #time.sleep(0.1)
                     brake_pub.publish(1)
                     time.sleep(2)
                     detected_sign_number = True
                     rospy.loginfo("Park edildi")
                     detection_control.publish(True)
-
-                    #os.system("rosnode kill "+ "stabil_throttle_node")
-                    #os.system("rosnode kill "+ "sign_detector_node")
-                    
-                    #time.sleep(5)
                 
             if detected_sign_number == 13: # sola dönüş
                 if current_lane == 1: # sag seritten
