@@ -103,11 +103,18 @@ def steering_control(image, midpoints, endpoints, areas):
             midpoints['sag'] = (0, 0)
         #image = image[:, :, ::-1].copy() # renk kanallarını tersine çevirir, muhtemelen başka kütüphanede işlemek için düzenleme işlemidir
         if midpoints['sol'] != (0, 0) and midpoints['sag'] != (0, 0): # şeritlerin orta noktası hesaplanabiliyorsa koşulu
-            if abs (midpoints["sol"][1]-midpoints["sag"][1]) < 10: 
-                mid_line_y = (midpoints['sol'][1] + midpoints['sag'][1]) / 2
-                mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
+            if abs(midpoints["sag"][0] - midpoints["sol"][0]) < 300:
+                if areas["sol"] > areas["sag"]:
+                    mid_line_x = midpoints['sol'][0] + 200
+                else:
+                    mid_line_x = midpoints['sag'][0] - 200
             else:
                 mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
+            if abs (midpoints["sol"][1]-midpoints["sag"][1]) < 10: 
+                mid_line_y = (midpoints['sol'][1] + midpoints['sag'][1]) / 2
+                #mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
+            else:
+                #mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
                 if areas["sol"] > areas["sag"]:
                     mid_line_y = midpoints["sol"][1]
                 else:
