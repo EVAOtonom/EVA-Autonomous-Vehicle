@@ -15,9 +15,9 @@ def read_odometer(msg):
     global distance
     distance = msg.data
     
-'''def lane_callback(msg):
+def lane_callback(msg):
     global current_lane
-    current_lane = msg.data'''
+    current_lane = msg.data
 
 def kavsak_callback(msg):
     global kavsak_girisi
@@ -39,7 +39,7 @@ if __name__ == "__main__":
 
     distance = 0
 
-    current_lane = 1
+    current_lane = None
 
     x1, y1, x2, y2, size, depth = (None,)*6
 
