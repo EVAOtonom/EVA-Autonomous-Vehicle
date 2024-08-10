@@ -3,7 +3,7 @@
   <node name="stm32_node" pkg="evaotonom" type="AKS_Communication.py" output="screen"/>
   <node name="lane_track_node" pkg="evaotonom" type="reel-lane-track.py" output="screen">
   <node name="decision_node" pkg="evaotonom" type="decision_algorithm.py" output="screen"/>
-  <node name="obstacle_detector_node" pkg="evaotonom" type="tk_obstacle_detector.py" output="screen"/>
+  <node name="obstacle_detector_node" pkg="evaotonom" type="obstacle_avoidance.py" output="screen"/>
   <node name="zed_object_detection" pkg="evaotonom" type="sign_detector.py" output="screen"/>
   <node name="data_logger_node" pkg="evaotonom" type="data_logger_teknofest.py" output="screen"/>
   <node name="gps_checker" pkg="evaotonom" type="gpskavsak.py" output="screen"/>
