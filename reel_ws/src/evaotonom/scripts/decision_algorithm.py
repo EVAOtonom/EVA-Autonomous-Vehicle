@@ -54,7 +54,7 @@ if __name__ == "__main__":
     #Subscribers
     rospy.Subscriber("/sign_detector/detected_sign_number", Int8, sign_callback) 
     rospy.Subscriber('/stm/read_odometer', Float32, read_odometer)
-   # rospy.Subscriber('/lane_track/current_lane', Int8, lane_callback)
+    rospy.Subscriber('/lane_track/current_lane', Int8, lane_callback)
     rospy.Subscriber('/sign_detection/tabela', Int8, sign_callback , queue_size=10)
     rospy.Subscriber('/sign_detection/position', Float32MultiArray,position_callback ,queue_size=10)
     rospy.Subscriber("/sign_detection/roundabout", Int8 , kavsak_callback)
