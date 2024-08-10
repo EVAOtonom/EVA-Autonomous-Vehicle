@@ -99,44 +99,51 @@ def annotate_image (blended_image_array, prediction):
 
 def steering_control(image, midpoints, endpoints, areas):
         global current_lane_number
-        if areas['sol'] <= 50: # sol şerit pikseli 50'den fazla ise orta noktasını alıyor
+        if areas['sol'] <= 70: # sol şerit pikseli 50'den fazla ise orta noktasını alıyor
             midpoints['sol'] = (0, 0)
-        if areas['sag'] <= 50: # sag şerit pikseli 50'den fazla ise orta noktasını alıyor
+        if areas['sag'] <= 70: # sag şerit pikseli 50'den fazla ise orta noktasını alıyor
             midpoints['sag'] = (0, 0)
         #image = image[:, :, ::-1].copy() # renk kanallarını tersine çevirir, muhtemelen başka kütüphanede işlemek için düzenleme işlemidir
         if midpoints['sol'] != (0, 0) and midpoints['sag'] != (0, 0): # şeritlerin orta noktası hesaplanabiliyorsa koşulu
-            if int(endpoints['sag']['max'][0] - endpoints['sag']['min'][0]) > 300:
+            if (int(endpoints['sag']['max'][0] - endpoints['sag']['min'][0]) > 300) and midpoints['sol'][1] - midpoints['sag'][1] > 80 :
                 mid_line_y = midpoints['sag'][1]
                 mid_line_x = midpoints['sag'][0] - 250
-            elif int(endpoints['sol']['min'][0] - endpoints['sol']['max'][0]) > 300:
+            elif int(endpoints['sol']['min'][0] - endpoints['sol']['max'][0]) > 300 and midpoints['sag'][1] - midpoints['sol'][1] > 80:
                 mid_line_y = midpoints['sol'][1]
                 mid_line_x = midpoints['sol'][0] + 250
             else:
-                mid_line_y = (midpoints['sol'][1] + midpoints['sag'][1]) / 2
-                mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
+                if abs (midpoints["sol"][1]-midpoints["sag"][1]) < 15: 
+                    mid_line_y = (midpoints['sol'][1] + midpoints['sag'][1]) / 2
+                    mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
+                else:
+                    mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
+                    if areas["sol"] > areas["sag"]:
+                        mid_line_y = midpoints["sol"][1]
+                    else:
+                        mid_line_y = midpoints["sag"][1]
 
         elif midpoints['sag'] == (0, 0) and midpoints['sol'] != (0, 0): # sagın orta noktası yok solun orta noktası var koşulu
             if int(endpoints['sol']['min'][0] - endpoints['sol']['max'][0]) > 230:
                 mid_line_y = midpoints['sol'][1]
-                mid_line_x = midpoints['sol'][0] + 230
+                mid_line_x = midpoints['sol'][0] + 250
             else:
-                mid_line_y = 290
+                mid_line_y = midpoints['sol'][1]
                 mid_line_x = midpoints['sol'][0] + 150    # sol şeride 150 ekleyerek sag şeritsiz yolun ortasını buluyor
 
         elif midpoints['sol'] == (0, 0) and midpoints['sag'] != (0, 0):     # solun orta noktası yok sagın orta noktası var koşulu
             if int(endpoints['sag']['max'][0] - endpoints['sag']['min'][0]) > 230:
                 mid_line_y = midpoints['sag'][1]
-                mid_line_x = midpoints['sag'][0] - 230
+                mid_line_x = midpoints['sag'][0] - 250
             else:
-                mid_line_y = 290
+                mid_line_y = midpoints['sag'][1]
                 mid_line_x = midpoints['sag'][0] - 150           # sag seridin orta noktasından 150 piksel çıkartarak yolun ortasını buluyor
         else:
             cv2.putText(image, 'UCGEN CIZILEMEDI',(15, 40), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
             print("UCGEN CIZILEMEDI")
 
-        image = cv2.line(image, ((int(image.shape[1] / 2))-15, 422),
+        image = cv2.line(image, ((int(image.shape[1] / 2))-15, 332),
                         ((int(image.shape[1] / 2))-15, int(mid_line_y)), (0, 255, 0), 2)                       # düz çizgiyi çekiyor
-        image = cv2.line(image, ((int(image.shape[1] / 2))-15, 422),
+        image = cv2.line(image, ((int(image.shape[1] / 2))-15, 332),
                         (int(mid_line_x)-15, int(mid_line_y)), (0, 255, 0), 2)                                 # çapraz çizgiyi çekiyor
         image = cv2.line(image, ((int(image.shape[1] / 2))-15, int(mid_line_y)),
                         (int(mid_line_x)-15, int(mid_line_y)), (0, 255, 0), 2)                                     # yatay çizgiyi çekiyor
@@ -169,7 +176,6 @@ def steering_control(image, midpoints, endpoints, areas):
         lane_publisher.publish(current_lane_number)    
 
         #print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
-        kayit.write(image)
         cv2.imshow("EVA OTONOM LANE TRACK", image)
         cv2.waitKey(1)
 
@@ -218,8 +224,5 @@ if __name__ == "__main__":
     time.sleep(5)
     obstacle_detected = False
     motor_power_pub.publish(1)
-    kayit = cv2.VideoWriter("/home/eva/Downloads/kayit/output_yahya_2.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 7.0, (640, 360))
     while not rospy.is_shutdown():
         callback()
-
-kayit.release()
