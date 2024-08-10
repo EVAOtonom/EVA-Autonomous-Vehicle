@@ -153,14 +153,13 @@ if __name__ == "__main__":
                 
             elif detected_sign_number == 8: # PARK 
                 if depth is not None:
+                    #os.system("rosnode kill "+ "lane_track_node")
+                    #os.system("rosnode kill "+ "obstacle_detector_node")
                     while depth > 337 :
                         print (depth)
                         if x1 == None or x2 == None or size == None:
                             print("None")
                             continue
-                        os.system("rosnode kill "+ "lane_track_node")
-                        os.system("rosnode kill "+ "obstacle_detector_node")
-                        time.sleep(2)
                         sign_midpoint = (x1 + x2) / 2 # Tespit edilen Levhanın orta noktası alınır
                         im_midpoint = size / 2 # Görselin orta noktası alınır
                         steering_angle = ((im_midpoint - sign_midpoint + 208)*0.192) - 40 # -208 ile 208 arasında olan değer tekerlek açısı için -40 ile 40 arasına çevrilir
@@ -172,10 +171,10 @@ if __name__ == "__main__":
                     rospy.loginfo("Park edildi")
                     detection_control.publish(True)
 
-                    os.system("rosnode kill "+ "stabil_throttle_node")
-                    os.system("rosnode kill "+ "sign_detector_node")
+                    #os.system("rosnode kill "+ "stabil_throttle_node")
+                    #os.system("rosnode kill "+ "sign_detector_node")
                     
-                    time.sleep(5)
+                    #time.sleep(5)
                 
             if detected_sign_number == 13: # sola dönüş
                 if current_lane == 1: # sag seritten
