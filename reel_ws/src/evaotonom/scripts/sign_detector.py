@@ -280,7 +280,8 @@ if __name__ == '__main__':
     camera_info = None
     obstacle_detected = 0
     decision_control = None
-    x1, y1, x2, y2, size = (0,) *5
+    x1, y1, x2, y2 = (0,) *4
+    size = 416
     class_names = {
             0: '20', 1: '30', 2: 'dur', 3: 'durak', 4: 'girisyok',
             5: 'ilerisag', 6: 'ilerisol', 7: 'kirmizi', 8: 'park',
