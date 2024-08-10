@@ -182,6 +182,10 @@ if __name__ == "__main__":
         'ensag': (0, 0, 255)   # Mavi
     }
     initialize_detection_variables()
+    #Otonom sinyalini bekleme
+    rospy.loginfo("Kumandadan komut bekleniyor...")
+    rospy.wait_for_message('/stm/check_otonom', Bool, timeout=100) # Kumandadan otonom tuşuna basılmasını bekler.
+    rospy.loginfo("Otonom komutu geldi şerit takibi başlıyor.")
     
     #Subscribers
     rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback)
