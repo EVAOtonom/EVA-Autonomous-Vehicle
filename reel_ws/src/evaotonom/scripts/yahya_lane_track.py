@@ -99,16 +99,16 @@ def annotate_image (blended_image_array, prediction):
 
 def steering_control(image, midpoints, endpoints, areas):
         global current_lane_number
-        if areas['sol'] <= 70: # sol şerit pikseli 50'den fazla ise orta noktasını alıyor
+        if areas['sol'] <= 80: # sol şerit pikseli 50'den fazla ise orta noktasını alıyor
             midpoints['sol'] = (0, 0)
-        if areas['sag'] <= 70: # sag şerit pikseli 50'den fazla ise orta noktasını alıyor
+        if areas['sag'] <= 80: # sag şerit pikseli 50'den fazla ise orta noktasını alıyor
             midpoints['sag'] = (0, 0)
         #image = image[:, :, ::-1].copy() # renk kanallarını tersine çevirir, muhtemelen başka kütüphanede işlemek için düzenleme işlemidir
         if midpoints['sol'] != (0, 0) and midpoints['sag'] != (0, 0): # şeritlerin orta noktası hesaplanabiliyorsa koşulu
-            if (int(endpoints['sag']['max'][0] - endpoints['sag']['min'][0]) > 300) and midpoints['sol'][1] - midpoints['sag'][1] > 80 :
+            if (int(endpoints['sag']['max'][0] - endpoints['sag']['min'][0]) > 300) and midpoints['sol'][1] - midpoints['sag'][1] > 1000 :
                 mid_line_y = midpoints['sag'][1]
                 mid_line_x = midpoints['sag'][0] - 250
-            elif int(endpoints['sol']['min'][0] - endpoints['sol']['max'][0]) > 300 and midpoints['sag'][1] - midpoints['sol'][1] > 80:
+            elif int(endpoints['sol']['min'][0] - endpoints['sol']['max'][0]) > 300 and midpoints['sag'][1] - midpoints['sol'][1] > 100:
                 mid_line_y = midpoints['sol'][1]
                 mid_line_x = midpoints['sol'][0] + 250
             else:
@@ -176,6 +176,7 @@ def steering_control(image, midpoints, endpoints, areas):
         lane_publisher.publish(current_lane_number)    
 
         #print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
+        kayit.write(image)
         cv2.imshow("EVA OTONOM LANE TRACK", image)
         cv2.waitKey(1)
 
@@ -224,5 +225,8 @@ if __name__ == "__main__":
     time.sleep(5)
     obstacle_detected = False
     motor_power_pub.publish(1)
+    kayit = cv2.VideoWriter("/home/eva/Downloads/kayit/output_yahya_10.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 7.0, (640, 360))
     while not rospy.is_shutdown():
         callback()
+
+kayit.release()

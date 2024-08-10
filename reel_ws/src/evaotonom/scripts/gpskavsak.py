@@ -32,12 +32,18 @@ if __name__ == "__main__":
     ]
        # Dikdörtgen alanı belirleyen koordinatlar
 
+    # #Şerit Takibi Bekleme
+    rospy.loginfo("Waiting for 'lane_track_node' service...")
+    rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
+    rospy.loginfo("'lane_track_node' service is now available.")    
+   
+
     # Subscribers
     rospy.Subscriber('/stm/gps_latitude', Float32, latitude_callback)
     rospy.Subscriber('/stm/gps_longitude', Float32, longitude_callback)
 
     # Publishers
-    kavsak_noktasi_pub = rospy.Publisher("/sign_detection/roundabout", Int8, queue_size=10)
+    kavsak_noktasi_pub = rospy.Publisher("/sign_detector/roundabout", Int8, queue_size=10)
 
     rate = rospy.Rate(1)  # 1 Hz
 
@@ -45,8 +51,8 @@ if __name__ == "__main__":
         if latitude is not None and longitude is not None:
             corrected_latitude = latitude 
             corrected_longitude = longitude 
-            print(corrected_latitude, corrected_longitude)
             if is_within_area(corrected_latitude, corrected_longitude, rect_area):
+                print(corrected_latitude, corrected_longitude)
                 kavsak_noktasi_pub.publish(1)
                 rospy.loginfo("Kavşak")
             else:

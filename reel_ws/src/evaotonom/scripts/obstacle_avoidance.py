@@ -2,16 +2,12 @@
 #Bu kod engel gördüğünde engelden kaçar!
 import rospy
 from sensor_msgs.msg import LaserScan
-from std_msgs.msg import Bool, Float32, Int8, Float64
+from std_msgs.msg import Bool, Float32, Int8
 import time
 
 def decision_callback(msg):
     global sign_detected
     sign_detected = msg.data
-
-def sign_callback(msg):
-    global detected_sign_number
-    detected_sign_number= msg.data
 
 def callback(msg):
     global scan
@@ -29,7 +25,7 @@ def escapeLeft():
     global obstacle_detected
     if scan is not None:
         obstacle_detected = False
-        for angle_index in range (1001,1240):
+        for angle_index in range (1101,1200):
             distance = scan[angle_index]
             if distance != float('inf'):
                 if (distance < 6) :
@@ -54,7 +50,7 @@ def escapeRight():
                     rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
                     obstacle_publisher.publish(True)
                     obstacle_detected = True
-                    avoidance_obstacle(current_lane, 1)
+                    avoidance_obstacle(1, 1)
                     return True
                 else:
                     return False
@@ -75,8 +71,9 @@ def avoidance_obstacle(current_lane, kacinma):
         if not escapeLeft():
             brake_pub.publish(0)
             time.sleep(2)
+            print("SAĞ SERIDE GECIYORUM  0-0")
             while traveled_distance < 220:
-                print("SAĞ SERIDE GECIYORUM  0-0")
+                pass
             brake_pub.publish(1)
             time.sleep(2)
             reset_odom.publish(1)
@@ -87,8 +84,9 @@ def avoidance_obstacle(current_lane, kacinma):
             time.sleep(0.5)
             brake_pub.publish(0)
             time.sleep(2)
+            print("KENDIMI DUZLUYORUM 0-0")
             while traveled_distance < 200:
-                print("KENDIMI DUZLUYORUM 0-0")
+                pass
             brake_pub.publish(1)
             time.sleep(2)
             reset_odom.publish(1)
@@ -97,8 +95,9 @@ def avoidance_obstacle(current_lane, kacinma):
             time.sleep(2.5)
             brake_pub.publish(0)
             time.sleep(2)
+            print("BITIRDIM SOL SERITTE DEVAM EDIYORUM 0-0")
             while traveled_distance < 100:
-                print("BITIRDIM SOL SERITTE DEVAM EDIYORUM 0-0")
+                pass
             brake_pub.publish(1)
             time.sleep(2)
             obstacle_detected = False
@@ -108,17 +107,17 @@ def avoidance_obstacle(current_lane, kacinma):
     elif current_lane == 0 and kacinma == 1:
         rospy.loginfo(f"SOLDAN BÜYÜK KAÇIŞ BAŞLIYOR 0-1")
         reset_odom.publish(1)
-        time.sleep(2)
+        time.sleep(0.5)
         left_signal.publish(2)
-        time.sleep(4)
+        time.sleep(0.5)
         brake_pub.publish(0)
         time.sleep(2)
+        rospy.loginfo("Beklemeye girdi 4M ----  0-1")
         while traveled_distance < 400:
-            rospy.loginfo("Beklemeye girdi 4M ----  0-1")
+            pass
         time.sleep(0.5)
-        steering_pub.publsih(0)
+        steering_pub.publish(0)
         time.sleep(2)
-        left_signal.publish(False)
         obstacle_detected = False
         obstacle_publisher.publish(obstacle_detected)
 
@@ -135,8 +134,9 @@ def avoidance_obstacle(current_lane, kacinma):
         if not escapeRight():
             brake_pub.publish(0)
             time.sleep(2)
+            print("SOL SERIDE GECIYORUM")
             while traveled_distance < 200:
-                print("SOL SERIDE GECIYORUM")
+                pass
             brake_pub.publish(1)
             time.sleep(2)
             reset_odom.publish(1)
@@ -145,8 +145,9 @@ def avoidance_obstacle(current_lane, kacinma):
             time.sleep(4)
             brake_pub.publish(0)
             time.sleep(2)
+            print("KENDIMI DUZLUYORUM")
             while traveled_distance < 220:
-                print("KENDIMI DUZLUYORUM")
+                pass
             brake_pub.publish(1)
             time.sleep(2)
             reset_odom.publish(1)
@@ -155,8 +156,9 @@ def avoidance_obstacle(current_lane, kacinma):
             time.sleep(2.5)
             brake_pub.publish(0)
             time.sleep(2)
+            print("BITIRDIM SOL SERITTE DEVAM EDIYORUM")
             while traveled_distance < 100:
-                print("BITIRDIM SOL SERITTE DEVAM EDIYORUM")
+                pass
             brake_pub.publish(1)
             time.sleep(2)
             obstacle_detected = False
@@ -171,8 +173,9 @@ def avoidance_obstacle(current_lane, kacinma):
         time.sleep(4)
         brake_pub.publish(0)
         time.sleep(2)
+        rospy.loginfo("Beklemeye girdi 4M ----  1-1")
         while traveled_distance < 400:
-            rospy.loginfo("Beklemeye girdi 4M ----  1-1")
+            pass
         time.sleep(0.5)
         steering_pub.publish(0)
         time.sleep(2)
@@ -191,14 +194,13 @@ if __name__ == "__main__":
     sign_detected = False
     detected_sign_number = False
     HelperArray3 = []
-    rate = rospy.Rate(1)
+    rate = rospy.Rate(5)
 
     #Subscribers
     rospy.Subscriber('/scan', LaserScan, callback, queue_size=10)
     rospy.Subscriber("/lane_track/current_lane", Int8, current_lane_check) # 0 sol 1 sağ
     rospy.Subscriber('/stm/read_odometer', Float32, read_odometer)
     rospy.Subscriber('/decision_algorithm/detection_control', Bool, decision_callback)
-    rospy.Subscriber("/sign_detector/detected_sign_number", Int8, sign_callback)
 
     #Publishers
     reset_odom = rospy.Publisher('/stm/reset_odometer', Bool, queue_size=10)
@@ -212,9 +214,9 @@ if __name__ == "__main__":
     obstacle_publisher.publish(obstacle_detected)
 
     # #Şerit Takibi Bekleme
-    # rospy.loginfo("Waiting for 'lane_track_node' service...")
-    # rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
-    # rospy.loginfo("'lane_track_node' service is now available.")    
+    rospy.loginfo("Waiting for 'lane_track_node' service...")
+    rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
+    rospy.loginfo("'lane_track_node' service is now available.")    
 
     while not rospy.is_shutdown():
         if not sign_detected:
@@ -223,16 +225,16 @@ if __name__ == "__main__":
                 for angle_index in range (0,1285):
                     distance = scan[angle_index]
                     if distance != float('inf'):
-                        if angle_index <= 72 and angle_index >= 0 and distance < 4.50:
+                        if angle_index <= 72 and angle_index >= 0 and distance < 3.50:
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
                             obstacle_detected = True
                             obstacle_publisher.publish(True)
-                            avoidance_obstacle(current_lane, 0)
+                            avoidance_obstacle(1, 0)
                             break
-                        if angle_index <= 1285 and angle_index > 1180 and distance < 4.50:
+                        if angle_index <= 1285 and angle_index > 1180 and distance < 3.50:
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
                             obstacle_detected = True
                             obstacle_publisher.publish(True)
-                            avoidance_obstacle(current_lane, 0)
+                            avoidance_obstacle(1, 0)
                             break
             rate.sleep()

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3.9
 
 # BU KOD YAPAY ZEKA İŞLEMLERİ SONUCUNDA ARACIN KONTROL EDİLEBİLMESİ İÇİN YAZILMIŞTIR.
 # gps_latitude, gps_longitude, read_odometer verileri Float32 tipinde yayınlanmaktadır.
@@ -38,9 +39,13 @@ class STM_Communication:
     def __init__(self, port, slave_address=1, baudrate=38400):
         self.stm = minimalmodbus.Instrument(port, slave_address)
         self.stm.serial.baudrate = baudrate
-        self.stm.serial.timeout = 1  # 1 saniye
+        self.stm.serial.timeout = 1 # 1 saniye
         self.stm.clear_buffers_before_each_transaction = True
+        self.stm.serial.bytesize = 8
+        self.stm.serial.parity = 'N'
+        self.stm.serial.stopbits = 1
 
+        self.mutex = 0
         self.gps_latitude = None
         self.gps_latitude_1 = None
         self.gps_latitude_2 = None
@@ -71,14 +76,18 @@ class STM_Communication:
             if -32769 < data < 32768:
                 if data < 0:
                     data = 65536 + data
-                self.stm.write_register(num_of_registers.value, int(data), functioncode=6)
-                rospy.loginfo(f'{num_of_registers.name} degeri {datatemp} olarak gonderildi.')
+                while True:
+                    if self.mutex == 0: # Okuma yaparken yazma, yazma yaparken okuma yapılmasını engelleyip, çakışmayı önlemek için
+                        self.mutex = 1
+                        self.stm.write_register(num_of_registers.value, int(data))
+                        self.mutex = 0
+                        rospy.loginfo(f'{num_of_registers.name} degeri {datatemp} olarak gonderildi.')
+                        return
             else:
                 rospy.logwarn(f"Fonksiyon icerisine 32767 ila -32768 araliginda deger giriniz. {datatemp}")
         except Exception as e:
-            rospy.loginfo(f"TEKRAR GONDERME CALISTI")
-            time.sleep(0.2)
-            self.send_command(num_of_registers, datatemp)
+            rospy.loginfo(f"GONDERME HATASI {e}")
+            self.mutex = 0
 
     def read_data(self, num_of_registers):
         try:
@@ -119,17 +128,17 @@ class STM_Communication:
     def right_signal(self, x=5):
         for i in range (0,x):
             self.send_command(Register.RIGHT_TURN_SIGNAL, 1)
-            time.sleep(0.8)
+            time.sleep(0.6)
             self.send_command(Register.RIGHT_TURN_SIGNAL, 0)
-            time.sleep(0.8)
+            time.sleep(0.6)
         print("SAG SINYAL BITTI")
 
     def left_signal(self, x=5):
         for i in range (0,x):
             self.send_command(Register.LEFT_TURN_SIGNAL, 1)
-            time.sleep(0.8)
+            time.sleep(0.6)
             self.send_command(Register.LEFT_TURN_SIGNAL, 0)
-            time.sleep(0.8)
+            time.sleep(0.6)
         print("SOL SINYAL BITTI")
     def r_signal_callback(self, msg):
         try:
@@ -147,27 +156,31 @@ class STM_Communication:
         
     def publish_data(self):
         global pub_rate
-        self.gps_latitude_1 = self.read_data(Register.GPS_LATITUDE)
-        self.gps_latitude_2 = self.read_data(Register.GPS_LATITUDE_2)
-        self.gps_longitude_1 = self.read_data(Register.GPS_LONGITUDE)
-        self.gps_longitude_2 = self.read_data(Register.GPS_LONGITUDE_2)
-        self.read_odometer = self.read_data(Register.READ_ODOMETER)
-        self.check_otonom = self.read_data(Register.DRIVING_OTONOM )
-        if self.gps_latitude_1 is not None and self.gps_latitude_2 is not None:
-            self.gps_latitude = ((self.gps_latitude_1 * 10000) + self.gps_latitude_2) / 1000000
-            self.gps_latitude_pub.publish(self.gps_latitude)
-        if self.gps_longitude_1 is not None and self.gps_longitude_2 is not None:
-            self.gps_longitude = ((self.gps_longitude_1 * 100000) + (self.gps_longitude_2 * 10)) / 100000000
-            self.gps_longitude_pub.publish(self.gps_longitude)
-        if self.read_odometer is not None and self.read_odometer < 64000 :
-            self.read_odometer_pub.publish(self.read_odometer)
-        if self.check_otonom is not None:
-            self.check_otonom_pub.publish(self.check_otonom)
-        pub_rate.sleep()
+        if self.mutex == 0:
+            self.mutex = 1
+            self.gps_latitude_1 = self.read_data(Register.GPS_LATITUDE)
+            self.gps_latitude_2 = self.read_data(Register.GPS_LATITUDE_2)
+            self.gps_longitude_1 = self.read_data(Register.GPS_LONGITUDE)
+            self.gps_longitude_2 = self.read_data(Register.GPS_LONGITUDE_2)
+            self.read_odometer = self.read_data(Register.READ_ODOMETER)
+            self.check_otonom = self.read_data(Register.DRIVING_OTONOM)
+            self.mutex = 0
+            if self.gps_latitude_1 is not None and self.gps_latitude_2 is not None:
+                self.gps_latitude = ((self.gps_latitude_1 * 10000) + self.gps_latitude_2) / 1000000
+                self.gps_latitude_pub.publish(self.gps_latitude)
+            if self.gps_longitude_1 is not None and self.gps_longitude_2 is not None:
+                self.gps_longitude = ((self.gps_longitude_1 * 100000) + (self.gps_longitude_2 * 10)) / 100000000
+                self.gps_longitude_pub.publish(self.gps_longitude)
+            if self.read_odometer is not None and self.read_odometer < 64000 :
+                self.read_odometer_pub.publish(self.read_odometer)
+            if self.check_otonom is not None and self.check_otonom != 0:
+                self.check_otonom_pub.publish(self.check_otonom)
+            pub_rate.sleep()
         
     def spin(self):
         while not rospy.is_shutdown():
             self.publish_data()
+            pass
             
 if __name__ == '__main__':
     try:

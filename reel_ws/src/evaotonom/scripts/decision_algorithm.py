@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.9
 
 import rospy
-from std_msgs.msg import Int8, Float64, Bool, Float32MultiArray, Float32
+from std_msgs.msg import Int8, Bool, Float32MultiArray, Float32
 import time
 import os
 
@@ -46,22 +46,21 @@ if __name__ == "__main__":
     kavsak_girisi = None
 
     #ŞERİT TAKİBİ BEKLEME
-    # rospy.loginfo("Waiting for 'lane_track_node' service...")
-    # rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
-    # rospy.loginfo("'lane_track_node' service is now available.")
+    rospy.loginfo("Waiting for 'lane_track_node' service...")
+    rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
+    rospy.loginfo("'lane_track_node' service is now available.")
 
 
     #Subscribers
     rospy.Subscriber("/sign_detector/detected_sign_number", Int8, sign_callback) 
     rospy.Subscriber('/stm/read_odometer', Float32, read_odometer)
     rospy.Subscriber('/lane_track/current_lane', Int8, lane_callback)
-    rospy.Subscriber('/sign_detection/tabela', Int8, sign_callback , queue_size=10)
-    rospy.Subscriber('/sign_detection/position', Float32MultiArray,position_callback ,queue_size=10)
-    rospy.Subscriber("/sign_detection/roundabout", Int8 , kavsak_callback)
+    rospy.Subscriber('/sign_detector/position', Float32MultiArray,position_callback ,queue_size=10)
+    rospy.Subscriber("/sign_detector/roundabout", Int8 , kavsak_callback)
 
     #Publishers
-    steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=100)
-    brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=100)
+    steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=1)
+    brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=10)
     detection_control = rospy.Publisher("/decision_algorithm/detection_control", Bool, queue_size=10)
     motor_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=100)
     reset_odom = rospy.Publisher('/stm/reset_odometer', Bool, queue_size=10)
@@ -155,16 +154,17 @@ if __name__ == "__main__":
                 if depth is not None:
                     #os.system("rosnode kill "+ "lane_track_node")
                     #os.system("rosnode kill "+ "obstacle_detector_node")
-                    while depth > 337 :
-                        print (depth)
+                    while depth > 3.37:
                         if x1 == None or x2 == None or size == None:
                             print("None")
                             continue
                         sign_midpoint = (x1 + x2) / 2 # Tespit edilen Levhanın orta noktası alınır
                         im_midpoint = size / 2 # Görselin orta noktası alınır
                         steering_angle = ((im_midpoint - sign_midpoint + 208)*0.192) - 40 # -208 ile 208 arasında olan değer tekerlek açısı için -40 ile 40 arasına çevrilir
-                        steering_pub.publish(steering_angle) 
-                    time.sleep(0.1)
+                        steering_pub.publish((int(steering_angle)) * -1)
+                        print(steering_angle)
+                        time.sleep(0.5)
+                    time.sleep(2)
                     brake_pub.publish(1)
                     time.sleep(2)
                     detected_sign_number = True
@@ -181,11 +181,11 @@ if __name__ == "__main__":
                     rospy.loginfo("sagdan sola donus basladı")
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    while distance < 550:
+                    while distance < 380:
                         print(distance)
+                    detection_control.publish(True)
                     print("dist bitti")
                     time.sleep(0.5)
-                    detection_control.publish(True)
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
@@ -196,27 +196,21 @@ if __name__ == "__main__":
                     time.sleep(2)
                     brake_pub.publish(0)
                     time.sleep(2)
-                    while distance < 300:
+                    while distance < 475:
                         print(distance)
-                    brake_pub.publish(1)
-                    time.sleep(2)
-                    reset_odom.publish(1)
-                    time.sleep(0.5)
                     steering_pub.publish(0)
-                    time.sleep(2)
-                    brake_pub.publish(0)
                     time.sleep(2)
 
                 
                 elif current_lane == 0: # sol seritten
                     rospy.loginfo("soldan sola donus basladı")
+                    detection_control.publish(True)
                     reset_odom.publish(1)
                     time.sleep(0.5)
                     while distance <650:
                         print(distance)
                     print("dist bitti")
                     time.sleep(0.5)
-                    detection_control.publish(True)
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
@@ -246,7 +240,7 @@ if __name__ == "__main__":
                     rospy.loginfo("sagdan saga donus basladı")
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    while distance <550:
+                    while distance <350:
                         print(distance)
                     print("dist bitti")
                     time.sleep(0.5)
@@ -261,7 +255,7 @@ if __name__ == "__main__":
                     time.sleep(2)
                     brake_pub.publish(0)
                     time.sleep(2)
-                    while distance < 300:
+                    while distance < 500:
                         print(distance)
                     brake_pub.publish(1)
                     time.sleep(2)
@@ -318,7 +312,7 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                         brake_pub.publish(0)
                         time.sleep(2)                                                
-                        while distance < 450:
+                        while distance < 425:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)

@@ -42,102 +42,102 @@ bridge = CvBridge()
 
 def callback(left_image_msg, right_image_msg, point_cloud_msg):
     global left_image, right_image, point_cloud, original_height, original_width, sign_detected, x1, x2, y1, y2, current_detections, cumulative_counters, last_publish_time, size, detection_limit,bridge
-    
-    # Convert images
-    original_left_image = bridge.imgmsg_to_cv2(left_image_msg, "bgr8")
-    original_right_image = bridge.imgmsg_to_cv2(right_image_msg, "bgr8")
+    if obstacle_detected != 1:
+        # Convert images
+        original_left_image = bridge.imgmsg_to_cv2(left_image_msg, "bgr8")
+        original_right_image = bridge.imgmsg_to_cv2(right_image_msg, "bgr8")
 
-    # Store original image dimensions
-    original_height, original_width = original_left_image.shape[:2]
+        # Store original image dimensions
+        original_height, original_width = original_left_image.shape[:2]
 
-    # Resize images to 416x416
-    left_image = cv2.resize(original_left_image, (416, 416))
-    right_image = cv2.resize(original_right_image, (416, 416))
+        # Resize images to 416x416
+        left_image = cv2.resize(original_left_image, (416, 416))
+        right_image = cv2.resize(original_right_image, (416, 416))
 
-    # Store point cloud
-    point_cloud = point_cloud_msg
+        # Store point cloud
+        point_cloud = point_cloud_msg
 
-    # Detect objects in left image
-    results_left = model(left_image)
-    left_detected = False
-    detected_boxes = []
-    sign_detected = False
+        # Detect objects in left image
+        results_left = model(left_image)
+        left_detected = False
+        detected_boxes = []
+        sign_detected = False
 
-    for result in results_left:
-        class_name = None
-        for box in result.boxes:
-            if box.conf > 0.7:  # Adjust threshold as needed
-                # Get box coordinates
-                x1, y1, x2, y2 = map(int, box.xyxy[0])
-                class_id = int(box.cls[0])
-                class_name = class_names.get(class_id, 'Unknown')
-                # Draw bounding box and label on left image
-                cv2.rectangle(left_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
-                label = f'{class_name}'
-                cv2.putText(left_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)    
-                left_detected = True
-                detected_boxes.append((x1, y1, x2, y2, class_name))
-    
-    if left_detected:
-        # Detect objects in right image
-        results_right = model(right_image)
-        for result in results_right:
+        for result in results_left:
+            class_name = None
             for box in result.boxes:
                 if box.conf > 0.7:  # Adjust threshold as needed
                     # Get box coordinates
                     x1, y1, x2, y2 = map(int, box.xyxy[0])
                     class_id = int(box.cls[0])
                     class_name = class_names.get(class_id, 'Unknown')
+                    # Draw bounding box and label on left image
+                    cv2.rectangle(left_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
+                    label = f'{class_name}'
+                    cv2.putText(left_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)    
+                    left_detected = True
+                    detected_boxes.append((x1, y1, x2, y2, class_name))
+        
+        if left_detected:
+            # Detect objects in right image
+            results_right = model(right_image)
+            for result in results_right:
+                for box in result.boxes:
+                    if box.conf > 0.7:  # Adjust threshold as needed
+                        # Get box coordinates
+                        x1, y1, x2, y2 = map(int, box.xyxy[0])
+                        class_id = int(box.cls[0])
+                        class_name = class_names.get(class_id, 'Unknown')
 
-                    sign_detected = True     
-                    
-                    # Calculate the depth using the point cloud
-                    depth = calculate_depth(point_cloud, (x1, y1, x2, y2))
+                        sign_detected = True     
+                        
+                        # Calculate the depth using the point cloud
+                        depth = calculate_depth(point_cloud, (x1, y1, x2, y2))
 
-                    if depth is not None and math.isnan(depth) == False and math.isinf(depth) == False:
+                        if depth is not None and math.isnan(depth) == False and math.isinf(depth) == False:
 
-                        # Güvenlik önlemi: Anahtarın sözlükte var olduğundan emin olun
-                        if class_name not in cumulative_counters:
+                            # Güvenlik önlemi: Anahtarın sözlükte var olduğundan emin olun
+                            if class_name not in cumulative_counters:
+                                if class_name != "parkyapilmaz" and class_name != "soladonulmez":
+                                    cumulative_counters[class_name] = 0
+
                             if class_name != "parkyapilmaz" and class_name != "soladonulmez":
-                                cumulative_counters[class_name] = 0
+                                cumulative_counters[class_name] += 1
+                                current_detections += 1
 
-                        if class_name != "parkyapilmaz" and class_name != "soladonulmez":
-                            cumulative_counters[class_name] += 1
-                            current_detections += 1
+                            # Algılama sayısı limitine ulaşıldığında kontrol
+                            if current_detections >= detection_limit:
+                                # En sık tespit edilen işareti bul
+                                class_name = max(cumulative_counters, key=cumulative_counters.get)
 
-                        # Algılama sayısı limitine ulaşıldığında kontrol
-                        if current_detections >= detection_limit:
-                            # En sık tespit edilen işareti bul
-                            class_name = max(cumulative_counters, key=cumulative_counters.get)
+                                # En sık tespit edilen sınıfı tabela_bilgi fonksiyonuna gönder
+                                tabela_bilgi(class_name, calculate_depth(point_cloud, (x1, y1, x2, y2)))
 
-                            # En sık tespit edilen sınıfı tabela_bilgi fonksiyonuna gönder
-                            tabela_bilgi(class_name, calculate_depth(point_cloud, (x1, y1, x2, y2)))
+                                # Sayaçları ve algılama sayısını sıfırla
+                                cumulative_counters = {class_name: 0 for class_name in class_names.values()}
+                                current_detections = 0
+                                
+                            # Draw bounding box and label on right image
+                            cv2.rectangle(right_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
+                            label = f'{class_name} ({depth:.2f}m)' if depth is not None else class_name
 
-                            # Sayaçları ve algılama sayısını sıfırla
-                            cumulative_counters = {class_name: 0 for class_name in class_names.values()}
-                            current_detections = 0
-                            
-                        # Draw bounding box and label on right image
-                        cv2.rectangle(right_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
-                        label = f'{class_name} ({depth:.2f}m)' if depth is not None else class_name
+                            cv2.putText(right_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
-                        cv2.putText(right_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+                            if depth is not None:
+                                print(f"LEVHA: {class_name} UZAKLIK: {depth:.2f}m")
+                            else:
+                                pass
 
-                        if depth is not None:
-                            print(f"LEVHA: {class_name} UZAKLIK: {depth:.2f}m")
-                        else:
-                            pass
-
-                # Ekstra: Her sınıfın sayısını ekrana bas
-        for class_name, count in cumulative_counters.items():
-            if count > 0:
-                print(f"Class: {class_name}, Count: {count}")
-    else:
-        # 23 kodunu yayınlamak için zaman kontrolü
-        current_time = time.time()
-        if current_time - last_publish_time >= 1.0:  # 1 saniyede bir kontrol
-            tabela_pub.publish(23)
-            last_publish_time = current_time
+                    # Ekstra: Her sınıfın sayısını ekrana bas
+            for class_name, count in cumulative_counters.items():
+                if count > 0:
+                    print(f"Class: {class_name}, Count: {count}")
+        else:
+            # 23 kodunu yayınlamak için zaman kontrolü
+            current_time = time.time()
+            if current_time - last_publish_time >= 1.0:  # 1 saniyede bir kontrol
+                tabela_pub.publish(23)
+                last_publish_time = current_time
 
 def calculate_depth(point_cloud, boundingbox):
     if sign_detected == True:
@@ -195,7 +195,7 @@ def tabela_bilgi(class_name, depth_in_meters):
         elif class_name == "kirmizi" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(7)
 
-        elif class_name == "park" and depth_in_meters is not None and depth_in_meters < 18.0:
+        elif class_name == "park" and depth_in_meters is not None and depth_in_meters < 30.0:
             tabela_pub.publish(8)
 
             data = [float(x1), float(y1), float(x2), float(y2), float(size), float(depth_in_meters)]
@@ -254,6 +254,12 @@ def tabela_bilgi(class_name, depth_in_meters):
 if __name__ == '__main__':
     rospy.init_node('zed_object_detection')
 
+    # #Şerit Takibi Bekleme
+    rospy.loginfo("Waiting for 'lane_track_node' service...")
+    rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
+    rospy.loginfo("'lane_track_node' service is now available.")    
+
+
     # Subscribers
     left_image_sub = message_filters.Subscriber("/zed2i/zed_node/left_raw/image_raw_color", Image)
     right_image_sub = message_filters.Subscriber("/zed2i/zed_node/right_raw/image_raw_color", Image)
@@ -264,8 +270,8 @@ if __name__ == '__main__':
     decision_control_sub = rospy.Subscriber('/decision_algorithm/detection_control', Bool, decision_callback)
     ts = message_filters.TimeSynchronizer([left_image_sub, right_image_sub, point_cloud_sub], 10)
     ts.registerCallback(callback)
-    tabela_pub = rospy.Publisher('/sign_detection/tabela', Int8, queue_size=10)
-    position_pub = rospy.Publisher('/sign_detection/position', Float32MultiArray, queue_size=10)
+    tabela_pub = rospy.Publisher('/sign_detector/detected_sign_number', Int8, queue_size=10)
+    position_pub = rospy.Publisher('/sign_detector/position', Float32MultiArray, queue_size=10)
 
     # rospy.loginfo("Waiting for 'lane_track_node' service...")
     # rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
@@ -293,7 +299,7 @@ if __name__ == '__main__':
     
     cumulative_counters = defaultdict(int)    # Kümülatif sayaçlar
     # Algılama sayısı limiti
-    detection_limit = 25 # 25 algılamada bir kontrol edilecek
+    detection_limit = 10 # 25 algılamada bir kontrol edilecek
     current_detections = 0  # Mevcut algılama sayısı
     cumulative_counters = {class_name: 0 for class_name in class_names.values()}  # Her bir sınıf için sayaç
     last_publish_time = time.time()  # İlk zaman

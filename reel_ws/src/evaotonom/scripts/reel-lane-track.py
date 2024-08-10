@@ -157,10 +157,12 @@ def steering_control(image, midpoints, endpoints, areas):
 
 def callback():
     try:
-        ret, msg = cam.read()
-        image, pr = segment_image(msg)
-        image, midpoints, endpoints, areas = annotate_image(image, pr)
-        steering_control(image, midpoints, endpoints, areas)
+        if obstacle_detected !=1 and sign_detected != 1:
+            ret, msg = cam.read()
+            image, pr = segment_image(msg)
+            image, midpoints, endpoints, areas = annotate_image(image, pr)
+            steering_control(image, midpoints, endpoints, areas)
+        rate.sleep()
     except Exception as e:
         print("SERIT TAKIBI HATASI: " + str(e))
     
@@ -196,7 +198,8 @@ if __name__ == "__main__":
     steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=10)
     lane_publisher = rospy.Publisher("/lane_track/current_lane", Int8, queue_size=10)
     brake_publisher = rospy.Publisher('/stm/brake', Bool, queue_size=10)
-    time.sleep(2)
+    rate = rospy.Rate(2)
+    time.sleep(3)
     obstacle_detected = False
     motor_power_pub.publish(1)
     while not rospy.is_shutdown():

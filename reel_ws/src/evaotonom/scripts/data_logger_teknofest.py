@@ -151,6 +151,12 @@ if __name__ == "__main__":
         22: 'parkYapilmaz',
         23: "N/A"
     }
+
+    # #Şerit Takibi Bekleme
+    rospy.loginfo("Waiting for 'lane_track_node' service...")
+    rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
+    rospy.loginfo("'lane_track_node' service is now available.")    
+
     
     with open (file_path,"w") as file:
         file.write("")
@@ -160,7 +166,7 @@ if __name__ == "__main__":
     rospy.Subscriber('/stm/gps_latitude', Float32, lat_callback)
     rospy.Subscriber('/stm/gps_longitude', Float32, long_callback)
     rospy.Subscriber('/sign_detector/detected_sign_number', Int8, sign_callback)
-    rospy.Subscriber('/scan', LaserScan, obstacle_callback, queue_size=10)
+    rospy.Subscriber('/obstacle_detector/obstacle_detection', LaserScan, obstacle_callback, queue_size=10)
     rospy.Subscriber("/lane_track/current_lane", Int8, current_lane_check)
 
     rospy.Timer(rospy.Duration(1), log_data)
