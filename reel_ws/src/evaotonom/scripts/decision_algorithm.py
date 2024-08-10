@@ -163,7 +163,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         sign_midpoint = (x1 + x2) / 2 # Tespit edilen Levhanın orta noktası alınır
                         im_midpoint = size / 2 # Görselin orta noktası alınır
-                        steering_angle = (im_midpoint - sign_midpoint)*0.016 # -640 ile 640 arasında olan değer tekerlek açısı için -10 ile 10 arasına çevrilir
+                        steering_angle = ((im_midpoint - sign_midpoint + 208)*0.192) - 40 # -208 ile 208 arasında olan değer tekerlek açısı için -40 ile 40 arasına çevrilir
                         steering_pub.publish(steering_angle) 
                     time.sleep(0.1)
                     brake_pub.publish(1)
