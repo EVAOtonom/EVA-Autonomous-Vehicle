@@ -99,6 +99,7 @@ def annotate_image (blended_image_array, prediction):
 
 def steering_control(image, midpoints, endpoints, areas):
         global current_lane_number
+        kosul = 0
         if areas['sol'] <= 80: # sol şerit pikseli 50'den fazla ise orta noktasını alıyor
             midpoints['sol'] = (0, 0)
         if areas['sag'] <= 80: # sag şerit pikseli 50'den fazla ise orta noktasını alıyor
@@ -108,35 +109,33 @@ def steering_control(image, midpoints, endpoints, areas):
             if (int(endpoints['sag']['max'][0] - endpoints['sag']['min'][0]) > 300) and midpoints['sol'][1] - midpoints['sag'][1] > 1000 :
                 mid_line_y = midpoints['sag'][1]
                 mid_line_x = midpoints['sag'][0] - 250
+                kosul = 1
             elif int(endpoints['sol']['min'][0] - endpoints['sol']['max'][0]) > 300 and midpoints['sag'][1] - midpoints['sol'][1] > 100:
                 mid_line_y = midpoints['sol'][1]
                 mid_line_x = midpoints['sol'][0] + 250
+                kosul = 2
             else:
-                if abs (midpoints["sol"][1]-midpoints["sag"][1]) < 15: 
-                    mid_line_y = (midpoints['sol'][1] + midpoints['sag'][1]) / 2
-                    mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
-                else:
-                    mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
-                    if areas["sol"] > areas["sag"]:
-                        mid_line_y = midpoints["sol"][1]
-                    else:
-                        mid_line_y = midpoints["sag"][1]
-
+                mid_line_y = (midpoints['sol'][1] + midpoints['sag'][1]) / 2
+                mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
+                kosul = 3
         elif midpoints['sag'] == (0, 0) and midpoints['sol'] != (0, 0): # sagın orta noktası yok solun orta noktası var koşulu
             if int(endpoints['sol']['min'][0] - endpoints['sol']['max'][0]) > 230:
                 mid_line_y = midpoints['sol'][1]
                 mid_line_x = midpoints['sol'][0] + 250
+                kosul = 4
             else:
                 mid_line_y = midpoints['sol'][1]
                 mid_line_x = midpoints['sol'][0] + 150    # sol şeride 150 ekleyerek sag şeritsiz yolun ortasını buluyor
-
+                kosul = 5
         elif midpoints['sol'] == (0, 0) and midpoints['sag'] != (0, 0):     # solun orta noktası yok sagın orta noktası var koşulu
             if int(endpoints['sag']['max'][0] - endpoints['sag']['min'][0]) > 230:
                 mid_line_y = midpoints['sag'][1]
                 mid_line_x = midpoints['sag'][0] - 250
+                kosul = 6
             else:
                 mid_line_y = midpoints['sag'][1]
                 mid_line_x = midpoints['sag'][0] - 150           # sag seridin orta noktasından 150 piksel çıkartarak yolun ortasını buluyor
+                kosul = 7
         else:
             cv2.putText(image, 'UCGEN CIZILEMEDI',(15, 40), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
             print("UCGEN CIZILEMEDI")
@@ -161,6 +160,8 @@ def steering_control(image, midpoints, endpoints, areas):
 
         cv2.putText(image, f"tekerlek acisi: {steering}", (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
         cv2.putText(image, f"ucgen aci: {degree}", (15, 55), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
+        cv2.putText(image, f"KOSUL : {kosul}", (15, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
+
         if areas['ensol'] > areas['ensag']: # Mevcut şerit bilgisini ekrana yazdırır
             cv2.putText(image, 'arac SAG seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
             current_lane_number = 1
