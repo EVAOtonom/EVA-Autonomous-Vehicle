@@ -76,12 +76,12 @@ if __name__ == "__main__":
             if detected_sign_number == 3: # DURAK KARAR ALGORITMASI
                 if current_lane == 1: # SAG SERITTEYSE
                     rospy.loginfo(" @@@@@@@@@@ SAG SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ")  
+                    detection_control.publish(True) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
                     reset_odom.publish(1)
                     time.sleep(0.5)
                     while distance < 180:  
                         print(distance)
                     print("dist1 bitti")
-                    detection_control.publish(True) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
                     brake_pub.publish(1)
                     time.sleep(2)
                     right_signal.publish(2)
@@ -212,11 +212,11 @@ if __name__ == "__main__":
             if detected_sign_number == 13: # sola dönüş
                 if current_lane == 1: # sag seritten
                     rospy.loginfo("sagdan sola donus basladı")
+                    detection_control.publish(True)
                     reset_odom.publish(1)
                     time.sleep(0.5)
                     while distance < 380:
                         print(distance)
-                    detection_control.publish(True)
                     print("dist bitti")
                     time.sleep(0.5)
                     brake_pub.publish(1)
@@ -256,14 +256,9 @@ if __name__ == "__main__":
                     time.sleep(2)
                     while distance < 300:
                         print(distance)
-                    brake_pub.publish(1)
-                    time.sleep(2)
-                    reset_odom.publish(1)   
-                    time.sleep(0.5) 
                     steering_pub.publish(0)
                     time.sleep(2)
-                    brake_pub.publish(0)
-                    time.sleep(2)
+
                 
 
                 detection_control.publish(False)               
@@ -271,13 +266,13 @@ if __name__ == "__main__":
             if detected_sign_number == 10: # saga donus
                 if current_lane == 1: # sag seritten
                     rospy.loginfo("sagdan saga donus basladı")
+                    detection_control.publish(True)
                     reset_odom.publish(1)
                     time.sleep(0.5)
                     while distance <350:
                         print(distance)
                     print("dist bitti")
-                    time.sleep(0.5)
-                    detection_control.publish(True)                       
+                    time.sleep(0.5)                  
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
@@ -290,25 +285,19 @@ if __name__ == "__main__":
                     time.sleep(2)
                     while distance < 500:
                         print(distance)
-                    brake_pub.publish(1)
-                    time.sleep(2)
-                    reset_odom.publish(1)
-                    time.sleep(0.5)
                     steering_pub.publish(0)
-                    time.sleep(2)
-                    brake_pub.publish(0)
-                    time.sleep(2)
+
 
                     
                 elif current_lane == 0: # sol seritten
                     rospy.loginfo("soldan saga donus basladı")
+                    detection_control.publish(True)
                     reset_odom.publish(1)
                     time.sleep(0.5)
                     while distance <650:
                         print(distance)
                     print("dist bitti")
                     time.sleep(0.5)
-                    detection_control.publish(True)
                     brake_pub.publish(1)
                     time.sleep(2)
                     right_signal.publish(4)
@@ -321,14 +310,9 @@ if __name__ == "__main__":
                     time.sleep(2)
                     while distance < 300:
                         print(distance)
-                    brake_pub.publish(1)
-                    time.sleep(2)
-                    reset_odom.publish(1)
-                    time.sleep(0.5)
                     steering_pub.publish(0)
                     time.sleep(2)
-                    brake_pub.publish(0)
-                    time.sleep(2)
+
                     
                 detection_control.publish(False)
 
