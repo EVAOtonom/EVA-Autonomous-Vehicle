@@ -95,7 +95,11 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
                         depth = calculate_depth(point_cloud, (x1, y1, x2, y2))
 
                         if depth is not None and math.isnan(depth) == False and math.isinf(depth) == False:
-
+                            
+                            if class_name in ["park", "engellipark"] and box.conf > 0.9:  # Doğrulama kontrolü
+                                cumulative_counters[class_name] += 1
+                                current_detections += 1
+                                
                             # Güvenlik önlemi: Anahtarın sözlükte var olduğundan emin olun
                             if class_name not in cumulative_counters:
                                 if class_name != "parkyapilmaz" and class_name != "soladonulmez":
