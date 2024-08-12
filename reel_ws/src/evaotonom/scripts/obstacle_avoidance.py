@@ -50,7 +50,7 @@ def escapeRight():
                     rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
                     obstacle_publisher.publish(True)
                     obstacle_detected = True
-                    avoidance_obstacle(1, 1)
+                    avoidance_obstacle(current_lane, 1)
                     return True
                 else:
                     return False
@@ -210,7 +210,6 @@ if __name__ == "__main__":
     steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=100)
     throttle_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=100)
     brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=100)
-    throttle_pub.publish(1)
     obstacle_publisher.publish(obstacle_detected)
 
     # #Şerit Takibi Bekleme
@@ -229,12 +228,12 @@ if __name__ == "__main__":
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
                             obstacle_detected = True
                             obstacle_publisher.publish(True)
-                            avoidance_obstacle(1, 0)
+                            avoidance_obstacle(current_lane, 0)
                             break
                         if angle_index <= 1285 and angle_index > 1180 and distance < 3.50:
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
                             obstacle_detected = True
                             obstacle_publisher.publish(True)
-                            avoidance_obstacle(1, 0)
+                            avoidance_obstacle(current_lane, 0)
                             break
             rate.sleep()
