@@ -1,8 +1,7 @@
 #!/usr/bin/env python3.9
 
 import rospy
-from std_msgs.msg import Float32, Int8
-from sensor_msgs.msg import Bool
+from std_msgs.msg import Float32, Int8, Bool
 from datetime import datetime
 import pytz
 import random
