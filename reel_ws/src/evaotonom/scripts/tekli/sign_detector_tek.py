@@ -39,7 +39,7 @@ def decision_callback(msg):
     decision_control = msg.data
 
 #model 
-model = YOLO(f'{os.path.dirname(os.path.abspath(__file__))}/sol300best.pt')
+model = YOLO(f'{os.path.dirname(os.path.abspath(__file__))}/../sol300best.pt')
 bridge = CvBridge()
 
 def callback(left_image_msg, right_image_msg, point_cloud_msg):
