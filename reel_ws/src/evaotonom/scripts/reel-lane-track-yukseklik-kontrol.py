@@ -223,7 +223,7 @@ if __name__ == "__main__":
     time.sleep(5)
     obstacle_detected = False
     motor_power_pub.publish(1)
-    kayit = cv2.VideoWriter("/home/eva/Downloads/kayit/output_sefa_17.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 7.0, (640, 360))
+    kayit = cv2.VideoWriter("/home/eva/Downloads/kayit/output_yarisma_1.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 7.0, (640, 360))
     while not rospy.is_shutdown():
         callback()
     
