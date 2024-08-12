@@ -4,6 +4,8 @@ import rospy
 from sensor_msgs.msg import LaserScan
 from std_msgs.msg import Bool, Float32, Int8
 import time
+from datetime import datetime
+
 
 def decision_callback(msg):
     global sign_detected
@@ -30,6 +32,8 @@ def escapeLeft():
             if distance != float('inf'):
                 if (distance < 6) :
                     rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
+                    with open('angle_index.txt', 'a', encoding='utf-8') as dosya:
+                        dosya.write(f"Alıglanan Açı : {angle_index} Algılanan Mesafe : {distance}  Algılanan Saat : {hour} ---- 0-1")
                     obstacle_publisher.publish(True)
                     obstacle_detected = True
                     avoidance_obstacle(1, 1)
@@ -48,6 +52,8 @@ def escapeRight():
             if distance != float('inf'):
                 if (distance < 10 ):
                     rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
+                    with open('angle_index.txt', 'a', encoding='utf-8') as dosya:
+                        dosya.write(f"Alıglanan Açı : {angle_index} Algılanan Mesafe : {distance}  Algılanan Saat : {hour} ---- 1-1")
                     obstacle_publisher.publish(True)
                     obstacle_detected = True
                     avoidance_obstacle(1, 1)
@@ -193,6 +199,8 @@ if __name__ == "__main__":
     obstacle_detected = False
     sign_detected = False
     detected_sign_number = False
+    rightnow = datetime.now()
+    hour = rightnow.strftime("%H:%M:%S")
     HelperArray3 = []
     rate = rospy.Rate(5)
 
@@ -226,14 +234,16 @@ if __name__ == "__main__":
                     if distance != float('inf'):
                         if angle_index <= 72 and angle_index >= 0 and distance < 3.50:
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
+                            with open('angle_index.txt', 'a', encoding='utf-8') as dosya:
+                                dosya.write(f"Alıglanan Açı : {angle_index} Algılanan Mesafe : {distance}  Algılanan Saat : {hour}")
                             obstacle_detected = True
                             obstacle_publisher.publish(True)
                             avoidance_obstacle(1, 0)
                             break
                         if angle_index <= 1285 and angle_index > 1180 and distance < 3.50:
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
-                            obstacle_detected = True
-                            obstacle_publisher.publish(True)
+                            with open('angle_index.txt', 'a', encoding='utf-8') as dosya:
+                                dosya.write(f"Alıglanan Açı : {angle_index} Algılanan Mesafe : {distance}  Algılanan Saat : {hour}")
                             avoidance_obstacle(1, 0)
                             break
             rate.sleep()
