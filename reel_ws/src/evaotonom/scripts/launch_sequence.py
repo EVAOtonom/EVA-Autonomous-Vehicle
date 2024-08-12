@@ -4,11 +4,14 @@ import time
 import subprocess
 
 def launch_file(package, launch_file):
-    subprocess.run(["roslaunch", package, launch_file])
+    subprocess.Popen(["roslaunch", package, launch_file])
 
 def launch_node(package, node_type, node_name):
-    subprocess.Popen(["rosrun", package, node_type, node_name])    
-    
+    subprocess.Popen([
+        "gnome-terminal", "--", "bash", "-c", 
+        f"source ~/.bashrc; rosrun {package} {node_type} {node_name}; exec bash"
+    ])
+
 if __name__ == "__main__":
     
     rospy.init_node("sequence_launcher")
@@ -31,5 +34,5 @@ if __name__ == "__main__":
     ]
 
     for node in nodes:
-        launch_node(node["package"],node["type"], node["name"])
+        launch_node(node["package"], node["type"], node["name"])
         time.sleep(2)

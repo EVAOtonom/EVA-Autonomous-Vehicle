@@ -137,36 +137,37 @@ def avoidance_obstacle(current_lane, kacinma):
         time.sleep(2.5)
         left_signal.publish(5)
         time.sleep(0.5)
+        throttle_pub.publish(2)
         if not escapeRight():
             brake_pub.publish(0)
             time.sleep(2)
             print("SOL SERIDE GECIYORUM")
-            while traveled_distance < 220:
+            while traveled_distance < 300:
                 pass
-            brake_pub.publish(1)
-            time.sleep(2)
+            # brake_pub.publish(1)
+            # time.sleep(2)
             reset_odom.publish(1)
             time.sleep(0.5)
             steering_pub.publish(40)
             time.sleep(4)
-            brake_pub.publish(0)
-            time.sleep(2)
+            # brake_pub.publish(0)
+            # time.sleep(2)
             print("KENDIMI DUZLUYORUM")
-            while traveled_distance < 250:
+            while traveled_distance < 450:
                 pass
-            brake_pub.publish(1)
-            time.sleep(2)
+            # brake_pub.publish(1)
+            # time.sleep(2)
             reset_odom.publish(1)
             time.sleep(0.5)
-            steering_pub.publish(0)
+            steering_pub.publish(-40)
             time.sleep(2.5)
-            brake_pub.publish(0)
-            time.sleep(2)
+            # brake_pub.publish(0)
+            # time.sleep(2)
             print("BITIRDIM SOL SERITTE DEVAM EDIYORUM")
-            while traveled_distance < 100:
+            while traveled_distance < 250:
                 pass
-            brake_pub.publish(1)
-            time.sleep(2)
+            # brake_pub.publish(1)
+            # time.sleep(2)
             obstacle_detected = False
             obstacle_publisher.publish(obstacle_detected)
 

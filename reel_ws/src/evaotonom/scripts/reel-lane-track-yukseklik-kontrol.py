@@ -183,11 +183,12 @@ def steering_control(image, midpoints, endpoints, areas):
 
 def callback():
     try:
-        ret, msg = cam.read()
-        image, pr = segment_image(msg)
-        image, midpoints, endpoints, areas = annotate_image(image, pr)
-        steering_control(image, midpoints, endpoints, areas)
-        #rate.sleep()
+        if sign_detected != 1 and obstacle_detected != 1:
+            ret, msg = cam.read()
+            image, pr = segment_image(msg)
+            image, midpoints, endpoints, areas = annotate_image(image, pr)
+            steering_control(image, midpoints, endpoints, areas)
+            rate.sleep()
     except Exception as e:
         print("SERIT TAKIBI HATASI: " + str(e))
     
@@ -210,7 +211,7 @@ if __name__ == "__main__":
         'ensag': (0, 0, 255)   # Mavi
     }
     initialize_detection_variables()
-    
+    rate = rospy.Rate(2)
     #Subscribers
     rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback)
     rospy.Subscriber('/decision_algorithm/detection_control', Bool, decision_callback)
@@ -223,7 +224,7 @@ if __name__ == "__main__":
     time.sleep(5)
     obstacle_detected = False
     motor_power_pub.publish(1)
-    kayit = cv2.VideoWriter("/home/eva/Downloads/kayit/output_yarisma_1.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 7.0, (640, 360))
+    kayit = cv2.VideoWriter("/home/eva/Downloads/kayit/output_yarisma_2.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 7.0, (640, 360))
     while not rospy.is_shutdown():
         callback()
     

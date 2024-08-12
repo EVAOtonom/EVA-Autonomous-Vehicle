@@ -187,7 +187,7 @@ def callback():
         image, pr = segment_image(msg)
         image, midpoints, endpoints, areas = annotate_image(image, pr)
         steering_control(image, midpoints, endpoints, areas)
-        #rate.sleep()
+        rate.sleep()
     except Exception as e:
         print("SERIT TAKIBI HATASI: " + str(e))
     
@@ -195,7 +195,7 @@ if __name__ == "__main__":
     rospy.init_node('lane_track_node') 
 
     #Variables
-    #rate = rospy.Rate(2)
+    rate = rospy.Rate(2)
     model = load_model('/home/eva/EVA-Autonomous-Vehicle/reel_ws/src/evaotonom/scripts/tumVeriSetiyleSeritTakibiModeli.h5', compile=False)
     colors = [(0, 0, 0), (128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128)]
     INPUT_SHAPE = [480, 640, 3]  # (Height, Width , Color Format) 
@@ -223,7 +223,7 @@ if __name__ == "__main__":
     time.sleep(5)
     obstacle_detected = False
     motor_power_pub.publish(1)
-    kayit = cv2.VideoWriter("/home/eva/Downloads/kayit/output_yarisma_1.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 7.0, (640, 360))
+    kayit = cv2.VideoWriter("/home/eva/Downloads/kayit/output_yarisma_2.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 7.0, (640, 360))
     while not rospy.is_shutdown():
         callback()
     

@@ -54,6 +54,7 @@ class STM_Communication:
         self.gps_longitude_2 = None
         self.read_odometer = None
         self.check_otonom = None
+        self.check_otonom_stop = 0
 
         # Publishers
         self.gps_latitude_pub = rospy.Publisher('/stm/gps_latitude', Float32, queue_size=1)
@@ -163,7 +164,10 @@ class STM_Communication:
             self.gps_longitude_1 = self.read_data(Register.GPS_LONGITUDE)
             self.gps_longitude_2 = self.read_data(Register.GPS_LONGITUDE_2)
             self.read_odometer = self.read_data(Register.READ_ODOMETER)
-            self.check_otonom = self.read_data(Register.DRIVING_OTONOM)
+            if self.check_otonom is not None and self.check_otonom != 0 and self.check_otonom_stop != 1:
+                self.check_otonom = self.read_data(Register.DRIVING_OTONOM)
+                self.check_otonom_pub.publish(self.check_otonom)
+                self.check_otonom_stop = 1
             self.mutex = 0
             if self.gps_latitude_1 is not None and self.gps_latitude_2 is not None:
                 self.gps_latitude = ((self.gps_latitude_1 * 10000) + self.gps_latitude_2) / 1000000
