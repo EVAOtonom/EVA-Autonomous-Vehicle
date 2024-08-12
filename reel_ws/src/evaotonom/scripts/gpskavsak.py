@@ -3,7 +3,7 @@
 import rospy
 from std_msgs.msg import Float32, Int8
 
-def is_within_area(lat, lon, area): # Yardımcı fonksiyon: Bir noktanın belirli bir alan içinde olup olmadığını kontrol eder
+def is_within_area(lat, lon, area): 
     min_lat = min(point[0] for point in area)
     max_lat = max(point[0] for point in area)
     min_lon = min(point[1] for point in area)
@@ -21,22 +21,40 @@ def longitude_callback(msg):
 if __name__ == "__main__":
     rospy.init_node('gps_checker', anonymous=True)
 
-    # Veriables
+    # Variables
     latitude = None
     longitude = None
-    rect_area = [
-        (41.05751419067383, 28.820289611816406),
-        (41.057472229003906, 28.820341110229492),
-        (41.057464599609375, 28.82032585144043),
-        (41.05746078491211, 28.820268630981445)
-    ]
-       # Dikdörtgen alanı belirleyen koordinatlar
+    rect_areas = {
+        1: [
+            (40.7897849, 29.5090326),  # sol alt
+            (40.7898167, 29.5089471),  # sağ alt
+            (40.7897664, 29.5089062),  # sağ üst
+            (40.7897436, 29.5089515)   # sol üst
+        ],
+        2: [
+            (40.7897900, 29.5091680),  # sol alt
+            (40.7898205, 29.5091456),  # sağ alt
+            (40.7897530, 29.5091077),  # sol üst
+            (40.7897827, 29.5090782)   # sağ üst
+        ],
+        3: [
+            (40.7899446, 29.5091915),  # sağ alt
+            (40.7899063, 29.5092250),  # sol alt
+            (40.7898903, 29.5091935),  # sol üst
+            (40.7899213, 29.5091265)   # sağ üst
+        ],
+        4: [
+            (40.7898964, 29.5089334),  # sol üst
+            (40.7899169, 29.5089937),  # sol alt
+            (40.7899967, 29.5089199),  # sağ alt
+            (40.7899829, 29.5088710)   # sağ üst
+        ]
+    }
 
-    # #Şerit Takibi Bekleme
+    # Wait for the lane tracking node to be ready
     rospy.loginfo("Waiting for 'lane_track_node' service...")
-    rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
-    rospy.loginfo("'lane_track_node' service is now available.")    
-   
+    rospy.wait_for_message("/lane_track/current_lane", Int8, timeout=100)
+    rospy.loginfo("'lane_track_node' service is now available.")
 
     # Subscribers
     rospy.Subscriber('/stm/gps_latitude', Float32, latitude_callback)
@@ -49,15 +67,16 @@ if __name__ == "__main__":
 
     while not rospy.is_shutdown():
         if latitude is not None and longitude is not None:
-            corrected_latitude = latitude 
-            corrected_longitude = longitude 
-            if is_within_area(corrected_latitude, corrected_longitude, rect_area):
-                print(corrected_latitude, corrected_longitude)
-                kavsak_noktasi_pub.publish(1)
-                rospy.loginfo("Kavşak")
-            else:
-                kavsak_noktasi_pub.publish(0)  # Kavşak değilse 0 yayınla
+            found_area = False
+            for area_num, rect_area in rect_areas.items():
+                if is_within_area(latitude, longitude, rect_area):
+                    kavsak_noktasi_pub.publish(area_num)
+                    rospy.loginfo(f"Kavşak: {area_num}")
+                    found_area = True
+                    break
+            if not found_area:
+                kavsak_noktasi_pub.publish(0)  # No matching area, publish 0
         else:
-            print("veri alınamıyor")
-            
+            rospy.logwarn("Veri alınamıyor")
+
         rate.sleep()
