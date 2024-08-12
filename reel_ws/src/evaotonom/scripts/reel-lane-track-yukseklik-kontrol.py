@@ -64,13 +64,6 @@ def segment_image(msg):
             int((INPUT_SHAPE[1] - new_img_width) // 2):int((INPUT_SHAPE[1] - new_img_width) // 2 + new_img_width)] # model tahminini orjinal görüntüye oranlar
     prediction = cv2.resize(prediction, (orj_img_width, orj_img_height), interpolation=cv2.INTER_LINEAR)
     
-    prediction_control = np.exp(prediction) / np.sum(np.exp(prediction), axis=-1, keepdims=True)
-
-    confidence_threshold = 0.7
-    confidence = np.max(prediction_control, axis=-1)  # Get the maximum confidence for each pixel
-    print(confidence)
-    #prediction = np.where(confidence >= confidence_threshold, prediction.argmax(axis=-1), -1)  # -1 or any default class for low confidence
-    
     prediction = prediction.argmax(axis=-1) #her piksel için class olma olasılığı en yüksek hangisiyse onu bulur
 
     seg_img = np.reshape(np.array(colors, np.uint8)[np.reshape(prediction, [-1])], [orj_img_height, orj_img_width, -1]) #her piksele ait olduğu classa göre renk atanır
