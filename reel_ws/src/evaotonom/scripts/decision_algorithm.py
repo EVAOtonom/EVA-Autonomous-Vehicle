@@ -150,7 +150,7 @@ if __name__ == "__main__":
                 brake_pub.publish(1)
                 time.sleep(2)
                 
-            # elif detected_sign_number == 8: # PARK 
+            # elif detected_sign_number == 8: # PARK LEVHASINI ORTALAR
             #     if depth is not None:
             #         #os.system("rosnode kill "+ "lane_track_node")
             #         #os.system("rosnode kill "+ "obstacle_detector_node")
@@ -176,7 +176,7 @@ if __name__ == "__main__":
                     
             #         #time.sleep(5)
 
-            elif detected_sign_number == 8: # PARK 
+            elif detected_sign_number == 8: # PARK LEVHASINA GORE YAY YAPAR
                 if depth is not None:
                     #os.system("rosnode kill "+ "lane_track_node")
                     #os.system("rosnode kill "+ "obstacle_detector_node")
