@@ -135,7 +135,7 @@ def avoidance_obstacle(current_lane, kacinma):
             brake_pub.publish(0)
             time.sleep(2)
             print("SOL SERIDE GECIYORUM")
-            while traveled_distance < 200:
+            while traveled_distance < 220:
                 pass
             brake_pub.publish(1)
             time.sleep(2)
@@ -146,7 +146,7 @@ def avoidance_obstacle(current_lane, kacinma):
             brake_pub.publish(0)
             time.sleep(2)
             print("KENDIMI DUZLUYORUM")
-            while traveled_distance < 220:
+            while traveled_distance < 250:
                 pass
             brake_pub.publish(1)
             time.sleep(2)
