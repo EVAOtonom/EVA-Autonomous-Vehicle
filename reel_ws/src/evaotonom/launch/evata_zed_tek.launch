@@ -1,0 +1,7 @@
+<launch>
+  <arg name="node_start_delay" default="5.0" /> 
+  <node pkg="evaotonom" type="zed_sdk.py" name="zed_sdk" output="screen" />
+<node name="decision_node" pkg="evaotonom" type="decision_algorithm.py" output="screen"/>
+  <node name="zed_object_detection" pkg="evaotonom" type="sign_detector_tek.py" output="screen"/>
+  <node name="gps_checker" pkg="evaotonom" type="gpskavsak.py" output="screen"/>
+</launch> 	

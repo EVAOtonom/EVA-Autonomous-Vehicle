@@ -2,10 +2,8 @@
   <arg name="node_start_delay" default="5.0" /> 
   <node pkg="evaotonom" type="zed_sdk.py" name="zed_sdk" output="screen" />
   <node pkg="evaotonom" type="lidar_sdk.py" name="lidar_sdk" output="screen" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' "/>
-  <node pkg="evaotonom" type="AKS_Communication.py" name="stm32_node" output="screen" />
   <node name="decision_node" pkg="evaotonom" type="decision_algorithm_seritsiz.py" output="screen"/>
   <node name="obstacle_detector_node" pkg="evaotonom" type="obstacle_avoidance_seritsiz.py" output="screen"/>
   <node name="zed_object_detection" pkg="evaotonom" type="sign_detector_seritsiz.py" output="screen"/>
   <node name="gps_checker" pkg="evaotonom" type="gpskavsak_seritsiz.py" output="screen"/>
-  <node name="data_logger_node" pkg="evaotonom" type="data_logger_teknofest.py" output="screen"/>
 </launch> 	
