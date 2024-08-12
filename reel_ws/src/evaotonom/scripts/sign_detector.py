@@ -20,6 +20,8 @@ def display_images():
     global left_image, right_image
     while not rospy.is_shutdown():
         if left_image is not None and right_image is not None:
+            kayit_sag.write(right_image)
+            kayit_sol.write(left_image)
             cv2.imshow("EVA OTONOM SOL KAMERA", left_image)
             cv2.imshow("EVA OTONOM SAG KAMERA", right_image)
             cv2.waitKey(1)
@@ -280,6 +282,9 @@ if __name__ == '__main__':
     # rospy.loginfo("Waiting for 'lane_track_node' service...")
     # rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
     # rospy.loginfo("'lane_track_node' service is now available.")
+
+    kayit_sag = cv2.VideoWriter("/home/eva/Downloads/kayit/zed_sag_output_yarisma_1.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 7.0, (640, 360))
+    kayit_sol = cv2.VideoWriter("/home/eva/Downloads/kayit/zed_sol_output_yarisma_1.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 7.0, (640, 360))
     
     # Veriables
     left_image = None
@@ -312,3 +317,5 @@ if __name__ == '__main__':
     display_thread = threading.Thread(target=display_images)
     display_thread.start()
     rate.sleep()
+
+kayit.release()
