@@ -2,7 +2,7 @@
 
 import rospy
 from std_msgs.msg import Float32, Int8
-from sensor_msgs.msg import LaserScan
+from sensor_msgs.msg import Bool
 from datetime import datetime
 import pytz
 import random
@@ -166,7 +166,7 @@ if __name__ == "__main__":
     rospy.Subscriber('/stm/gps_latitude', Float32, lat_callback)
     rospy.Subscriber('/stm/gps_longitude', Float32, long_callback)
     rospy.Subscriber('/sign_detector/detected_sign_number', Int8, sign_callback)
-    rospy.Subscriber('/obstacle_detector/obstacle_detection', LaserScan, obstacle_callback, queue_size=10)
+    rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback, queue_size=10)
     rospy.Subscriber("/lane_track/current_lane", Int8, current_lane_check)
 
     rospy.Timer(rospy.Duration(1), log_data)
