@@ -67,7 +67,7 @@ if __name__ == "__main__":
     left_signal = rospy.Publisher('/stm/left_signal', Int8, queue_size= 10)
     right_signal = rospy.Publisher('/stm/right_signal', Int8, queue_size=10)
 
-    motor_pub.publish(False)
+    #motor_pub.publish(False)
     detection_control.publish(False)
 
     while not rospy.is_shutdown():
