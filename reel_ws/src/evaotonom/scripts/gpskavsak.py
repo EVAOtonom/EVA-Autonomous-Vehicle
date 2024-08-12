@@ -73,6 +73,7 @@ if __name__ == "__main__":
                     kavsak_noktasi_pub.publish(area_num)
                     rospy.loginfo(f"Kavşak: {area_num}")
                     found_area = True
+                    print(latitude,longitude)
                     break
             if not found_area:
                 kavsak_noktasi_pub.publish(0)  # No matching area, publish 0
