@@ -2,7 +2,7 @@
 import time
 import rospy
 from sensor_msgs.msg import Image, PointCloud2
-from std_msgs.msg import Int8, Float32MultiArray, Bool
+from std_msgs.msg import Int8, Float32MultiArray, Bool, Float32
 from cv_bridge import CvBridge
 import cv2
 import numpy as np
@@ -167,6 +167,12 @@ cumulative_counters = defaultdict(int)
 def tabela_bilgi(class_name, depth_in_meters):
     global x1, y1, x2, y2, size
     if obstacle_detected == 1:  # ENGEL TESPİT EDİLDİĞİ DURUMDA ÇALIŞMASI GEREKEN KARAR ALGORİTMALARI
+        if depth_in_meters is not None:
+            # Derinlik bilgisini Float32MultiArray formatında yayınla
+            depth_msg = Float32()     
+            depth_msg.data = depth_in_meters
+            depth_pub.publish(depth_msg)
+
         if class_name == "kirmizi" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(7)
 
@@ -174,7 +180,12 @@ def tabela_bilgi(class_name, depth_in_meters):
             tabela_pub.publish(15)
 
     elif obstacle_detected == 0:  # ENGEL TESPİT EDİLMEDİĞİ DURUMDA ÇALIŞMASI GEREKEN KARAR ALGORİTMALARI
-        
+        if depth_in_meters is not None:
+            # Derinlik bilgisini Float32MultiArray formatında yayınla
+            depth_msg = Float32()     
+            depth_msg.data = depth_in_meters
+            depth_pub.publish(depth_msg)
+
         if class_name == "20" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(0)
 
@@ -276,6 +287,7 @@ if __name__ == '__main__':
     ts.registerCallback(callback)
     tabela_pub = rospy.Publisher('/sign_detector/detected_sign_number', Int8, queue_size=10)
     position_pub = rospy.Publisher('/sign_detector/position', Float32MultiArray, queue_size=10)
+    depth_pub = rospy.Publisher('/sign_detector/depth', Float32, queue_size=10)
 
     # rospy.loginfo("Waiting for 'lane_track_node' service...")
     # rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
