@@ -182,6 +182,7 @@ if __name__ == "__main__":
             #         #time.sleep(5)
 
             elif detected_sign_number == 8: # PARK LEVHASINA GORE YAY YAPAR
+                detection_control.publish(True)
                 if depth is not None:
                     #os.system("rosnode kill "+ "lane_track_node")
                     #os.system("rosnode kill "+ "obstacle_detector_node")
@@ -212,7 +213,8 @@ if __name__ == "__main__":
                     time.sleep(2)
                     detected_sign_number = True
                     rospy.loginfo("Park edildi")
-                    detection_control.publish(True)
+                else:
+                    print("depth is none")
                 
             if detected_sign_number == 13: # sola dönüş
                 if current_lane == 1: # sag seritten
