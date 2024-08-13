@@ -102,10 +102,10 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
                                 
                             # Güvenlik önlemi: Anahtarın sözlükte var olduğundan emin olun
                             if class_name not in cumulative_counters:
-                                if class_name != "parkyapilmaz" and class_name != "soladonulmez":
+                                if class_name != "parkyapilmaz" and class_name != "soladonulmez" and class_name != "parkyasak":
                                     cumulative_counters[class_name] = 0
 
-                            if class_name != "parkyapilmaz" and class_name != "soladonulmez":
+                            if class_name != "parkyapilmaz" and class_name != "soladonulmez" and class_name != "parkyasak":
                                 cumulative_counters[class_name] += 1
                                 current_detections += 1
 
