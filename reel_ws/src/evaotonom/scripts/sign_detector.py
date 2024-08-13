@@ -310,7 +310,7 @@ if __name__ == '__main__':
             9: 'parkyasak', 10: 'sag', 11: 'sagadonulmez', 12: 'sari',
             13: 'sol', 14: 'soladonulmez', 15: 'yesil', 16: 'engellipark',
             17: 'tasitrafiginekapali', 18: 'yayagecidi', 19: 'kavsak',
-            20: 'ikiliyon', 21: 'tersengellipark', 22: 'parkYapilmaz'
+            20: 'ikiliyon', 21: 'tersengellipark', 22: 'parkyapilmaz'
         }
     
     cumulative_counters = defaultdict(int)    # Kümülatif sayaçlar
