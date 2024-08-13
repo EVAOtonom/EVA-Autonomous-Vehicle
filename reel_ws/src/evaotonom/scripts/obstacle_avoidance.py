@@ -1,5 +1,6 @@
 #!/usr/bin/env python3.9
 #Bu kod engel gördüğünde engelden kaçar!
+#Current_lane 1 ise sağ 0 ise sol
 import rospy
 from sensor_msgs.msg import LaserScan
 from std_msgs.msg import Bool, Float32, Int8
@@ -21,43 +22,8 @@ def read_odometer(msg):
     global traveled_distance
     traveled_distance = msg.data
 
-def escapeLeft():
-    global obstacle_detected
-    if scan is not None:
-        obstacle_detected = False
-        for angle_index in range (1101,1200):
-            distance = scan[angle_index]
-            if distance != float('inf'):
-                if (distance < 6) :
-                    rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
-                    obstacle_publisher.publish(True)
-                    obstacle_detected = True
-                    avoidance_obstacle(current_lane, 1)
-                    return True
-                else:
-                    return False
-        return False
-
-
-def escapeRight():
-    global obstacle_detected
-    if scan is not None:
-        obstacle_detected = False
-        for angle_index in range (105,250):
-            distance = scan[angle_index]
-            if distance != float('inf'):
-                if (distance < 6 ):
-                    rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
-                    obstacle_publisher.publish(True)
-                    obstacle_detected = True
-                    avoidance_obstacle(current_lane, 1)
-                    return True
-                else:
-                    return False
-        return False
 
 def avoidance_obstacle(current_lane, kacinma):
-
     if current_lane == 0 and kacinma == 0:
         brake_pub.publish(1)
         time.sleep(2)
@@ -65,46 +31,54 @@ def avoidance_obstacle(current_lane, kacinma):
         reset_odom.publish(1)
         time.sleep(0.5)
         steering_pub.publish(40)
+        time.sleep(2)
+        right_signal.publish(5)
+        time.sleep(0.5)
+        brake_pub.publish(0)
+        time.sleep(2)
+        print("SAĞ SERIDE GECIYORUM  0-0")
+        while traveled_distance < 300:
+            pass
+        brake_pub.publish(1)
+        time.sleep(2)
+        reset_odom.publish(1)
+        time.sleep(0.5)
+        steering_pub.publish(-40)
+        time.sleep(4)
+        right_signal.publish(5)
+        time.sleep(0.5)
+        brake_pub.publish(0)
+        time.sleep(0.5)
+        print("KENDIMI DUZLUYORUM 0-0")
+        while traveled_distance < 450:
+            pass
+        brake_pub.publish(1)
+        time.sleep(2)
+        reset_odom.publish(1)
+        time.sleep(0.5)
+        steering_pub.publish(0)
+        time.sleep(2.5)
+        brake_pub.publish(0)
+        time.sleep(2)
+        print("BITIRDIM SOL SERITTE DEVAM EDIYORUM 0-0")
+        while traveled_distance < 250:
+            pass
+        brake_pub.publish(1)
+        time.sleep(2)
+        obstacle_detected = False
+        obstacle_publisher.publish(obstacle_detected)
+
+
+    elif current_lane == 0 and kacinma == 1: #GENİŞ KAÇIŞ SOLDAN SAĞ
+        brake_pub.publish(1)
+        time.sleep(2)
+        rospy.loginfo("SOLDAN KACIS 0-1")
+        reset_odom.publish(1)
+        time.sleep(0.5)
+        steering_pub.publish(40)
         time.sleep(2.5)
         right_signal.publish(5)
         time.sleep(0.5)
-        if not escapeLeft():
-            brake_pub.publish(0)
-            time.sleep(2)
-            print("SAĞ SERIDE GECIYORUM  0-0")
-            while traveled_distance < 220:
-                pass
-            brake_pub.publish(1)
-            time.sleep(2)
-            reset_odom.publish(1)
-            time.sleep(0.5)
-            steering_pub.publish(-40)
-            time.sleep(4)
-            right_signal.publish(5)
-            time.sleep(0.5)
-            brake_pub.publish(0)
-            time.sleep(2)
-            print("KENDIMI DUZLUYORUM 0-0")
-            while traveled_distance < 200:
-                pass
-            brake_pub.publish(1)
-            time.sleep(2)
-            reset_odom.publish(1)
-            time.sleep(0.5)
-            steering_pub.publish(0)
-            time.sleep(2.5)
-            brake_pub.publish(0)
-            time.sleep(2)
-            print("BITIRDIM SOL SERITTE DEVAM EDIYORUM 0-0")
-            while traveled_distance < 100:
-                pass
-            brake_pub.publish(1)
-            time.sleep(2)
-            obstacle_detected = False
-            obstacle_publisher.publish(obstacle_detected)
-
-
-    elif current_lane == 0 and kacinma == 1:
         rospy.loginfo(f"SOLDAN BÜYÜK KAÇIŞ BAŞLIYOR 0-1")
         reset_odom.publish(1)
         time.sleep(0.5)
@@ -132,40 +106,50 @@ def avoidance_obstacle(current_lane, kacinma):
         left_signal.publish(5)
         time.sleep(0.5)
         throttle_pub.publish(2)
-        if not escapeRight():
-            brake_pub.publish(0)
-            time.sleep(2)
-            print("SOL SERIDE GECIYORUM")
-            while traveled_distance < 300:
-                pass
+        time.sleep(0.5)
+        brake_pub.publish(0)
+        time.sleep(2)
+        print("SOL SERIDE GECIYORUM")
+        while traveled_distance < 300:
+            pass
             # brake_pub.publish(1)
             # time.sleep(2)
-            reset_odom.publish(1)
-            time.sleep(0.5)
-            steering_pub.publish(40)
-            time.sleep(4)
+        reset_odom.publish(1)
+        time.sleep(0.5)
+        steering_pub.publish(40)
+        time.sleep(4)
             # brake_pub.publish(0)
             # time.sleep(2)
-            print("KENDIMI DUZLUYORUM")
-            while traveled_distance < 450:
-                pass
+        print("KENDIMI DUZLUYORUM")
+        while traveled_distance < 450:
+            pass
             # brake_pub.publish(1)
             # time.sleep(2)
-            reset_odom.publish(1)
-            time.sleep(0.5)
-            steering_pub.publish(-40)
-            time.sleep(2.5)
+        reset_odom.publish(1)
+        time.sleep(0.5)
+        steering_pub.publish(-40)
+        time.sleep(2.5)
             # brake_pub.publish(0)
             # time.sleep(2)
-            print("BITIRDIM SOL SERITTE DEVAM EDIYORUM")
-            while traveled_distance < 250:
-                pass
+        print("BITIRDIM SOL SERITTE DEVAM EDIYORUM")
+        while traveled_distance < 250:
+            pass
             # brake_pub.publish(1)
             # time.sleep(2)
-            obstacle_detected = False
-            obstacle_publisher.publish(obstacle_detected)
+        obstacle_detected = False
+        obstacle_publisher.publish(obstacle_detected)
 
     elif current_lane == 1 and kacinma == 1:
+        brake_pub.publish(1)
+        time.sleep(2)
+        rospy.loginfo("SAGDAN KACIS")
+        reset_odom.publish(1)
+        time.sleep(0.5)
+        steering_pub.publish(-40)
+        time.sleep(2.5)
+        left_signal.publish(5)
+        time.sleep(0.5)
+        throttle_pub.publish(2)
         rospy.loginfo(f"SAGDAN 2. KACIS BASLIYOR")
         reset_odom.publish(1)
         time.sleep(2)
@@ -217,44 +201,75 @@ if __name__ == "__main__":
     rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
     rospy.loginfo("'lane_track_node' service is now available.")
    
-    def birinci_bolge_karari():
+    def birinci_bolge_karari_sag():
         global obstacle_detected
         while not rospy.is_shutdown():
             if not sign_detected:
                 if scan is not None:
                     obstacle_detected = False
-                    for angle_index in range (0,81):
+                    for angle_index in range (0,1285):
                         distance = scan[angle_index]
                         if distance != float('inf'):
-                            if (0 <= angle_index <= 81) and  3.0 < distance < 3.50:
+                            if (0 <= angle_index <= 81) and  3 < distance < 3.4:
                                 rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 2. BÖLGE ")
-                                ikinci_bolge_karari()
+                                ikinci_bolge_karari_sag()
                             else:
                                 pass
-    def ikinci_bolge_karari():
+    def birinci_bolge_karari_sol():
         global obstacle_detected
         while not rospy.is_shutdown():
             if not sign_detected:
                 if scan is not None:
                     obstacle_detected = False
-                    for angle_index in range (82,185):
+                    for angle_index in range (0,1285):
                         distance = scan[angle_index]
                         if distance != float('inf'):
-                            if (82 <= angle_index <= 185) and  3.5 < distance < 5.5:
-                                rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 3. BÖLGE ")
-                                ucuncu_bolge_karari()
+                            if (1204 <= angle_index <= 1285) and  3 < distance < 3.4:
+                                rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 2. BÖLGE ")
+                                ikinci_bolge_karari_sol()
                             else:
+                                pass
+    def ikinci_bolge_karari_sag():
+        global obstacle_detected
+        while not rospy.is_shutdown():
+            if not sign_detected:
+                if scan is not None:
+                    obstacle_detected = False
+                    for angle_index in range (0,1285):
+                        distance = scan[angle_index]
+                        if distance != float('inf'):
+                            if (82 <= angle_index <= 185) and  3.5 < distance < 5.5: #3. bölgede de engel var
                                 rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 3. BÖLGE ")
+                                ucuncu_bolge_karari_sag()
+                            else: #1 ve 2de var 3te yok kaçış yapıcak
+                                rospy.loginfo("3. BÖLGE TEMİZ SOLDAN SAĞA KAÇIŞ YAPILIYOR")
                                 obstacle_detected = True
                                 obstacle_publisher.publish(True)
                                 avoidance_obstacle(current_lane, 0) #DEĞERLER GİRİLECEK KAÇIŞ OLACAK
-    def ucuncu_bolge_karari():
+    def ikinci_bolge_karari_sol():
         global obstacle_detected
         while not rospy.is_shutdown():
             if not sign_detected:
                 if scan is not None:
                     obstacle_detected = False
-                    for angle_index in range (186,215):
+                    for angle_index in range (0,1285):
+                        distance = scan[angle_index]
+                        if distance != float('inf'):
+                            if (1102 <= angle_index <= 1203) and  3.5 < distance < 5.5: #3. bölgede de engel var
+                                rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 3. BÖLGE ")
+                                ucuncu_bolge_karari_sol()
+                            else: #1 ve 2de var 3te yok kaçış yapıcak
+                                rospy.loginfo("3. BÖLGE TEMİZ SOLDAN SAĞA KAÇIŞ YAPILIYOR")
+                                obstacle_detected = True
+                                obstacle_publisher.publish(True)
+                                avoidance_obstacle(current_lane, 0) #DEĞERLER GİRİLECEK KAÇIŞ OLACAK
+    def ucuncu_bolge_karari_sag():
+        global obstacle_detected
+        while not rospy.is_shutdown():
+            if not sign_detected:
+                if scan is not None:
+                    obstacle_detected = False
+                    for angle_index in range (0,1285):
                         distance = scan[angle_index]
                         if distance != float('inf'):
                             if (186 <= angle_index <= 215) and  5.5 < distance < 7:
@@ -267,17 +282,45 @@ if __name__ == "__main__":
                                 obstacle_detected = True
                                 obstacle_publisher.publish(True)
                                 avoidance_obstacle(current_lane, 1) #GENİŞ KAÇIŞ OLACAK                                                              
-
+    def ucuncu_bolge_karari_sol():
+        global obstacle_detected
+        while not rospy.is_shutdown():
+            if not sign_detected:
+                if scan is not None:
+                    obstacle_detected = False
+                    for angle_index in range (0,1285):
+                        distance = scan[angle_index]
+                        if distance != float('inf'):
+                            if (1067 <= angle_index <= 1101) and  5.5 < distance < 7:
+                                rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 4. BÖLGE ")
+                                obstacle_detected = True
+                                obstacle_publisher.publish(True)
+                                avoidance_obstacle(current_lane, 1) #GENİŞ KAÇIŞ OLACAK
+                            else:
+                                rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 4. BÖLGE ")
+                                obstacle_detected = True
+                                obstacle_publisher.publish(True)
+                                avoidance_obstacle(current_lane, 1) #GENİŞ KAÇIŞ OLACAK    
     while not rospy.is_shutdown():
         if not sign_detected:
             if scan is not None:
                 obstacle_detected = False
-                for angle_index in range (1203,1285):
+                for angle_index in range (0,1285):
                     distance = scan[angle_index]
                     if distance != float('inf'):
-                        if (1203 <= angle_index <= 1285) and  3.0 < distance < 3.50:
+                        if (1203 <= angle_index <= 1285) and  (3 < distance < 3.4) and (current_lane == 1):
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 1. BÖLGE ")
-                            birinci_bolge_karari()
+                            birinci_bolge_karari_sag()
+    while not rospy.is_shutdown():
+        if not sign_detected:
+            if scan is not None:
+                obstacle_detected = False
+                for angle_index in range (0,1285):
+                    distance = scan[angle_index]
+                    if distance != float('inf'):
+                        if (0 <= angle_index <= 81) and  (3 < distance < 3.4) and (current_lane == 0):
+                            rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 1. BÖLGE ")
+                            birinci_bolge_karari_sol()
                             
                             
 
