@@ -269,7 +269,7 @@ if __name__ == "__main__":
                             aci *= 3
                         steering_angle = aci * -40/346
                         print("yay")
-                        steering_pub.publish(steering_angle) 
+                        steering_pub.publish(int(steering_angle)) 
                         time.sleep(0.50)
                     while depth > 3.37:
                         if x1 == None or x2 == None or size == None:
@@ -279,7 +279,7 @@ if __name__ == "__main__":
                         hedef = size / 2
                         steering_angle = (((hedef - sign_midpoint + 208)*0.192) - 40) * -1
                         print("düz")
-                        steering_pub.publish(steering_angle) 
+                        steering_pub.publish(int(steering_angle)) 
                         time.sleep(0.50)
                     #time.sleep(0.1)
                     brake_pub.publish(1)
