@@ -7,6 +7,10 @@ import os
 
 #sağa ve sola dönüş değiştirildi diğerleride değiştirilecek
 
+def depth_callback(msg):
+    global depth
+    depth= msg.data
+    
 def sign_callback(msg):
     global detected_sign_number
     detected_sign_number= msg.data
@@ -53,6 +57,7 @@ if __name__ == "__main__":
 
     #Subscribers
     rospy.Subscriber("/sign_detector/detected_sign_number", Int8, sign_callback) 
+    rospy.Subscriber('/sign_detector/depth', Float32, depth_callback ,queue_size=10)
     rospy.Subscriber('/stm/read_odometer', Float32, read_odometer)
     rospy.Subscriber('/lane_track/current_lane', Int8, lane_callback)
     rospy.Subscriber('/sign_detector/position', Float32MultiArray,position_callback ,queue_size=10)
@@ -79,7 +84,7 @@ if __name__ == "__main__":
                     detection_control.publish(True) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    while distance < 180:  
+                    while distance < depth -2: 
                         print(distance)
                     print("dist1 bitti")
                     brake_pub.publish(1)
@@ -215,7 +220,7 @@ if __name__ == "__main__":
                     detection_control.publish(True)
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    while distance < 380:
+                    while distance < depth -2:
                         print(distance)
                     print("dist bitti")
                     time.sleep(0.5)
@@ -240,7 +245,7 @@ if __name__ == "__main__":
                     detection_control.publish(True)
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    while distance <650:
+                    while distance < depth -2:
                         print(distance)
                     print("dist bitti")
                     time.sleep(0.5)
@@ -269,7 +274,7 @@ if __name__ == "__main__":
                     detection_control.publish(True)
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    while distance <350:
+                    while distance < depth -2:
                         print(distance)
                     print("dist bitti")
                     time.sleep(0.5)                  
@@ -294,7 +299,7 @@ if __name__ == "__main__":
                     detection_control.publish(True)
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    while distance <650:
+                    while distance < depth -2:
                         print(distance)
                     print("dist bitti")
                     time.sleep(0.5)
