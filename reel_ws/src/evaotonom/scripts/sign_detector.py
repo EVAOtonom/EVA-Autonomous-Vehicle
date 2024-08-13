@@ -315,7 +315,7 @@ if __name__ == '__main__':
     
     cumulative_counters = defaultdict(int)    # Kümülatif sayaçlar
     # Algılama sayısı limiti
-    detection_limit = 10 # 25 algılamada bir kontrol edilecek
+    detection_limit = 2 # 2 algılamada bir kontrol edilecek
     current_detections = 0  # Mevcut algılama sayısı
     cumulative_counters = {class_name: 0 for class_name in class_names.values()}  # Her bir sınıf için sayaç
     last_publish_time = time.time()  # İlk zaman
