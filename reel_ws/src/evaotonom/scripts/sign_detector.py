@@ -19,8 +19,7 @@ logging.getLogger('ultralytics').setLevel(logging.ERROR)
 def display_images():
     global left_image, right_image
     while not rospy.is_shutdown():
-        if left_image is not None and right_image is not None:
-            cv2.imshow("EVA OTONOM SOL KAMERA", left_image)
+        if  right_image is not None:
             cv2.imshow("EVA OTONOM SAG KAMERA", right_image)
             cv2.waitKey(1)
 
@@ -71,10 +70,7 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
                     x1, y1, x2, y2 = map(int, box.xyxy[0])
                     class_id = int(box.cls[0])
                     class_name = class_names.get(class_id, 'Unknown')
-                    # Draw bounding box and label on left image
-                    cv2.rectangle(left_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
-                    label = f'{class_name}'
-                    cv2.putText(left_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)    
+
                     left_detected = True
                     detected_boxes.append((x1, y1, x2, y2, class_name))
         
@@ -314,9 +310,8 @@ if __name__ == '__main__':
     current_detections = 0  # Mevcut algılama sayısı
     cumulative_counters = {class_name: 0 for class_name in class_names.values()}  # Her bir sınıf için sayaç
     last_publish_time = time.time()  # İlk zaman
-    rate = rospy.Rate(1)
+    rate = rospy.Rate(5)
 
-    display_thread = threading.Thread(target=display_images)
-    display_thread.start()
-    rate.sleep()
-
+    while not rospy.is_shutdown():
+        display_images()
+        rate.sleep()
