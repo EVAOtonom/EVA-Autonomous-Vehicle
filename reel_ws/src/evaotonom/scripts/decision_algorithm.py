@@ -81,11 +81,11 @@ if __name__ == "__main__":
             if detected_sign_number == 3: # DURAK KARAR ALGORITMASI
                 if current_lane == 1: # SAG SERITTEYSE
                     rospy.loginfo(" @@@@@@@@@@ SAG SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ")  
-                    detection_control.publish(True) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    while distance < depth*100 + 300 :
+                    while distance < depth * 100 + 300 :
                         print(distance)
+                    detection_control.publish(True) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
                     print("dist1 bitti")
                     brake_pub.publish(1)
                     time.sleep(2)
@@ -142,7 +142,6 @@ if __name__ == "__main__":
                     steering_pub.publish(40)
                     time.sleep(2)
                     brake_pub.publish(0)
-                    time.sleep(2)
                     while distance < 300:
                         print(distance)
                     brake_pub.publish(1)
@@ -157,7 +156,7 @@ if __name__ == "__main__":
                         print(distance)
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    while distance < depth*100 + 300 :
+                    while distance < depth * 100 + 300 :
                         print(distance)
                     print("dist1 bitti")
                     brake_pub.publish(1)
