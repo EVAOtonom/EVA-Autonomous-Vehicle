@@ -84,7 +84,7 @@ if __name__ == "__main__":
                     detection_control.publish(True) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    while distance < depth -2: 
+                    while distance < depth + 3 :
                         print(distance)
                     print("dist1 bitti")
                     brake_pub.publish(1)
@@ -132,8 +132,7 @@ if __name__ == "__main__":
                     while distance < 250:
                         print(distance)
                     print("dist5 bitti")
-
-                elif current_lane == 0: # SAG SERITTEYSE
+                elif current_lane == 0: # SOL SERITTEYSE
                     rospy.loginfo(" @@@@@@@@@@ SOL SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ")  
                     detection_control.publish(True)
                     brake_pub.publish(1)
