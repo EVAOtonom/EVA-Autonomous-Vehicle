@@ -228,8 +228,6 @@ if __name__ == "__main__":
                         if distance != float('inf'):
                             if (0 <= angle_index <= 81) and  3.0 < distance < 3.50:
                                 rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 2. BÖLGE ")
-                                obstacle_detected = True
-                                obstacle_publisher.publish(True)
                                 ikinci_bolge_karari()
                             else:
                                 pass
@@ -244,8 +242,6 @@ if __name__ == "__main__":
                         if distance != float('inf'):
                             if (82 <= angle_index <= 185) and  3.5 < distance < 5.5:
                                 rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 3. BÖLGE ")
-                                obstacle_detected = True
-                                obstacle_publisher.publish(True)
                                 ucuncu_bolge_karari()
                             else:
                                 rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 3. BÖLGE ")
@@ -281,8 +277,6 @@ if __name__ == "__main__":
                     if distance != float('inf'):
                         if (1203 <= angle_index <= 1285) and  3.0 < distance < 3.50:
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 1. BÖLGE ")
-                            obstacle_detected = True
-                            obstacle_publisher.publish(True)
                             birinci_bolge_karari()
                             
                             
