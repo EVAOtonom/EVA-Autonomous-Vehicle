@@ -264,10 +264,13 @@ if __name__ == "__main__":
                         sign_midpoint = (x1 + x2) / 2 # Tespit edilen Levhanın orta noktası alınır
                         #im_midpoint = size * 5 / 6 # Görselin orta noktası alınır
                         hedef = size * 5 / 6
-                        steering_angle = (hedef - sign_midpoint) * -40/346
+                        aci = (hedef - sign_midpoint)
+                        if aci < 0:
+                            aci *= 3
+                        steering_angle = aci * -40/346
                         print("yay")
                         steering_pub.publish(steering_angle) 
-                        time.sleep(0.25)
+                        time.sleep(0.50)
                     while depth > 3.37:
                         if x1 == None or x2 == None or size == None:
                             print("None")
@@ -277,7 +280,7 @@ if __name__ == "__main__":
                         steering_angle = (((hedef - sign_midpoint + 208)*0.192) - 40) * -1
                         print("düz")
                         steering_pub.publish(steering_angle) 
-                        time.sleep(0.25)
+                        time.sleep(0.50)
                     #time.sleep(0.1)
                     brake_pub.publish(1)
                     time.sleep(2)
