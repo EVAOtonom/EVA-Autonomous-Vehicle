@@ -295,7 +295,7 @@ if __name__ == "__main__":
                     detection_control.publish(True)
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    while distance < depth -2:
+                    while distance < depth +1:
                         print(distance)
                     print("dist bitti")
                     time.sleep(0.5)
@@ -320,7 +320,7 @@ if __name__ == "__main__":
                     detection_control.publish(True)
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    while distance < depth -2:
+                    while distance < depth +1:
                         print(distance)
                     print("dist bitti")
                     time.sleep(0.5)
@@ -349,7 +349,7 @@ if __name__ == "__main__":
                     detection_control.publish(True)
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    while distance < depth -2:
+                    while distance < depth +1:
                         print(distance)
                     print("dist bitti")
                     time.sleep(0.5)                  
@@ -374,7 +374,7 @@ if __name__ == "__main__":
                     detection_control.publish(True)
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    while distance < depth -2:
+                    while distance < depth +1:
                         print(distance)
                     print("dist bitti")
                     time.sleep(0.5)
