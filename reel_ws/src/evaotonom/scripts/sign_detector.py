@@ -131,11 +131,6 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
                                 print(f"LEVHA: {class_name} UZAKLIK: {depth:.2f}m")
                             else:
                                 pass
-
-                    # Ekstra: Her sınıfın sayısını ekrana bas
-            for class_name, count in cumulative_counters.items():
-                if count > 0:
-                    print(f"Class: {class_name}, Count: {count}")
         else:
             # 23 kodunu yayınlamak için zaman kontrolü
             current_time = time.time()
