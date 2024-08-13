@@ -10,6 +10,7 @@ import math
 import numpy as np
 import copy
 import time
+from collections import deque
 
 def obstacle_callback(msg):
     global obstacle_detected
@@ -96,9 +97,8 @@ def annotate_image (blended_image_array, prediction):
         cv2.circle(blended_image_array, (midpoints[label_name][0], midpoints[label_name][1]), 10, labels_color[label_name], -1) # şeritlerin orta noktasına bi nokta
         cv2.putText(blended_image_array, f"orta {str(label_name)}",(midpoints[label_name][0], midpoints[label_name][1]+20),cv2.FONT_HERSHEY_SIMPLEX, 0.5, labels_color[label_name], 2)
     return blended_image_array, midpoints, endpoints, areas
-kosul = 0
 def steering_control(image, midpoints, endpoints, areas):
-        global current_lane_number, kayit, kosul
+        global current_lane_number, kayit, kosul, mid_line_y, mid_line_x, count_0, count_1
         if areas['sol'] <= 150: # sol şerit pikseli 50'den fazla ise orta noktasını alıyor
             midpoints['sol'] = (0, 0)
         if areas['sag'] <= 150: # sag şerit pikseli 50'den fazla ise orta noktasını alıyor
@@ -108,37 +108,28 @@ def steering_control(image, midpoints, endpoints, areas):
             if abs(midpoints["sag"][0] - midpoints["sol"][0]) < 200:
                 if areas["sol"] > areas["sag"]:
                     mid_line_x = midpoints['sol'][0] + 200
-                    kosul = 1
                 else:
                     mid_line_x = midpoints['sag'][0] - 200
-                    kosul = 2
             else:
                 mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
-                kosul = 3
             if abs (midpoints["sol"][1]-midpoints["sag"][1]) < 10: 
                 mid_line_y = (midpoints['sol'][1] + midpoints['sag'][1]) / 2
-                kosul = 4
                 #mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
             else:
                 #mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
                 if areas["sol"] > areas["sag"]:
                     mid_line_y = midpoints["sol"][1]
-                    kosul = 5
                 else:
                     mid_line_y = midpoints["sag"][1]
-                    kosul = 6
         elif midpoints['sag'] == (0, 0) and midpoints['sol'] != (0, 0): # sagın orta noktası yok solun orta noktası var koşulu
             mid_line_y = midpoints['sol'][1]
             mid_line_x = midpoints['sol'][0] + 200                      # sol şeride 150 ekleyerek sag şeritsiz yolun ortasını buluyor
-            kosul = 7
         elif midpoints['sol'] == (0, 0) and midpoints['sag'] != (0, 0): # solun orta noktası yok sagın orta noktası var koşulu
             mid_line_y = midpoints['sag'][1]
             mid_line_x = midpoints['sag'][0] - 200                     # sag seridin orta noktasından 150 piksel çıkartarak yolun ortasını buluyor
-            kosul = 8
         else:
             cv2.putText(image, 'UCGEN CIZILEMEDI',(15, 40), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
-            print("UCGEN CIZILEMEDI")
-            kosul = 9
+            print("SERIT TAKIBI YAPILAMIYOR, UCGEN CIZILEMEDI")
 
         image = cv2.line(image, ((int(image.shape[1] / 2)), 332),
                         ((int(image.shape[1] / 2))-15, int(mid_line_y)), (0, 255, 0), 2)                       # düz çizgiyi çekiyor
@@ -160,20 +151,27 @@ def steering_control(image, midpoints, endpoints, areas):
 
         cv2.putText(image, f"tekerlek acisi: {steering}", (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
         cv2.putText(image, f"ucgen aci: {degree}", (15, 55), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
-    
-        if areas['ensol'] > areas['ensag']: # Mevcut şerit bilgisini ekrana yazdırır
-            cv2.putText(image, 'arac SAG seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
-            current_lane_number = 1
-        elif areas ['ensag'] > areas ['ensol']: 
-            cv2.putText(image, 'arac SOL seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
-            current_lane_number = 0
-        else:
-            if current_lane_number == 0:
-                cv2.putText(image, 'arac SOL seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
-            elif current_lane_number == 1:
-                cv2.putText(image, 'arac SAG seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
 
-        lane_publisher.publish(current_lane_number)    
+        if (areas["ensol"] > areas["sol"]) or (areas['ensag'] > areas["sag"]):
+            if areas['ensol'] > areas['ensag']: # Mevcut şerit bilgisini ekrana yazdırır
+                cv2.putText(image, 'arac SAG seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
+                current_lane_number = 1
+            elif areas ['ensag'] > areas ['ensol']: 
+                cv2.putText(image, 'arac SOL seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
+                current_lane_number = 0
+
+        if current_lane_number in [0, 1]:
+
+            lanes.append(current_lane_number)
+        
+            count_0 = lanes.count(0)
+            count_1 = lanes.count(1)
+        if count_0 / 20.0 >= 0.73:
+            cv2.putText(image, 'arac SOL seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
+            lane_publisher.publish(0)
+        elif count_1 / 20.0 >= 0.73:
+            cv2.putText(image, 'arac SAG seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
+            lane_publisher.publish(1) 
 
         #print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
         kayit.write(image)
@@ -196,12 +194,12 @@ if __name__ == "__main__":
 
     #Variables
     #rate = rospy.Rate(2)
-    model = load_model('/home/eva/EVA-Autonomous-Vehicle/reel_ws/src/evaotonom/scripts/tumVeriSetiyleSeritTakibiModeli.h5', compile=False)
+    model = load_model('/home/eva/Desktop/modeller/tum-veri-seti-13.08.h5', compile=False)
     colors = [(0, 0, 0), (128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128)]
     INPUT_SHAPE = [480, 640, 3]  # (Height, Width , Color Format) 
     current_lane_number = None
     obstacle_detected, sign_detected = (False,) *2
-    cam = cv2.VideoCapture(2)
+    cam = cv2.VideoCapture(0)
     label_names = ['background', 'ensol', 'sol', 'sag', 'ensag']
     labels_color = {
         'ensol': (255, 0, 0),  # Kırmızı
@@ -213,7 +211,11 @@ if __name__ == "__main__":
     rate = rospy.Rate(2)
     timer = time.strftime("%d.%m-%H:%M")
     obstacle_detected = False
-    
+    mid_line_x, mid_line_y = (0,) *2
+    lanes = deque(maxlen=30) # maxlen istenilen veri sayısı 
+    count_0 = 0.0
+    count_1 = 0.0
+
     #Subscribers
     rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback)
     rospy.Subscriber('/decision_algorithm/detection_control', Bool, decision_callback)
