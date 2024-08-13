@@ -160,8 +160,7 @@ def steering_control(image, midpoints, endpoints, areas):
 
         cv2.putText(image, f"tekerlek acisi: {steering}", (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
         cv2.putText(image, f"ucgen aci: {degree}", (15, 55), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
-        cv2.putText(image, f"KOSUL : {kosul}", (15, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
-
+    
         if areas['ensol'] > areas['ensag']: # Mevcut şerit bilgisini ekrana yazdırır
             cv2.putText(image, 'arac SAG seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
             current_lane_number = 1
@@ -212,6 +211,9 @@ if __name__ == "__main__":
     }
     initialize_detection_variables()
     rate = rospy.Rate(2)
+    timer = time.strftime("%d.%m-%H:%M")
+    obstacle_detected = False
+    
     #Subscribers
     rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback)
     rospy.Subscriber('/decision_algorithm/detection_control', Bool, decision_callback)
@@ -221,10 +223,11 @@ if __name__ == "__main__":
     steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=10)
     lane_publisher = rospy.Publisher("/lane_track/current_lane", Int8, queue_size=10)
     brake_publisher = rospy.Publisher('/stm/brake', Bool, queue_size=10)
+    
     time.sleep(5)
-    obstacle_detected = False
-    motor_power_pub.publish(1)
-    kayit = cv2.VideoWriter("/home/eva/Downloads/kayit/output_yarisma_2.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 7.0, (640, 360))
+    motor_power_pub.publish(3)
+    
+    kayit = cv2.VideoWriter(f"/home/eva/Videos/kayit/lane-track-{timer}.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 7.0, (640, 360))
     while not rospy.is_shutdown():
         callback()
     
