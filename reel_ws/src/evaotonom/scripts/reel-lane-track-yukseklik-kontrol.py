@@ -198,7 +198,7 @@ if __name__ == "__main__":
     INPUT_SHAPE = [480, 640, 3]  # (Height, Width , Color Format) 
     current_lane_number = None
     obstacle_detected, sign_detected = (False,) *2
-    cam = cv2.VideoCapture(0)
+    cam = cv2.VideoCapture(2)
     label_names = ['background', 'ensol', 'sol', 'sag', 'ensag']
     labels_color = {
         'ensol': (255, 0, 0),  # Kırmızı
