@@ -80,11 +80,15 @@ if __name__ == "__main__":
 
             if detected_sign_number == 3: # DURAK KARAR ALGORITMASI
                 if current_lane == 1: # SAG SERITTEYSE
-                    rospy.loginfo(" @@@@@@@@@@ SAG SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ")  
+                    rospy.loginfo(" @@@@@@@@@@ SAG SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ") 
+                    brake_pub.publish(1)
+                    time.sleep(2) 
                     reset_odom.publish(1)
                     time.sleep(0.5)
+                    brake_pub.publish(0)
+                    time.sleep(2)
                     durak_depth = depth
-                    while distance < int(durak_depth) * 100 - 100 : # 8.7 gibi bir değer olabilir
+                    while distance < int(durak_depth) * 100 - 250 : # 8.7 gibi bir değer olabilir
                         print(distance)
                     detection_control.publish(True) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
                     print("dist1 bitti")
@@ -295,10 +299,16 @@ if __name__ == "__main__":
                 if current_lane == 1: # sag seritten
                     rospy.loginfo("sagdan sola donus basladı")
                     detection_control.publish(True)
+                    brake_pub.publish(1)
+                    time.sleep(2)
                     reset_odom.publish(1)
                     time.sleep(0.5)
+                    left_signal.publish(6)
+                    time.sleep(0.5)
+                    brake_pub.publish(0)
+                    time.sleep(2)
                     left_depth = depth
-                    while distance < left_depth*100 + 100:
+                    while distance < left_depth*100 - 100:
                         print(distance)
                     print("dist bitti")
                     time.sleep(0.5)
@@ -321,8 +331,14 @@ if __name__ == "__main__":
                 elif current_lane == 0: # sol seritten
                     rospy.loginfo("soldan sola donus basladı")
                     detection_control.publish(True)
+                    brake_pub.publish(1)
+                    time.sleep(2)
                     reset_odom.publish(1)
                     time.sleep(0.5)
+                    left_signal.publish(6)
+                    time.sleep(0.5)
+                    brake_pub.publish(0)
+                    time.sleep(2)
                     left_depth = depth
                     while distance < left_depth*100:
                         print(distance)
@@ -332,13 +348,11 @@ if __name__ == "__main__":
                     time.sleep(2)
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    left_signal.publish(4)
-                    time.sleep(0.5)
                     steering_pub.publish(-40)
                     time.sleep(2)
                     brake_pub.publish(0)
                     time.sleep(2)
-                    while distance < 300:
+                    while distance < 500:
                         print(distance)
                     steering_pub.publish(0)
                     time.sleep(2)
@@ -351,18 +365,22 @@ if __name__ == "__main__":
                 if current_lane == 1: # sag seritten
                     rospy.loginfo("sagdan saga donus basladı")
                     detection_control.publish(True)
-                    reset_odom.publish(1)
-                    time.sleep(0.5)
-                    right_depth = depth
-                    while distance < right_depth*100 +100:
-                        print(distance)
-                    print("dist bitti")
-                    time.sleep(0.5)                  
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    right_signal.publish(4)
+                    right_signal.publish(6)
+                    time.sleep(0.5)
+                    brake_pub.publish(0)
+                    time.sleep(2)
+                    right_depth = depth
+                    while distance < right_depth*100:
+                        print(distance)
+                    print("dist bitti")
+                    time.sleep(0.5)  
+                    brake_pub.publish(1)
+                    time.sleep(2)                
+                    reset_odom.publish(1)
                     time.sleep(0.5)
                     steering_pub.publish(40)
                     time.sleep(2)
@@ -377,10 +395,16 @@ if __name__ == "__main__":
                 elif current_lane == 0: # sol seritten
                     rospy.loginfo("soldan saga donus basladı")
                     detection_control.publish(True)
+                    brake_pub.publish(1)
+                    time.sleep(2)
                     reset_odom.publish(1)
                     time.sleep(0.5)
+                    right_signal.publish(6)
+                    time.sleep(0.5)
+                    brake_pub.publish(0)
+                    time.sleep(2)
                     right_depth = depth
-                    while distance < right_depth*100:
+                    while distance < right_depth*100 -100:
                         print(distance)
                     print("dist bitti")
                     time.sleep(0.5)
