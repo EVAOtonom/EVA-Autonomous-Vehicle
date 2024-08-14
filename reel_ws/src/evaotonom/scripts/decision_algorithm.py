@@ -83,7 +83,7 @@ if __name__ == "__main__":
                     rospy.loginfo(" @@@@@@@@@@ SAG SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ")  
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    while distance < int(depth) * 100 - 300 :
+                    while distance < int(depth) * 100 - 100 : # 8.7 gibi bir değer olabilir
                         print(distance)
                     detection_control.publish(True) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
                     print("dist1 bitti")
@@ -97,7 +97,7 @@ if __name__ == "__main__":
                     time.sleep(2)
                     brake_pub.publish(0)
                     time.sleep(2)
-                    while distance < 300:  
+                    while distance < 280: # durak giriş azaltıldı  
                         print(distance)
                     print("dist2 bitti")
                     reset_odom.publish(1)
@@ -119,7 +119,7 @@ if __name__ == "__main__":
                     time.sleep(2)
                     brake_pub.publish(0)
                     time.sleep(2)
-                    while distance < 320:
+                    while distance < 380: #320den 380e
                         print(distance)
                     print("dist4 bitti")
                     brake_pub.publish(1)
@@ -143,7 +143,7 @@ if __name__ == "__main__":
                     steering_pub.publish(40)
                     time.sleep(2)
                     brake_pub.publish(0)
-                    while distance < 300:
+                    while distance < 280:
                         print(distance)
                     brake_pub.publish(1)
                     time.sleep(2)
@@ -156,8 +156,8 @@ if __name__ == "__main__":
                     while distance < 150:
                         print(distance)
                     reset_odom.publish(1)
-                    time.sleep(0.5)
-                    while distance < int(depth) * 100 + 300 :
+                    time.sleep(0.5) # buradan yukarısı güncellenebilir 
+                    while distance < int(depth) * 100 - 800 : # 8.7 gibi bir değer olabilir
                         print(distance)
                     print("dist1 bitti")
                     brake_pub.publish(1)
@@ -295,7 +295,7 @@ if __name__ == "__main__":
                     detection_control.publish(True)
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    while distance < depth*100 +100:
+                    while distance < depth*100 + 100:
                         print(distance)
                     print("dist bitti")
                     time.sleep(0.5)
