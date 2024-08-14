@@ -189,7 +189,8 @@ def birinci_bolge_karari_sol():
                     if 3 < distance < 3.4:
                         rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 2. BÖLGE Sol")
                         ikinci_bolge_karari_sol()
-                        break 
+                        return True
+    return False 
 def ikinci_bolge_karari_sag():
     global obstacle_detected, scan, sign_detected
     if not sign_detected:
