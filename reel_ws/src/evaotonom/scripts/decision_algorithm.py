@@ -308,7 +308,7 @@ if __name__ == "__main__":
                     brake_pub.publish(0)
                     time.sleep(2)
                     left_depth = depth
-                    while distance < left_depth*100 - 100:
+                    while distance < left_depth*100 - 150:
                         print(distance)
                     print("dist bitti")
                     time.sleep(0.5)
@@ -340,7 +340,7 @@ if __name__ == "__main__":
                     brake_pub.publish(0)
                     time.sleep(2)
                     left_depth = depth
-                    while distance < left_depth*100:
+                    while distance < left_depth*100-50:
                         print(distance)
                     print("dist bitti")
                     time.sleep(0.5)
@@ -352,7 +352,7 @@ if __name__ == "__main__":
                     time.sleep(2)
                     brake_pub.publish(0)
                     time.sleep(2)
-                    while distance < 500:
+                    while distance < 400:
                         print(distance)
                     steering_pub.publish(0)
                     time.sleep(2)
@@ -374,7 +374,7 @@ if __name__ == "__main__":
                     brake_pub.publish(0)
                     time.sleep(2)
                     right_depth = depth
-                    while distance < right_depth*100:
+                    while distance < right_depth*100 -50:
                         print(distance)
                     print("dist bitti")
                     time.sleep(0.5)  
@@ -386,7 +386,7 @@ if __name__ == "__main__":
                     time.sleep(2)
                     brake_pub.publish(0)
                     time.sleep(2)
-                    while distance < 500:
+                    while distance < 400:
                         print(distance)
                     steering_pub.publish(0)
 
@@ -404,7 +404,7 @@ if __name__ == "__main__":
                     brake_pub.publish(0)
                     time.sleep(2)
                     right_depth = depth
-                    while distance < right_depth*100 -100:
+                    while distance < right_depth*100 -150:
                         print(distance)
                     print("dist bitti")
                     time.sleep(0.5)
@@ -418,7 +418,7 @@ if __name__ == "__main__":
                     time.sleep(0.5)
                     brake_pub.publish(0)
                     time.sleep(2)
-                    while distance < 300:
+                    while distance < 400:
                         print(distance)
                     steering_pub.publish(0)
                     time.sleep(2)
