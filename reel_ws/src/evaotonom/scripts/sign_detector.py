@@ -160,7 +160,7 @@ def tabela_bilgi(class_name, depth_in_meters):
     if obstacle_detected == 1:  # ENGEL TESPİT EDİLDİĞİ DURUMDA ÇALIŞMASI GEREKEN KARAR ALGORİTMALARI
         if depth_in_meters is not None:
             # Derinlik bilgisini Float32MultiArray formatında yayınla
-            depth_msg = Float32()     
+            depth_msg = Float32()      
             depth_msg.data = depth_in_meters
             depth_pub.publish(depth_msg)
 
