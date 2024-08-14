@@ -40,7 +40,7 @@ model = YOLO(f'{os.path.dirname(os.path.abspath(__file__))}/sol300best.pt')
 bridge = CvBridge()
 
 def callback(left_image_msg, right_image_msg, point_cloud_msg):
-    global left_image, right_image, point_cloud, original_height, original_width, sign_detected, x1, x2, y1, y2, current_detections, cumulative_counters, last_publish_time, size, detection_limit,bridge
+    global depth, left_image, right_image, point_cloud, original_height, original_width, sign_detected, x1, x2, y1, y2, current_detections, cumulative_counters, last_publish_time, size, detection_limit,bridge
     if obstacle_detected != 1:
         # Convert images
         original_left_image = bridge.imgmsg_to_cv2(left_image_msg, "bgr8")
@@ -70,7 +70,7 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
                     x1, y1, x2, y2 = map(int, box.xyxy[0])
                     class_id = int(box.cls[0])
                     class_name = class_names.get(class_id, 'Unknown')
-
+                    print(class_name)
                     left_detected = True
                     detected_boxes.append((x1, y1, x2, y2, class_name))
         
@@ -88,45 +88,43 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
                         sign_detected = True     
                         
                         # Calculate the depth using the point cloud
-                        depth = calculate_depth(point_cloud, (x1, y1, x2, y2))
-
-                        if depth is not None and math.isnan(depth) == False and math.isinf(depth) == False:
                             
-                            if class_name in ["park", "engellipark"] and box.conf > 0.9:  # Doğrulama kontrolü
-                                cumulative_counters[class_name] += 1
-                                current_detections += 1
-                                
-                            # Güvenlik önlemi: Anahtarın sözlükte var olduğundan emin olun
-                            if class_name not in cumulative_counters:
-                                if class_name != "parkyapilmaz" and class_name != "soladonulmez" and class_name != "parkyasak":
-                                    cumulative_counters[class_name] = 0
+                        if class_name in ["park", "engellipark"] and box.conf > 0.9:  # Doğrulama kontrolü
+                            cumulative_counters[class_name] += 1
+                            current_detections += 1
+                            
+                        # Güvenlik önlemi: Anahtarın sözlükte var olduğundan emin olun
+                        if class_name not in cumulative_counters:
+                            if class_name == "parkyapilmaz" and class_name == "soladonulmez" and class_name == "parkyasak":
+                                cumulative_counters[class_name] = 0
 
-                            if class_name != "parkyapilmaz" and class_name != "soladonulmez" and class_name != "parkyasak":
-                                cumulative_counters[class_name] += 1
-                                current_detections += 1
+                        if class_name != "parkyapilmaz" and class_name != "soladonulmez" and class_name != "parkyasak":
+                            cumulative_counters[class_name] += 1
+                            current_detections += 1
 
-                            # Algılama sayısı limitine ulaşıldığında kontrol
-                            if current_detections >= detection_limit:
-                                # En sık tespit edilen işareti bul
-                                class_name = max(cumulative_counters, key=cumulative_counters.get)
+                        # Algılama sayısı limitine ulaşıldığında kontrol
+                        if current_detections >= detection_limit:
+                            # En sık tespit edilen işareti bul
+                            class_name = max(cumulative_counters, key=cumulative_counters.get)
+                            depth = calculate_depth(point_cloud, (x1, y1, x2, y2))
 
-                                # En sık tespit edilen sınıfı tabela_bilgi fonksiyonuna gönder
-                                tabela_bilgi(class_name, calculate_depth(point_cloud, (x1, y1, x2, y2)))
+                            # En sık tespit edilen sınıfı tabela_bilgi fonksiyonuna gönder
+                            tabela_bilgi(class_name, depth)
 
-                                # Sayaçları ve algılama sayısını sıfırla
-                                cumulative_counters = {class_name: 0 for class_name in class_names.values()}
-                                current_detections = 0
-                                
-                            # Draw bounding box and label on right image
-                            cv2.rectangle(right_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
-                            label = f'{class_name} ({depth:.2f}m)' if depth is not None else class_name
+                            # Sayaçları ve algılama sayısını sıfırla
+                            cumulative_counters = {class_name: 0 for class_name in class_names.values()}
+                            current_detections = 0
+                            
+                        # Draw bounding box and label on right image
+                        cv2.rectangle(right_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
+                        label = f'{class_name} ({depth:.2f}m)' if depth is not None else class_name
 
-                            cv2.putText(right_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+                        cv2.putText(right_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
-                            if depth is not None:
-                                print(f"LEVHA: {class_name} UZAKLIK: {depth:.2f}m")
-                            else:
-                                pass
+                        if depth is not None:
+                            print(f"LEVHA: {class_name} UZAKLIK: {depth:.2f}m")
+                        else:
+                            pass
         else:
             # 23 kodunu yayınlamak için zaman kontrolü
             current_time = time.time()
@@ -147,10 +145,10 @@ def calculate_depth(point_cloud, boundingbox):
 
         if point is not None and len(point)>0:
             distance = math.sqrt(point[0]**2 + point[1]**2 + point[2]**2)
-            if point is not  math.isnan(distance) and not  math.isinf(distance):
+            if not math.isnan(distance) and not math.isinf(distance) and distance is not None:
                 return distance
         else:
-            return None
+            pass
         
 # Initialize only once
 cumulative_counters = defaultdict(int)
@@ -258,12 +256,7 @@ def tabela_bilgi(class_name, depth_in_meters):
 
 
 if __name__ == '__main__':
-    rospy.init_node('zed_object_detection')
-
-    # #Şerit Takibi Bekleme
-    rospy.loginfo("Waiting for 'lane_track_node' service...")
-    rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
-    rospy.loginfo("'lane_track_node' service is now available.")    
+    rospy.init_node('zed_object_detection')  
 
 
     # Subscribers
@@ -295,6 +288,7 @@ if __name__ == '__main__':
     decision_control = None
     x1, y1, x2, y2 = (0,) *4
     size = 416
+    depth = 0
     class_names = {
             0: '20', 1: '30', 2: 'dur', 3: 'durak', 4: 'girisyok',
             5: 'ilerisag', 6: 'ilerisol', 7: 'kirmizi', 8: 'park',
