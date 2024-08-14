@@ -83,19 +83,20 @@ if __name__ == "__main__":
                     rospy.loginfo(" @@@@@@@@@@ SAG SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ")  
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    while distance < depth * 100 + 300 :
+                    while distance < int(depth) * 100 - 300 :
                         print(distance)
                     detection_control.publish(True) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
                     print("dist1 bitti")
                     brake_pub.publish(1)
                     time.sleep(2)
-                    right_signal.publish(2)
-                    time.sleep(4)
                     reset_odom.publish(1)
+                    time.sleep(0.5)
+                    right_signal.publish(2)
                     time.sleep(0.5)
                     steering_pub.publish(28)
                     time.sleep(2)
                     brake_pub.publish(0)
+                    time.sleep(2)
                     while distance < 300:  
                         print(distance)
                     print("dist2 bitti")
@@ -108,14 +109,14 @@ if __name__ == "__main__":
                     print("dist3 bitti")
                     brake_pub.publish(1)
                     time.sleep(2)
+                    reset_odom.publish(1)
+                    time.sleep(0.5)
                     steering_pub.publish(0)
                     time.sleep(10)
                     left_signal.publish(2)
                     time.sleep(4)
                     steering_pub.publish(-28)
                     time.sleep(2)
-                    reset_odom.publish(1)
-                    time.sleep(0.5)
                     brake_pub.publish(0)
                     time.sleep(2)
                     while distance < 320:
@@ -156,7 +157,7 @@ if __name__ == "__main__":
                         print(distance)
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    while distance < depth * 100 + 300 :
+                    while distance < int(depth) * 100 + 300 :
                         print(distance)
                     print("dist1 bitti")
                     brake_pub.publish(1)
