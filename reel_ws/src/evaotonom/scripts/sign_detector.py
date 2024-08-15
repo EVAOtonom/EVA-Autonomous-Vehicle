@@ -220,7 +220,7 @@ if __name__ == '__main__':
             20: 'ikiliyon', 21: 'tersengellipark', 22: 'parkyapilmaz'
         }
     park_counter = 5
-    not_park_counter = 2 
+    not_park_counter = 6 
     sign_counter = {
     '20': 0,
     '30': 0,
