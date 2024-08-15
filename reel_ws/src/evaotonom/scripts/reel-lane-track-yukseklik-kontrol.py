@@ -81,7 +81,7 @@ def annotate_image (blended_image_array, prediction):
         if len(y_coordinates) == 0 or len(x_coordinates) == 0: # etikete ait hiç bir piksel yoksa for döngüsünü atlar
             continue
         areas[label_name] = len(y_coordinates) # kaç piksel varsa o kadar alan
-        if areas[label_name] < 150:
+        if areas[label_name] < 50:
             continue
         midpoints[label_name] = ( int(np.mean(x_coordinates)), int(np.mean(y_coordinates)) ) # her etiketin x ve y'de ortalaması bulunur 
         max_y_idx = np.argmax(y_coordinates) 
@@ -99,9 +99,9 @@ def annotate_image (blended_image_array, prediction):
     return blended_image_array, midpoints, endpoints, areas
 def steering_control(image, midpoints, endpoints, areas):
         global current_lane_number, kayit, kosul, mid_line_y, mid_line_x, count_0, count_1
-        if areas['sol'] <= 150: # sol şerit pikseli 50'den fazla ise orta noktasını alıyor
+        if areas['sol'] <= 50: # sol şerit pikseli 50'den fazla ise orta noktasını alıyor
             midpoints['sol'] = (0, 0)
-        if areas['sag'] <= 150: # sag şerit pikseli 50'den fazla ise orta noktasını alıyor
+        if areas['sag'] <= 50: # sag şerit pikseli 50'den fazla ise orta noktasını alıyor
             midpoints['sag'] = (0, 0)
         #image = image[:, :, ::-1].copy() # renk kanallarını tersine çevirir, muhtemelen başka kütüphanede işlemek için düzenleme işlemidir
         if midpoints['sol'] != (0, 0) and midpoints['sag'] != (0, 0): # şeritlerin orta noktası hesaplanabiliyorsa koşulu
@@ -134,11 +134,11 @@ def steering_control(image, midpoints, endpoints, areas):
             print("SERIT TAKIBI YAPILAMIYOR, UCGEN CIZILEMEDI")
 
         image = cv2.line(image, ((int(image.shape[1] / 2)), 332),
-                        ((int(image.shape[1] / 2))-15, int(mid_line_y)), (0, 255, 0), 2)                       # düz çizgiyi çekiyor
+                        ((int(image.shape[1] / 2)), int(mid_line_y)), (0, 255, 0), 2)                       # düz çizgiyi çekiyor
         image = cv2.line(image, ((int(image.shape[1] / 2)), 332),
-                        (int(mid_line_x)-15, int(mid_line_y)), (0, 255, 0), 2)                                 # çapraz çizgiyi çekiyor
+                        (int(mid_line_x), int(mid_line_y)), (0, 255, 0), 2)                                 # çapraz çizgiyi çekiyor
         image = cv2.line(image, ((int(image.shape[1] / 2)), int(mid_line_y)),
-                        (int(mid_line_x)-15, int(mid_line_y)), (0, 255, 0), 2)                                     # yatay çizgiyi çekiyor
+                        (int(mid_line_x), int(mid_line_y)), (0, 255, 0), 2)                                     # yatay çizgiyi çekiyor
         uzaklik_y = (image.shape[0] - mid_line_y)                                                         # cizgi uzunlugunu bulmaya yarar
         uzaklik_x = (((image.shape[1] / 2)) - mid_line_x)                                            # yolun ortasına aracın uzaklığı
         degree = (180 * math.atan(abs(uzaklik_x / uzaklik_y))) / (3.14)                                 # sapma bir açıya dönüştürülür
@@ -227,9 +227,6 @@ if __name__ == "__main__":
     steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=10)
     lane_publisher = rospy.Publisher("/lane_track/current_lane", Int8, queue_size=10)
     brake_publisher = rospy.Publisher('/stm/brake', Bool, queue_size=10)
-    
-    time.sleep(5)
-    motor_power_pub.publish(3)
     
     kayit = cv2.VideoWriter(f"/home/eva/Videos/kayit/lane-track-{timer}.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 7.0, (640, 360))
     while not rospy.is_shutdown():
