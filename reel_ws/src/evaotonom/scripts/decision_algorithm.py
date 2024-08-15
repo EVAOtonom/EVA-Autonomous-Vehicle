@@ -534,6 +534,7 @@ if __name__ == "__main__":
                         kavsak_depth = depth
                         while distance < kavsak_depth*100 - 200:
                             pass
+                        detection_control.publish(1)
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
@@ -578,6 +579,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
+                        detection_control.publish(0)
                         
                     else:
                         brake_pub.publish(1)
