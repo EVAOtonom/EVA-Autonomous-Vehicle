@@ -89,9 +89,8 @@ if __name__ == "__main__":
                     time.sleep(2)
                     durak_depth = depth
                     while distance < int(durak_depth) * 100 - 250 : # 8.7 gibi bir değer olabilir
-                        print(distance)
+                        pass
                     detection_control.publish(True) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
-                    print("dist1 bitti")
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
@@ -103,15 +102,13 @@ if __name__ == "__main__":
                     brake_pub.publish(0)
                     time.sleep(2)
                     while distance < 280: # durak giriş azaltıldı  
-                        print(distance)
-                    print("dist2 bitti")
+                        pass
                     reset_odom.publish(1)
                     time.sleep(0.5)
                     steering_pub.publish(-40)
                     time.sleep(2)
                     while distance < 300:
-                        print(distance)
-                    print("dist3 bitti")
+                        pass
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
@@ -125,8 +122,7 @@ if __name__ == "__main__":
                     brake_pub.publish(0)
                     time.sleep(2)
                     while distance < 380: #320den 380e
-                        print(distance)
-                    print("dist4 bitti")
+                        pass
                     brake_pub.publish(1)
                     time.sleep(2)
                     steering_pub.publish(32)
@@ -136,8 +132,7 @@ if __name__ == "__main__":
                     brake_pub.publish(0)
                     time.sleep(2)
                     while distance < 250:
-                        print(distance)
-                    print("dist5 bitti")
+                        pass
                 elif current_lane == 0: # SOL SERITTEYSE
                     rospy.loginfo(" @@@@@@@@@@ SOL SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ")  
                     detection_control.publish(True)
@@ -149,7 +144,7 @@ if __name__ == "__main__":
                     time.sleep(2)
                     brake_pub.publish(0)
                     while distance < 280:
-                        print(distance)
+                        pass
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
@@ -159,13 +154,12 @@ if __name__ == "__main__":
                     brake_pub.publish(0)
                     time.sleep(2)
                     while distance < 150:
-                        print(distance)
+                        pass
                     reset_odom.publish(1)
                     time.sleep(0.5) # buradan yukarısı güncellenebilir 
                     durak_depth = depth
                     while distance < int(durak_depth) * 100 - 800 : # 8.7 gibi bir değer olabilir
-                        print(distance)
-                    print("dist1 bitti")
+                        pass
                     brake_pub.publish(1)
                     time.sleep(2)
                     right_signal.publish(2)
@@ -176,15 +170,13 @@ if __name__ == "__main__":
                     time.sleep(2)
                     brake_pub.publish(0)
                     while distance < 300:  
-                        print(distance)
-                    print("dist2 bitti")
+                        pass
                     reset_odom.publish(1)
                     time.sleep(0.5)
                     steering_pub.publish(-40)
                     time.sleep(2)
                     while distance < 300:
-                        print(distance)
-                    print("dist3 bitti")
+                        pass
                     brake_pub.publish(1)
                     time.sleep(2)
                     steering_pub.publish(0)
@@ -198,8 +190,7 @@ if __name__ == "__main__":
                     brake_pub.publish(0)
                     time.sleep(2)
                     while distance < 320:
-                        print(distance)
-                    print("dist4 bitti")
+                        pass
                     brake_pub.publish(1)
                     time.sleep(2)
                     steering_pub.publish(32)
@@ -209,9 +200,8 @@ if __name__ == "__main__":
                     brake_pub.publish(0)
                     time.sleep(2)
                     while distance < 250:
-                        print(distance)
-                    print("dist5 bitti")
-
+                        pass
+                        
                 detection_control.publish(False) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
                 
             elif detected_sign_number == 2: # DUR
@@ -309,7 +299,7 @@ if __name__ == "__main__":
                     time.sleep(2)
                     left_depth = depth
                     while distance < left_depth*100 - 150:
-                        print(distance)
+                        pass
                     print("dist bitti")
                     time.sleep(0.5)
                     brake_pub.publish(1)
@@ -323,7 +313,7 @@ if __name__ == "__main__":
                     brake_pub.publish(0)
                     time.sleep(2)
                     while distance < 475:
-                        print(distance)
+                        pass
                     steering_pub.publish(0)
                     time.sleep(2)
 
@@ -341,7 +331,7 @@ if __name__ == "__main__":
                     time.sleep(2)
                     left_depth = depth
                     while distance < left_depth*100-50:
-                        print(distance)
+                        pass
                     print("dist bitti")
                     time.sleep(0.5)
                     brake_pub.publish(1)
@@ -353,7 +343,7 @@ if __name__ == "__main__":
                     brake_pub.publish(0)
                     time.sleep(2)
                     while distance < 400:
-                        print(distance)
+                        pass
                     steering_pub.publish(0)
                     time.sleep(2)
 
@@ -375,7 +365,7 @@ if __name__ == "__main__":
                     time.sleep(2)
                     right_depth = depth
                     while distance < right_depth*100 -50:
-                        print(distance)
+                        pass
                     print("dist bitti")
                     time.sleep(0.5)  
                     brake_pub.publish(1)
@@ -387,7 +377,7 @@ if __name__ == "__main__":
                     brake_pub.publish(0)
                     time.sleep(2)
                     while distance < 400:
-                        print(distance)
+                        pass
                     steering_pub.publish(0)
 
 
@@ -405,7 +395,7 @@ if __name__ == "__main__":
                     time.sleep(2)
                     right_depth = depth
                     while distance < right_depth*100 -150:
-                        print(distance)
+                        pass
                     print("dist bitti")
                     time.sleep(0.5)
                     brake_pub.publish(1)
@@ -419,7 +409,7 @@ if __name__ == "__main__":
                     brake_pub.publish(0)
                     time.sleep(2)
                     while distance < 400:
-                        print(distance)
+                        pass
                     steering_pub.publish(0)
                     time.sleep(2)
 
