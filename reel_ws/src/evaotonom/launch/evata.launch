@@ -8,5 +8,6 @@
   <node name="zed_object_detection" pkg="evaotonom" type="sign_detector.py" output="screen"/>
   <node name="gps_checker" pkg="evaotonom" type="gpskavsak.py" output="screen"/>
   <node name="data_logger_node" pkg="evaotonom" type="data_logger_teknofest.py" output="screen"/>
+  <node name="gps_coordinates" pkg="evaotonom" type="gps_degerleri.py" output="screen"/>
   
 </launch> 	
