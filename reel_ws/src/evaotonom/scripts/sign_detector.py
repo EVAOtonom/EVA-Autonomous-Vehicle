@@ -49,7 +49,6 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
                     left_class_id = int(box.cls[0])
                     left_detections.append((left_class_id, (x1, y1, x2, y2)))
         
-        
         results_right = model(right_image) # SAG GÖRÜNTÜDEN TESPİT YAPAR
         for result in results_right:
             for box in result.boxes:
@@ -68,9 +67,8 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
                            sign_counter[class_name_right] += 1
                            if sign_counter[class_name_right] % park_counter == 0:
                                 depth = calculate_depth(point_cloud, (right_result[1]), original_width, original_height)
-                                if depth is not None and math.isnan(depth) == False and math.isinf(depth) == False:                                                
+                                if depth is not None and math.isnan(depth) == False and math.isinf(depth) == False and depth != -1:                                                
                                         tabela_bilgi(class_name_right, depth)
-
                                         x1, y1, x2, y2 = right_result[1]
                                         cv2.rectangle(right_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
                                         label = f'{class_name_right} ({depth:.2f}m)' if depth is not None else class_name_right
@@ -83,9 +81,8 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
                             if sign_counter[class_name_right] % not_park_counter == 0:
 
                                 depth = calculate_depth(point_cloud, (right_result[1]), original_width, original_height)
-                                if depth is not None and math.isnan(depth) == False and math.isinf(depth) == False:                                                
+                                if depth is not None and math.isnan(depth) == False and math.isinf(depth) == False and depth != -1:                                                
                                         tabela_bilgi(class_name_right, depth)
-
                                         x1, y1, x2, y2 = right_result[1]
                                         cv2.rectangle(right_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
                                         label = f'{class_name_right} ({depth:.2f}m)' if depth is not None else class_name_right
@@ -113,90 +110,109 @@ def calculate_depth(point_cloud, boundingbox, width, height):
 
     if point is not None and len(point)>0:
         distance = math.sqrt(point[0]**2 + point[1]**2 + point[2]**2)
-        if point is not  math.isnan(distance) and not  math.isinf(distance) and not None:
+        if math.isnan(distance) == False and math.isinf(distance) == False and distance is not None:
             return distance
     else:
         return -1
 
 def tabela_bilgi(class_name, depth_in_meters):
     global x1, y1, x2, y2, obstacle_detected
-
+    
     if class_name == "kirmizi" and depth_in_meters is not None and depth_in_meters < 9.0:
         tabela_pub.publish(7)
+        depth_pub.publish(depth_in_meters)
 
     elif class_name == "yesil" and depth_in_meters is not None and depth_in_meters < 9.0:
         tabela_pub.publish(15)
+        depth_pub.publish(depth_in_meters)
 
     if obstacle_detected == 0:  # ENGEL TESPİT EDİLMEDİĞİ DURUMDA ÇALIŞMASI GEREKEN KARAR ALGORİTMALARI
         if class_name == "20" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(0)
+            depth_pub.publish(depth_in_meters)
 
         elif class_name == "30" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(1)
+            depth_pub.publish(depth_in_meters)
 
         elif class_name == "dur" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(2)
+            depth_pub.publish(depth_in_meters)
 
         elif class_name == "durak" and depth_in_meters is not None and depth_in_meters < 15.0:
             tabela_pub.publish(3)
+            depth_pub.publish(depth_in_meters)
 
         elif class_name == "girisyok" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(4)
+            depth_pub.publish(depth_in_meters)
 
         elif class_name == "ilerisag" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(5)
+            depth_pub.publish(depth_in_meters)
 
         elif class_name == "ilerisol" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(6)
+            depth_pub.publish(depth_in_meters)
 
         elif class_name == "park" and depth_in_meters is not None and depth_in_meters < 30.0:
             tabela_pub.publish(8)
-
             data = [float(x1), float(y1), float(x2), float(y2), float(416), float(depth_in_meters)]
-
             msg = Float32MultiArray()
             msg.data = data
             position_pub.publish(msg)
 
         elif class_name == "parkyasak" and depth_in_meters is not None and depth_in_meters < 9.5:
             tabela_pub.publish(9)
+            depth_pub.publish(depth_in_meters)
 
-        elif class_name == "sag" and depth_in_meters is not None and depth_in_meters < 10.0:
+        elif class_name == "sag" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(10)
+            depth_pub.publish(depth_in_meters)
 
         elif class_name == "sagadonulmez" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(11)
+            depth_pub.publish(depth_in_meters)
 
         elif class_name == "sari" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(12)
+            depth_pub.publish(depth_in_meters)
 
-        elif class_name == "sol" and depth_in_meters is not None and depth_in_meters < 10.0:
+        elif class_name == "sol" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(13)
+            depth_pub.publish(depth_in_meters)
 
         elif class_name == "soladonulmez" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(14)
+            depth_pub.publish(depth_in_meters)
 
         elif class_name == "engellipark" and depth_in_meters is not None and depth_in_meters < 9.5:
             tabela_pub.publish(16)
+            depth_pub.publish(depth_in_meters)
 
         elif class_name == "tasittrafiginekapali" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(17)
+            depth_pub.publish(depth_in_meters)
 
         elif class_name == "yayagecidi" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(18)
+            depth_pub.publish(depth_in_meters)
 
         elif class_name == "kavsak" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(19)
+            depth_pub.publish(depth_in_meters)
 
         elif class_name == "ikiliyon" and depth_in_meters is not None and depth_in_meters < 0.01:
             tabela_pub.publish(20)
+            depth_pub.publish(depth_in_meters)
 
         elif class_name == "tersengellipark" and depth_in_meters is not None and depth_in_meters < 9.5:
             tabela_pub.publish(21)
+            depth_pub.publish(depth_in_meters)
 
         elif class_name == "parkyapilmaz" and depth_in_meters is not None and depth_in_meters < 9.5:
             tabela_pub.publish(22)
-
+            depth_pub.publish(depth_in_meters)
 
 if __name__ == '__main__':
     rospy.init_node('zed_object_detection')
@@ -207,6 +223,7 @@ if __name__ == '__main__':
     left_image = None
     right_image = None
     point_cloud = None
+    depth = Float32()      
     obstacle_detected = 0
     decision_control = None
     x1, y1, x2, y2 = (0,) *4
@@ -219,33 +236,17 @@ if __name__ == '__main__':
             17: 'tasitrafiginekapali', 18: 'yayagecidi', 19: 'kavsak',
             20: 'ikiliyon', 21: 'tersengellipark', 22: 'parkyapilmaz'
         }
-    park_counter = 5
-    not_park_counter = 6 
+    park_counter = 10
+    not_park_counter = 6
     sign_counter = {
-    '20': 0,
-    '30': 0,
-    'dur': 0,
-    'durak': 0,
-    'girisyok': 0,
-    'ilerisag': 0,
-    'ilerisol': 0,
-    'kirmizi': 0,
-    'park': 0,
-    'parkyasak': 0,
-    'sag': 0,
-    'sagadonulmez': 0,
-    'sari': 0,
-    'sol': 0,
-    'soladonulmez': 0,
-    'yesil': 0,
-    'engellipark': 0,
-    'tasitrafiginekapali': 0,
-    'yayagecidi': 0,
-    'kavsak': 0,
-    'ikiliyon': 0,
-    'tersengellipark': 0,
-    'parkyapilmaz': 0
+    '20': 0, '30': 0, 'dur': 0, 'durak': 0,
+    'girisyok': 0, 'ilerisag': 0, 'ilerisol': 0,'kirmizi': 0,
+    'park': 0, 'parkyasak': 0, 'sag': 0, 'sagadonulmez': 0,
+    'sari': 0, 'sol': 0, 'soladonulmez': 0, 'yesil': 0,
+    'engellipark': 0, 'tasitrafiginekapali': 0, 'yayagecidi': 0,
+    'kavsak': 0, 'ikiliyon': 0, 'tersengellipark': 0, 'parkyapilmaz': 0
     }
+
     last_publish_time = time.time()  
     rate = rospy.Rate(10)
 
@@ -269,5 +270,3 @@ if __name__ == '__main__':
     
     while not rospy.is_shutdown():
         rate.sleep()
-
-
