@@ -185,7 +185,7 @@ def tabela_bilgi(class_name, depth_in_meters):
         elif class_name == "yayagecidi" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(18)
 
-        elif class_name == "kavsak" and depth_in_meters is not None and depth_in_meters < 4.0:
+        elif class_name == "kavsak" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(19)
 
         elif class_name == "ikiliyon" and depth_in_meters is not None and depth_in_meters < 0.01:
