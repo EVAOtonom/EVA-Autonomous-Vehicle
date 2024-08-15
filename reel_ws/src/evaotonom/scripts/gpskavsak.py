@@ -102,7 +102,7 @@ if __name__ == "__main__":
                 if is_within_area(latitude, longitude, rect_area):
 
                     if area_num in range(6, 9): 
-                        viraj_noktasi_pub(1)   
+                        viraj_noktasi_pub.publish(1)   
 
                     else:
                         kavsak_noktasi_pub.publish(area_num)
