@@ -10,6 +10,10 @@ def decision_callback(msg):
     global sign_detected
     sign_detected = msg.data
 
+def gps_callback(msg):
+    global viraj_detected
+    viraj_detected = msg.data
+
 def callback(msg):
     global scan
     scan = msg.ranges
@@ -270,6 +274,7 @@ if __name__ == "__main__":
     traveled_distance = 0
     obstacle_detected = False
     sign_detected = False
+    viraj_detected = False
     detected_sign_number = False
     HelperArray3 = []
     rate = rospy.Rate(5)
@@ -279,6 +284,7 @@ if __name__ == "__main__":
     rospy.Subscriber("/lane_track/current_lane", Int8, current_lane_check) # 0 sol 1 sağ
     rospy.Subscriber('/stm/read_odometer', Float32, read_odometer)
     rospy.Subscriber('/decision_algorithm/detection_control', Bool, decision_callback)
+    rospy.Subscriber('/gps_detector/viraj', Bool, gps_callback)
 
     #Publishers
     reset_odom = rospy.Publisher('/stm/reset_odometer', Bool, queue_size=10)
@@ -296,7 +302,7 @@ if __name__ == "__main__":
     rospy.loginfo("'lane_track_node' service is now available.")
        
     while not rospy.is_shutdown():
-        if not sign_detected:
+        if not sign_detected or viraj_detected:
             if scan is not None:
                 obstacle_detected = False
                 for angle_index in range (0,1285):
