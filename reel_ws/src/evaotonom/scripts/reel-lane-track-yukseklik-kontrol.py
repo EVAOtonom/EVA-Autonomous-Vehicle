@@ -129,6 +129,8 @@ def steering_control(image, midpoints, endpoints, areas):
             mid_line_x = midpoints['sag'][0] - 200                     # sag seridin orta noktasından 150 piksel çıkartarak yolun ortasını buluyor
         else:
             cv2.putText(image, 'UCGEN CIZILEMEDI',(15, 40), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
+            mid_line_x = 320
+            mid_line_y = 180
             print("SERIT TAKIBI YAPILAMIYOR, UCGEN CIZILEMEDI")
 
         image = cv2.line(image, ((int(image.shape[1] / 2)), 332),
@@ -210,7 +212,8 @@ if __name__ == "__main__":
     rate = rospy.Rate(2)
     timer = time.strftime("%d.%m-%H:%M")
     obstacle_detected = False
-    mid_line_x, mid_line_y = (0,) *2
+    mid_line_x = 320
+    mid_line_y = 180
     lanes = deque(maxlen=30) # maxlen istenilen veri sayısı 
     count_0 = 0.0
     count_1 = 0.0
