@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.9
 
 import rospy
-from std_msgs.msg import Float32, Int8
+from std_msgs.msg import Float32, Int8, Bool
 
 def is_within_area(lat, lon, area): 
     min_lat = min(point[0] for point in area)
@@ -54,7 +54,30 @@ if __name__ == "__main__":
             (40.789917, 29.509575), #sol alt
             (40.789960, 29.509508), #sağ alt
             (40.789923, 29.509449) #sağ üst
+        ],
+
+###############################################Donus Noktalari#################################################
+        6: [
+            
+            (40.790015, 29.508436),     # sağ alt          
+            (40.789948, 29.508517),     # sol alt            
+            (40.789888, 29.508434),     # sol üst           
+            (40.789947, 29.508372)      # sağ üst
+        ],
+        7: [
+            (40.789602, 29.508868),     # sağ alt
+            (40.789559, 29.508809),     # sağ üst         
+            (40.789508, 29.508900),     # sol üst
+   
+            (40.789537, 29.508978)      # sol alt
+        ],
+        8: [
+            (40.789767, 29.509367),     # sol üst
+            (40.789845, 29.509463),     # sol alt
+            (40.789910, 29.509383),     # sağ alt
+            (40.789859, 29.509313)      # sağ üst
         ]
+
     }
 
     # Wait for the lane tracking node to be ready
@@ -68,6 +91,7 @@ if __name__ == "__main__":
 
     # Publishers
     kavsak_noktasi_pub = rospy.Publisher("/sign_detector/roundabout", Int8, queue_size=10)
+    viraj_noktasi_pub = rospy.Publisher("/gps_detector/viraj", Bool, queue_size=10)
 
     rate = rospy.Rate(1)  # 1 Hz
 
@@ -76,13 +100,20 @@ if __name__ == "__main__":
             found_area = False
             for area_num, rect_area in rect_areas.items():
                 if is_within_area(latitude, longitude, rect_area):
-                    kavsak_noktasi_pub.publish(area_num)
-                    rospy.loginfo(f"Kavşak: {area_num}")
-                    found_area = True
-                    print(latitude,longitude)
-                    break
+
+                    if area_num in range(6, 9): 
+                        viraj_noktasi_pub(1)   
+
+                    else:
+                        kavsak_noktasi_pub.publish(area_num)
+                        rospy.loginfo(f"Kavşak: {area_num}")
+                        found_area = True
+                        print(latitude,longitude)
+                        break
+
             if not found_area:
-                kavsak_noktasi_pub.publish(0)  # No matching area, publish 0
+                kavsak_noktasi_pub.publish(0)
+                viraj_noktasi_pub.publish(0)  
         else:
             rospy.logwarn("Veri alınamıyor")
 
