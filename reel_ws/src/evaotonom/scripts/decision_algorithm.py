@@ -525,7 +525,15 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                 elif kavsak_girisi == 2: #distance ile
                     if current_lane == 1:
-                        detection_control.publish(True)
+                        brake_pub.publish(1)
+                        time.sleep(2)
+                        reset_odom.publish(1)
+                        time.sleep(0.5)
+                        brake_pub.publish(0)
+                        time.sleep(2)
+                        kavsak_depth = depth
+                        while distance < kavsak_depth*100 - 200:
+                            pass
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
@@ -534,8 +542,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        kavsak_depth = depth
-                        while distance < kavsak_depth*100 + 50:
+                        while distance < 250:  
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -555,13 +562,13 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 400:  
+                        while distance < 350:  
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
-                        steering_pub.publish(20)
+                        steering_pub.publish(25)
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
