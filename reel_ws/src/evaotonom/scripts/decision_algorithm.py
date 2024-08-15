@@ -665,13 +665,13 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 200:  
+                        while distance < 300:  
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
-                        steering_pub.publish(-25)
+                        steering_pub.publish(-22)
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
