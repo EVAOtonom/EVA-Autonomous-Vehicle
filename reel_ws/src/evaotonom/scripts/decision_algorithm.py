@@ -637,6 +637,15 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                 elif kavsak_girisi == 3:
                     if current_lane == 1:
+                        brake_pub.publish(1)
+                        time.sleep(2)
+                        reset_odom.publish(1)
+                        time.sleep(0.5)
+                        brake_pub.publish(0)
+                        time.sleep(2)
+                        kavsak_depth = depth
+                        while distance < kavsak_depth*100 - 250:
+                            pass
                         detection_control.publish(True)
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -646,24 +655,23 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        kavsak_depth = depth
-                        while distance < kavsak_depth*100 + 50:
+                        while distance < 190:  
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
-                        steering_pub.publish(-36)
+                        steering_pub.publish(36)
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 250:  
+                        while distance < 200:  
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
-                        steering_pub.publish(-16)
+                        steering_pub.publish(-25)
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
@@ -673,7 +681,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
-                        steering_pub.publish(25)
+                        steering_pub.publish(16)
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
@@ -684,6 +692,15 @@ if __name__ == "__main__":
                         reset_odom.publish(1)
                         time.sleep(0.5)
                     else:
+                        brake_pub.publish(1)
+                        time.sleep(2)
+                        reset_odom.publish(1)
+                        time.sleep(0.5)
+                        brake_pub.publish(0)
+                        time.sleep(2)
+                        kavsak_depth = depth
+                        while distance < kavsak_depth*100 - 350:
+                            pass
                         detection_control.publish(True)
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -693,8 +710,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        kavsak_depth = depth
-                        while distance < kavsak_depth*100 + 70:
+                        while distance < 200:  
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -704,7 +720,17 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 300: 
+                        while distance < 230:  
+                            pass
+                        brake_pub.publish(1)
+                        time.sleep(2)
+                        reset_odom.publish(1)
+                        time.sleep(0.5)
+                        steering_pub.publish(-25)
+                        time.sleep(2)
+                        brake_pub.publish(0)
+                        time.sleep(2)
+                        while distance < 1250:  
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -714,27 +740,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 500: 
-                            pass
-                        brake_pub.publish(1)
-                        time.sleep(2)
-                        reset_odom.publish(1)
-                        time.sleep(0.5)
-                        steering_pub.publish(-16)
-                        time.sleep(2)
-                        brake_pub.publish(0)
-                        time.sleep(2)
-                        while distance < 120:  
-                            pass
-                        brake_pub.publish(1)
-                        time.sleep(2)
-                        reset_odom.publish(1)
-                        time.sleep(0.5)
-                        steering_pub.publish(12)
-                        time.sleep(2)
-                        brake_pub.publish(0)
-                        time.sleep(2)
-                        while distance < 200:  
+                        while distance < 350:  
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
