@@ -161,7 +161,7 @@ def tabela_bilgi(class_name, depth_in_meters):
         elif class_name == "parkyasak" and depth_in_meters is not None and depth_in_meters < 9.5:
             tabela_pub.publish(9)
 
-        elif class_name == "sag" and depth_in_meters is not None and depth_in_meters < 7.0:
+        elif class_name == "sag" and depth_in_meters is not None and depth_in_meters < 10.0:
             tabela_pub.publish(10)
 
         elif class_name == "sagadonulmez" and depth_in_meters is not None and depth_in_meters < 7.0:
@@ -170,7 +170,7 @@ def tabela_bilgi(class_name, depth_in_meters):
         elif class_name == "sari" and depth_in_meters is not None and depth_in_meters < 7.0:
             tabela_pub.publish(12)
 
-        elif class_name == "sol" and depth_in_meters is not None and depth_in_meters < 7.0:
+        elif class_name == "sol" and depth_in_meters is not None and depth_in_meters < 10.0:
             tabela_pub.publish(13)
 
         elif class_name == "soladonulmez" and depth_in_meters is not None and depth_in_meters < 7.0:
