@@ -413,6 +413,7 @@ if __name__ == "__main__":
 
             if detected_sign_number == 19: #kavsak icin gps bilgisi kullanarak giris yerine göre döndüren algoritma
                 rospy.loginfo("kavsak donusu basladı")
+                obstacle_control.publish(False)
                 if kavsak_girisi == 1:
                     if current_lane == 1:
                         brake_pub.publish(1)
@@ -972,3 +973,4 @@ if __name__ == "__main__":
                         reset_odom.publish(1)
                         time.sleep(0.5)
                 detection_control.publish(False) 
+                obstacle_control.publish(False)
