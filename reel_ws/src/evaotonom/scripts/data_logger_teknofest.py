@@ -164,7 +164,7 @@ if __name__ == "__main__":
     rospy.Subscriber('/stm/steering_angle', Int8, steering_callback)
     rospy.Subscriber('/stm/gps_latitude', Float32, lat_callback)
     rospy.Subscriber('/stm/gps_longitude', Float32, long_callback)
-    rospy.Subscriber('/sign_detector/sign_info', Sign, queue_size=10)
+    rospy.Subscriber('/sign_detector/sign_info', Sign, queue_size=1)
     rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback, queue_size=10)
     rospy.Subscriber("/lane_track/current_lane", Int8, current_lane_check)
 

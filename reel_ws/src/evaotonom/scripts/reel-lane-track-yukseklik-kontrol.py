@@ -17,9 +17,9 @@ def obstacle_callback(msg):
     global obstacle_detected
     obstacle_detected = msg.data
 
-def decision_callback(msg):
-    global sign_detected
-    sign_detected = msg.data
+def lane_callback(msg):
+    global lane_stop
+    lane_stop = msg.data
 
 def initialize_detection_variables():
     midpoints = {label: (0, 0) for label in ['ensol', 'sol', 'sag', 'ensag']}
@@ -180,7 +180,7 @@ def steering_control(image, midpoints, endpoints, areas):
 
 def callback():
     try:
-        if sign_detected != 1 and obstacle_detected != 1:
+        if lane_stop != 1 and obstacle_detected != 1:
             ret, msg = cam.read()
             image, pr = segment_image(msg)
             image, midpoints, endpoints, areas = annotate_image(image, pr)
@@ -218,7 +218,7 @@ if __name__ == "__main__":
 
     #Subscribers
     rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback, queue_size=1)
-    rospy.Subscriber('/decision_algorithm/detection_control', Bool, decision_callback, queue_size=1)
+    rospy.Subscriber('/decision_algorithm/lane_control', Bool, lane_callback, queue_size=1)
 
     #Publishers
     motor_power_pub = rospy.Publisher('/stm/motor_power', Int8, queue_size=1)

@@ -14,10 +14,6 @@ def decision_callback(msg):
     global sign_detected
     sign_detected = msg.data
 
-def gps_callback(msg):
-    global viraj_detected
-    viraj_detected = msg.data
-
 def callback(msg):
     global scan
     scan = msg.ranges
@@ -285,21 +281,20 @@ if __name__ == "__main__":
     rate = rospy.Rate(5)
 
     #Subscribers
-    rospy.Subscriber('/scan', LaserScan, callback, queue_size=10)
-    rospy.Subscriber("/lane_track/current_lane", Int8, current_lane_check) # 0 sol 1 sağ
-    rospy.Subscriber('/stm/read_odometer', Float32, read_odometer)
-    rospy.Subscriber('/decision_algorithm/detection_control', Bool, decision_callback)
-    rospy.Subscriber('/gps_detector/viraj', Bool, gps_callback)
-    rospy.Subscriber('/decision_algorithm/obstacle_control', Bool , decision_obstacle_callback)
+    rospy.Subscriber('/scan', LaserScan, callback, queue_size=1)
+    rospy.Subscriber("/lane_track/current_lane", Int8, current_lane_check, queue_size=1) # 0 sol 1 sağ
+    rospy.Subscriber('/stm/read_odometer', Float32, read_odometer, queue_size=1)
+    rospy.Subscriber('/decision_algorithm/lane_control', Bool, decision_callback, queue_size=1)
+    rospy.Subscriber('/decision_algorithm/obstacle_control', Bool , decision_obstacle_callback, queue_size=1)
 
     #Publishers
-    reset_odom = rospy.Publisher('/stm/reset_odometer', Bool, queue_size=10)
-    left_signal = rospy.Publisher('/stm/left_signal', Int8, queue_size= 10)
-    right_signal = rospy.Publisher('/stm/right_signal', Int8, queue_size=10)
-    obstacle_publisher = rospy.Publisher("/obstacle_detector/obstacle_detection", Bool, queue_size=10)
-    steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=100)
-    throttle_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=100)
-    brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=100)
+    reset_odom = rospy.Publisher('/stm/reset_odometer', Bool, queue_size=1)
+    left_signal = rospy.Publisher('/stm/left_signal', Int8, queue_size= 1)
+    right_signal = rospy.Publisher('/stm/right_signal', Int8, queue_size=1)
+    obstacle_publisher = rospy.Publisher("/obstacle_detector/obstacle_detection", Bool, queue_size=1)
+    steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=1)
+    throttle_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=1)
+    brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=1)
     obstacle_publisher.publish(obstacle_detected)
 
     # #Şerit Takibi Bekleme
@@ -308,7 +303,7 @@ if __name__ == "__main__":
     rospy.loginfo("'lane_track_node' service is now available.")
        
     while not rospy.is_shutdown():
-        if not sign_detected or not viraj_detected or not decision_obstacle:
+        if not sign_detected or not decision_obstacle:
             if scan is not None:
                 obstacle_detected = False
                 for angle_index in range (0,1285):

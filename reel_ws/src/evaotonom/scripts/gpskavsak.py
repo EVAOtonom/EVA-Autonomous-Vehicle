@@ -49,12 +49,12 @@ if __name__ == "__main__":
             (40.789999, 29.508946),  # sağ alt
             (40.789962, 29.508899)   # sağ üst
         ],
-        5: [
-            (40.789887, 29.509510), #sol üst
-            (40.789917, 29.509575), #sol alt
-            (40.789960, 29.509508), #sağ alt
-            (40.789923, 29.509449) #sağ üst
-        ],
+        # 5: [
+        #     (40.789887, 29.509510), #sol üst
+        #     (40.789917, 29.509575), #sol alt
+        #     (40.789960, 29.509508), #sağ alt
+        #     (40.789923, 29.509449) #sağ üst
+        # ],
 
 ###############################################Donus Noktalari#################################################
         6: [
@@ -90,8 +90,8 @@ if __name__ == "__main__":
     rospy.Subscriber('/stm/gps_longitude', Float32, longitude_callback)
 
     # Publishers
-    kavsak_noktasi_pub = rospy.Publisher("/sign_detector/roundabout", Int8, queue_size=10)
-    viraj_noktasi_pub = rospy.Publisher("/gps_detector/viraj", Bool, queue_size=10)
+    kavsak_noktasi_pub = rospy.Publisher("/sign_detector/roundabout", Int8, queue_size=1)
+    obstacle_control_pub = rospy.Publisher("/decision_algortihm/obstacle_control", Bool, queue_size=1)
 
     rate = rospy.Rate(1)  # 1 Hz
 
@@ -102,8 +102,7 @@ if __name__ == "__main__":
                 if is_within_area(latitude, longitude, rect_area):
 
                     if area_num in range(6, 9): 
-                        viraj_noktasi_pub.publish(1)   
-                        print("##########################virajjjj")
+                        obstacle_control_pub.publish(1)   
 
                     else:
                         kavsak_noktasi_pub.publish(area_num)
@@ -114,8 +113,8 @@ if __name__ == "__main__":
 
             if not found_area:
                 kavsak_noktasi_pub.publish(0)
-                viraj_noktasi_pub.publish(0)  
+                obstacle_control_pub.publish(0)   
         else:
-            rospy.logwarn("GPS Verisi alınamıyor")
+            rospy.logwarn("GPS Kavsak verisi alınamıyor")
 
         rate.sleep()

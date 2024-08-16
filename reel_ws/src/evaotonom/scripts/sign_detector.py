@@ -281,8 +281,8 @@ if __name__ == '__main__':
     obstacle_detected_sub = rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback)
     ts = message_filters.TimeSynchronizer([left_image_sub, right_image_sub, point_cloud_sub], 10)
     ts.registerCallback(callback)
-    position_pub = rospy.Publisher('/sign_detector/position', Float32MultiArray, queue_size=10)
-    sign_pub = rospy.Publisher('/sign_detector/sign_info', Sign, queue_size=10)
+    position_pub = rospy.Publisher('/sign_detector/position', Float32MultiArray, queue_size=1)
+    sign_pub = rospy.Publisher('/sign_detector/sign_info', Sign, queue_size=1)
 
     # rospy.loginfo("Waiting for 'lane_track_node' service...")
     # rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
