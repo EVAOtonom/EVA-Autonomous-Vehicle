@@ -103,6 +103,7 @@ if __name__ == "__main__":
 
                     if area_num in range(6, 9): 
                         viraj_noktasi_pub.publish(1)   
+                        print("##########################virajjjj")
 
                     else:
                         kavsak_noktasi_pub.publish(area_num)

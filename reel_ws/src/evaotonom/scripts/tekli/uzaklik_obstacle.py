@@ -110,7 +110,7 @@ def avoidance_obstacle(current_lane, kacinma):
         brake_pub.publish(0)
         time.sleep(0.5)
         print("SOL SERIDE GECIYORUM")
-        while traveled_distance < 250:
+        while traveled_distance < 320:
             pass
             # brake_pub.publish(1)
             # time.sleep(2)
@@ -173,7 +173,7 @@ def birinci_bolge_karari_sag():
             for angle_index in range (0,81):
                 distance = scan[angle_index]
                 if distance != float('inf'):
-                    if 3.2 < distance < 3.3:
+                    if 2.7 < distance < 2.8:
                         rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 2. BÖLGE Sağ")
                         avoidance_obstacle(1,0)
 
@@ -222,7 +222,7 @@ if __name__ == "__main__":
                 for angle_index in range (0,1285):
                     distance = scan[angle_index]
                     if distance != float('inf'):
-                        if(1205 <= angle_index <= 1285) and (3.2 < distance < 3.3) and (current_lane == 1):
+                        if(1205 <= angle_index <= 1285) and (2.7 < distance < 2.8) and (current_lane == 1):
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 1. BÖLGE SAĞ")
                             birinci_bolge_karari_sag()
                             break

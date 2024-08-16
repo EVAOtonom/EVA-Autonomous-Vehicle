@@ -193,7 +193,7 @@ if __name__ == '__main__':
         # Veriables
         port = '/dev/ttyUSB0' 
         stm_node = STM_Communication(port,slave_address=1)
-        pub_rate = rospy.Rate(1)
+        pub_rate = rospy.Rate(3)
         
         stm_node.spin()
 

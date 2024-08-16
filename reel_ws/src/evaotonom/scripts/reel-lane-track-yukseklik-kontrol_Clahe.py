@@ -4,7 +4,7 @@ from cv_bridge import CvBridge
 from sensor_msgs.msg import Image as ros_Image
 from std_msgs.msg import Bool, Int8
 from keras.models import load_model
-from PIL import Image
+from PIL import Image as Pimage
 import cv2
 import math
 import numpy as np
@@ -43,14 +43,14 @@ def resize_image(image, size):
     scale = min(inp_width / img_width, inp_height / img_height) # birbirine oranlar
     new_weight = int(img_width * scale) # orana göre yüksekliği günceller
     new_height = int(img_height * scale) # orana göre genişliği günceller
-    image = image.resize((new_weight, new_height), Image.BICUBIC) # görüntüyü günceller
-    new_image = Image.new('RGB', size, (128, 128, 128)) # yeni görüntüyü oluşturur
+    image = image.resize((new_weight, new_height), Pimage.BICUBIC) # görüntüyü günceller
+    new_image = Pimage.new('RGB', size, (128, 128, 128)) # yeni görüntüyü oluşturur
     new_image.paste(image, ((inp_width - new_weight) // 2, (inp_height - new_height) // 2)) # yeni görüntüyü istenilen koordinatlara yapıştırır
     return new_image, new_weight, new_height #çıktı olarak yeni fotoğraf datası ve boyutları sunulur
 
 def segment_image(msg):
     global label_names, labels_color, model
-    image = Image.fromarray(cv2.cvtColor(msg, cv2.COLOR_BGR2RGB))
+    image = Pimage.fromarray(cv2.cvtColor(msg, cv2.COLOR_BGR2RGB))
     image = cvtColor(image) #RGB Sorgusu ve doğrulaması yapar / kaldırılabilir
     #########################################
     clahe = cv2.createCLAHE(clipLimit=2, tileGridSize=(4,4))
@@ -73,8 +73,8 @@ def segment_image(msg):
     prediction = prediction.argmax(axis=-1) #her piksel için class olma olasılığı en yüksek hangisiyse onu bulur
 
     seg_img = np.reshape(np.array(colors, np.uint8)[np.reshape(prediction, [-1])], [orj_img_height, orj_img_width, -1]) #her piksele ait olduğu classa göre renk atanır
-    image = Image.fromarray(seg_img) # np dizisini görtüntüye dönüştürür
-    image = Image.blend(orj_img, image, 0.7) #görüntü ve numpy dizisini belirlenen oranda karıştırır
+    image = Pimage.fromarray(seg_img) # np dizisini görtüntüye dönüştürür
+    image = Pimage.blend(orj_img, image, 0.7) #görüntü ve numpy dizisini belirlenen oranda karıştırır
     blended_image_array = np.array(image)
     return blended_image_array, prediction
 

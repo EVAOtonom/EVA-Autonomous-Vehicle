@@ -11,6 +11,7 @@ import numpy as np
 import copy
 import time
 from collections import deque
+import os
 
 def obstacle_callback(msg):
     global obstacle_detected
@@ -129,8 +130,6 @@ def steering_control(image, midpoints, endpoints, areas):
             mid_line_x = midpoints['sag'][0] - 200                     # sag seridin orta noktasından 150 piksel çıkartarak yolun ortasını buluyor
         else:
             cv2.putText(image, 'UCGEN CIZILEMEDI',(15, 40), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
-            mid_line_x = 320
-            mid_line_y = 180
             print("SERIT TAKIBI YAPILAMIYOR, UCGEN CIZILEMEDI")
 
         image = cv2.line(image, ((int(image.shape[1] / 2)), 332),
@@ -194,8 +193,7 @@ if __name__ == "__main__":
     rospy.init_node('lane_track_node') 
 
     #Variables
-    #rate = rospy.Rate(2)
-    model = load_model('/home/eva/Desktop/modeller/tum-veri-seti-13.08.h5', compile=False)
+    model = load_model('/home/eva/EVA-Autonomous-Vehicle/reel_ws/src/evaotonom/scripts/tumVeriSetiyleSeritTakibiModeli.h5', compile=False)
     colors = [(0, 0, 0), (128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128)]
     INPUT_SHAPE = [480, 640, 3]  # (Height, Width , Color Format) 
     current_lane_number = None
@@ -209,11 +207,10 @@ if __name__ == "__main__":
         'ensag': (0, 0, 255)   # Mavi
     }
     initialize_detection_variables()
-    rate = rospy.Rate(2)
+    rate = rospy.Rate(10)
     timer = time.strftime("%d.%m-%H:%M")
     obstacle_detected = False
-    mid_line_x = 320
-    mid_line_y = 180
+    mid_line_x, mid_line_y = (0,) *2
     lanes = deque(maxlen=30) # maxlen istenilen veri sayısı 
     count_0 = 0.0
     count_1 = 0.0
@@ -227,6 +224,9 @@ if __name__ == "__main__":
     steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=10)
     lane_publisher = rospy.Publisher("/lane_track/current_lane", Int8, queue_size=10)
     brake_publisher = rospy.Publisher('/stm/brake', Bool, queue_size=10)
+    
+    time.sleep(5)
+    motor_power_pub.publish(3)
     
     kayit = cv2.VideoWriter(f"/home/eva/Videos/kayit/lane-track-{timer}.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 7.0, (640, 360))
     while not rospy.is_shutdown():

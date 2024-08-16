@@ -11,8 +11,16 @@ from ultralytics import YOLO
 import message_filters
 import math
 import logging
-from evaotonom.msg import Sign
+import numpy as np
 logging.getLogger('ultralytics').setLevel(logging.ERROR)
+
+def image_proces(image):
+    image = image/255.0
+    for i in range(3):
+        image[:,:,i] = np.power(image[:, :,i]/ float(np.max(image[:, :, i])), 0.7)
+    image = np.clip(image*255, 0, 255)
+    image = np.uint8(image)
+    return image
 
 def obstacle_callback(msg):
     global obstacle_detected
@@ -23,7 +31,7 @@ def decision_callback(msg):
     decision_control = msg.data
 
 def callback(left_image_msg, right_image_msg, point_cloud_msg):
-    global depth, last_publish_time, bridge, obstacle_detected, sign_counter, sign_detected, park_counter, not_park_counter
+    global depth, last_publish_time, bridge, obstacle_detected, sign_counter, sign_detected, park_counter, not_park_counter,left_image, right_image
     if obstacle_detected != 1:
         # Convert images
         original_left_image = bridge.imgmsg_to_cv2(left_image_msg, "bgr8")
@@ -41,7 +49,6 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
         left_detections = [] 
         right_detections = []
         sign_detected = False
-    
         results_left = model(left_image) # SOL GÖRÜNTÜDEN TESPİT YAPAR
         for result in results_left:
             for box in result.boxes:
@@ -68,8 +75,9 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
                            sign_counter[class_name_right] += 1
                            if sign_counter[class_name_right] % park_counter == 0:
                                 depth = calculate_depth(point_cloud, (right_result[1]), original_width, original_height)
-                                if depth is not None and math.isnan(depth) == False and math.isinf(depth) == False and depth != -1:                                                
+                                if depth is not None and math.isnan(depth) == False and math.isinf(depth) == False:                                                
                                         tabela_bilgi(class_name_right, depth)
+
                                         x1, y1, x2, y2 = right_result[1]
                                         cv2.rectangle(right_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
                                         label = f'{class_name_right} ({depth:.2f}m)' if depth is not None else class_name_right
@@ -82,8 +90,9 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
                             if sign_counter[class_name_right] % not_park_counter == 0:
 
                                 depth = calculate_depth(point_cloud, (right_result[1]), original_width, original_height)
-                                if depth is not None and math.isnan(depth) == False and math.isinf(depth) == False and depth != -1:                                                
+                                if depth is not None and math.isnan(depth) == False and math.isinf(depth) == False:                                                
                                         tabela_bilgi(class_name_right, depth)
+
                                         x1, y1, x2, y2 = right_result[1]
                                         cv2.rectangle(right_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
                                         label = f'{class_name_right} ({depth:.2f}m)' if depth is not None else class_name_right
@@ -93,14 +102,12 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
 
         if sign_detected == False: # LEVHA ALGILANMADIGI DURUMDA SANIYEDE 1, 23 YAYINLAR
             current_time = time.time()
-            if current_time - last_publish_time >= 1.0:
-                detected_sign.sign_index = 0
-                detected_sign.depth = 0
-                sign_pub.publish(detected_sign)
+            if current_time - last_publish_time >= 1.0: 
+                tabela_pub.publish(23)
                 last_publish_time = current_time
                     
-        cv2.imshow("EVA OTONOM LEVHA TESPITI SAG", right_image)
-        cv2.waitKey(1)
+    cv2.imshow("EVA OTONOM LEVHA TESPITI SAG", right_image)
+    cv2.waitKey(1)
 
 def calculate_depth(point_cloud, boundingbox, width, height):
     # Scale bounding box coordinates back to the original image size
@@ -113,133 +120,90 @@ def calculate_depth(point_cloud, boundingbox, width, height):
 
     if point is not None and len(point)>0:
         distance = math.sqrt(point[0]**2 + point[1]**2 + point[2]**2)
-        if math.isnan(distance) == False and math.isinf(distance) == False and distance is not None:
+        if point is not  math.isnan(distance) and not  math.isinf(distance) and not None:
             return distance
     else:
         return -1
-    
+
 def tabela_bilgi(class_name, depth_in_meters):
     global x1, y1, x2, y2, obstacle_detected
-    
+
     if class_name == "kirmizi" and depth_in_meters is not None and depth_in_meters < 9.0:
-        detected_sign.sign_index = 7
-        detected_sign.depth = depth_in_meters
-        sign_pub.publish(detected_sign)
+        tabela_pub.publish(7)
 
     elif class_name == "yesil" and depth_in_meters is not None and depth_in_meters < 9.0:
-        detected_sign.sign_index = 15
-        detected_sign.depth = depth_in_meters
-        sign_pub.publish(detected_sign)
+        tabela_pub.publish(15)
 
     if obstacle_detected == 0:  # ENGEL TESPİT EDİLMEDİĞİ DURUMDA ÇALIŞMASI GEREKEN KARAR ALGORİTMALARI
         if class_name == "20" and depth_in_meters is not None and depth_in_meters < 7.0:
-            detected_sign.sign_index= 0
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(0)
 
         elif class_name == "30" and depth_in_meters is not None and depth_in_meters < 7.0:
-            detected_sign.sign_index = 1
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(1)
 
         elif class_name == "dur" and depth_in_meters is not None and depth_in_meters < 7.0:
-            detected_sign.sign_index = 2
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(2)
 
         elif class_name == "durak" and depth_in_meters is not None and depth_in_meters < 15.0:
-            detected_sign.sign_index = 3
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(3)
 
         elif class_name == "girisyok" and depth_in_meters is not None and depth_in_meters < 7.0:
-            detected_sign.sign_index = 4
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(4)
 
         elif class_name == "ilerisag" and depth_in_meters is not None and depth_in_meters < 7.0:
-            detected_sign.sign_index = 5
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(5)
 
         elif class_name == "ilerisol" and depth_in_meters is not None and depth_in_meters < 7.0:
-            detected_sign.sign_index = 6
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(6)
 
         elif class_name == "park" and depth_in_meters is not None and depth_in_meters < 30.0:
-            detected_sign.sign_index = 8
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
-            bounding_box = [float(x1), float(y1), float(x2), float(y2), float(416)]
+            tabela_pub.publish(8)
+
+            data = [float(x1), float(y1), float(x2), float(y2), float(416), float(depth_in_meters)]
+
             msg = Float32MultiArray()
-            msg.data = bounding_box
+            msg.data = data
             position_pub.publish(msg)
 
         elif class_name == "parkyasak" and depth_in_meters is not None and depth_in_meters < 9.5:
-            detected_sign.sign_index = 9
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(9)
 
         elif class_name == "sag" and depth_in_meters is not None and depth_in_meters < 7.0:
-            detected_sign.sign_index = 10
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(10)
 
         elif class_name == "sagadonulmez" and depth_in_meters is not None and depth_in_meters < 7.0:
-            detected_sign.sign_index = 11
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(11)
 
         elif class_name == "sari" and depth_in_meters is not None and depth_in_meters < 7.0:
-            detected_sign.sign_index = 12
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(12)
 
         elif class_name == "sol" and depth_in_meters is not None and depth_in_meters < 7.0:
-            detected_sign.sign_index = 13
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(13)
 
         elif class_name == "soladonulmez" and depth_in_meters is not None and depth_in_meters < 7.0:
-            detected_sign.sign_index = 14
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(14)
 
         elif class_name == "engellipark" and depth_in_meters is not None and depth_in_meters < 9.5:
-            detected_sign.sign_index = 16
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(16)
 
         elif class_name == "tasittrafiginekapali" and depth_in_meters is not None and depth_in_meters < 7.0:
-            detected_sign.sign_index = 17
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(17)
 
         elif class_name == "yayagecidi" and depth_in_meters is not None and depth_in_meters < 7.0:
-            detected_sign.sign_index = 18
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(18)
 
         elif class_name == "kavsak" and depth_in_meters is not None and depth_in_meters < 7.0:
-            detected_sign.sign_index = 19
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(19)
 
         elif class_name == "ikiliyon" and depth_in_meters is not None and depth_in_meters < 0.01:
-            detected_sign.sign_index = 20
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(20)
 
         elif class_name == "tersengellipark" and depth_in_meters is not None and depth_in_meters < 9.5:
-            detected_sign.sign_index = 21
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(21)
 
         elif class_name == "parkyapilmaz" and depth_in_meters is not None and depth_in_meters < 9.5:
-            detected_sign.sign_index = 22
-            detected_sign.depth = depth_in_meters
-            sign_pub.publish(detected_sign)
+            tabela_pub.publish(22)
+
 
 if __name__ == '__main__':
     rospy.init_node('zed_object_detection')
@@ -250,7 +214,6 @@ if __name__ == '__main__':
     left_image = None
     right_image = None
     point_cloud = None
-    depth = Float32()      
     obstacle_detected = 0
     decision_control = None
     x1, y1, x2, y2 = (0,) *4
@@ -263,20 +226,36 @@ if __name__ == '__main__':
             17: 'tasitrafiginekapali', 18: 'yayagecidi', 19: 'kavsak',
             20: 'ikiliyon', 21: 'tersengellipark', 22: 'parkyapilmaz'
         }
-    park_counter = 10
-    not_park_counter = 6
+    park_counter = 5
+    not_park_counter = 6 
     sign_counter = {
-    '20': 0, '30': 0, 'dur': 0, 'durak': 0,
-    'girisyok': 0, 'ilerisag': 0, 'ilerisol': 0,'kirmizi': 0,
-    'park': 0, 'parkyasak': 0, 'sag': 0, 'sagadonulmez': 0,
-    'sari': 0, 'sol': 0, 'soladonulmez': 0, 'yesil': 0,
-    'engellipark': 0, 'tasitrafiginekapali': 0, 'yayagecidi': 0,
-    'kavsak': 0, 'ikiliyon': 0, 'tersengellipark': 0, 'parkyapilmaz': 0
+    '20': 0,
+    '30': 0,
+    'dur': 0,
+    'durak': 0,
+    'girisyok': 0,
+    'ilerisag': 0,
+    'ilerisol': 0,
+    'kirmizi': 0,
+    'park': 0,
+    'parkyasak': 0,
+    'sag': 0,
+    'sagadonulmez': 0,
+    'sari': 0,
+    'sol': 0,
+    'soladonulmez': 0,
+    'yesil': 0,
+    'engellipark': 0,
+    'tasitrafiginekapali': 0,
+    'yayagecidi': 0,
+    'kavsak': 0,
+    'ikiliyon': 0,
+    'tersengellipark': 0,
+    'parkyapilmaz': 0
     }
-
     last_publish_time = time.time()  
     rate = rospy.Rate(10)
-    detected_sign = Sign()
+
     # Subscribers
     left_image_sub = message_filters.Subscriber("/zed2i/zed_node/left_raw/image_raw_color", Image)
     right_image_sub = message_filters.Subscriber("/zed2i/zed_node/right_raw/image_raw_color", Image)
@@ -287,8 +266,9 @@ if __name__ == '__main__':
     decision_control_sub = rospy.Subscriber('/decision_algorithm/detection_control', Bool, decision_callback)
     ts = message_filters.TimeSynchronizer([left_image_sub, right_image_sub, point_cloud_sub], 10)
     ts.registerCallback(callback)
+    tabela_pub = rospy.Publisher('/sign_detector/detected_sign_number', Int8, queue_size=10)
     position_pub = rospy.Publisher('/sign_detector/position', Float32MultiArray, queue_size=10)
-    sign_pub = rospy.Publisher('/sign_detector/sign_info', Sign, queue_size=10)
+    depth_pub = rospy.Publisher('/sign_detector/depth', Float32, queue_size=10)
 
     # rospy.loginfo("Waiting for 'lane_track_node' service...")
     # rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
@@ -296,3 +276,4 @@ if __name__ == '__main__':
     
     while not rospy.is_shutdown():
         rate.sleep()
+

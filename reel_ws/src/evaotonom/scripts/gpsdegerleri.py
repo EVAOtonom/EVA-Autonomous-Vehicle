@@ -26,9 +26,11 @@ if __name__ == "__main__":
     rate = rospy.Rate(1)  # 1 Hz
 
     while not rospy.is_shutdown():
+        print(latitude,longitude)
         if latitude is not None and longitude is not None:
             with open("coordinats.txt", "a") as file:
                 file.write(f"({latitude}, {longitude}),\n")
+
         else:
             rospy.logwarn("Veri alınamıyor")
 
