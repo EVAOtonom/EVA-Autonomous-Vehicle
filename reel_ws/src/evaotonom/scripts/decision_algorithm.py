@@ -3,17 +3,14 @@
 import rospy
 from std_msgs.msg import Int8, Bool, Float32MultiArray, Float32
 import time
-import os
+from evaotonom.msg import Sign
 
 #sağa ve sola dönüş değiştirildi diğerleride değiştirilecek
 
-def depth_callback(msg):
-    global depth
-    depth= msg.data
-    
 def sign_callback(msg):
-    global detected_sign_number
-    detected_sign_number= msg.data
+    global detected_sign_number, depth
+    detected_sign_number= msg.sign_index
+    depth = msg.depth
 
 def read_odometer(msg):
     global distance
@@ -28,12 +25,9 @@ def kavsak_callback(msg):
     kavsak_girisi = msg.data
 
 def position_callback(msg):
-    global x1,x2,y1,y2,size,depth
-    #x1,y1,x2,y2,depth = None
+    global x1,x2,y1,y2,size
     if len(msg.data) == 6:
-        x1,y1,x2,y2,size,depth = msg.data
-        depth = float(depth)
-    #print("x1 = {}, x2 = {}, y1 = {}, y2 = {} size = {} depth = {}".format(x1,x2,y1,y2,size,depth))
+        x1,y1,x2,y2,size = msg.data
 
 if __name__ == "__main__":
     rospy.init_node("decision_node")
@@ -49,15 +43,14 @@ if __name__ == "__main__":
 
     kavsak_girisi = None
 
-    #ŞERİT TAKİBİ BEKLEME
-    rospy.loginfo("Waiting for 'lane_track_node' service...")
-    rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
-    rospy.loginfo("'lane_track_node' service is now available.")
+    # #ŞERİT TAKİBİ BEKLEME
+    # rospy.loginfo("Waiting for 'lane_track_node' service...")
+    # rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
+    # rospy.loginfo("'lane_track_node' service is now available.")
 
 
     #Subscribers
-    rospy.Subscriber("/sign_detector/detected_sign_number", Int8, sign_callback) 
-    rospy.Subscriber('/sign_detector/depth', Float32, depth_callback ,queue_size=10)
+    rospy.Subscriber("/sign_detector/sign_info", Sign, sign_callback) 
     rospy.Subscriber('/stm/read_odometer', Float32, read_odometer)
     rospy.Subscriber('/lane_track/current_lane', Int8, lane_callback)
     rospy.Subscriber('/sign_detector/position', Float32MultiArray,position_callback ,queue_size=10)
