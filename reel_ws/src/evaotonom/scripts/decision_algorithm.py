@@ -42,6 +42,8 @@ if __name__ == "__main__":
     x1, y1, x2, y2, size, depth = (None,)*6
 
     kavsak_girisi = None
+    
+    none_sayac = 0
 
     # #ŞERİT TAKİBİ BEKLEME
     # rospy.loginfo("Waiting for 'lane_track_node' service...")
@@ -251,8 +253,9 @@ if __name__ == "__main__":
                     #os.system("rosnode kill "+ "obstacle_detector_node")
                     while depth > 9.0 :
                         #print (depth)
-                        if x1 == None or x2 == None or size == None:
+                        if (x1 == None or x2 == None or size == None) and none_sayac == 0:
                             print("None")
+                            none_sayac = 1
                             continue
                         sign_midpoint = (x1 + x2) / 2 # Tespit edilen Levhanın orta noktası alınır
                         #im_midpoint = size * 5 / 6 # Görselin orta noktası alınır
@@ -263,16 +266,19 @@ if __name__ == "__main__":
                         steering_angle = aci * -40/346
                         print("yay")
                         steering_pub.publish(int(steering_angle)) 
+                        none_sayac = 0
                         time.sleep(0.50)
                     while depth > 3.37:
-                        if x1 == None or x2 == None or size == None:
+                        if (x1 == None or x2 == None or size == None) and none_sayac == 0:
                             print("None")
+                            none_sayac = 1
                             continue
                         sign_midpoint = (x1 + x2) / 2
                         hedef = size / 2
                         steering_angle = (((hedef - sign_midpoint + 208)*0.192) - 40) * -1
                         print("düz")
                         steering_pub.publish(int(steering_angle)) 
+                        none_sayac = 0
                         time.sleep(0.50)
                     #time.sleep(0.1)
                     brake_pub.publish(1)
