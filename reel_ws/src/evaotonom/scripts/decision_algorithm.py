@@ -60,6 +60,7 @@ if __name__ == "__main__":
     steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=1)
     brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=10)
     detection_control = rospy.Publisher("/decision_algorithm/detection_control", Bool, queue_size=10)
+    obstacle_control = rospy.Publisher("/decision_algorithm/obstacle_control", Bool, queue_size=10)
     motor_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=100)
     reset_odom = rospy.Publisher('/stm/reset_odometer', Bool, queue_size=10)
     left_signal = rospy.Publisher('/stm/left_signal', Int8, queue_size= 10)
@@ -281,7 +282,7 @@ if __name__ == "__main__":
             if detected_sign_number == 13: # sola dönüş
                 if current_lane == 1: # sag seritten
                     rospy.loginfo("sagdan sola donus basladı")
-                    detection_control.publish(True)
+                    obstacle_control.publish(True)
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
@@ -293,7 +294,7 @@ if __name__ == "__main__":
                     left_depth = depth
                     while distance < left_depth*100 - 150:
                         pass
-                    print("dist bitti")
+                    detection_control.publish(True)
                     time.sleep(0.5)
                     brake_pub.publish(1)
                     time.sleep(2)
@@ -313,7 +314,7 @@ if __name__ == "__main__":
                 
                 elif current_lane == 0: # sol seritten
                     rospy.loginfo("soldan sola donus basladı")
-                    detection_control.publish(True)
+                    obstacle_control.publish(True)
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
@@ -325,6 +326,7 @@ if __name__ == "__main__":
                     left_depth = depth
                     while distance < left_depth*100-50:
                         pass
+                    detection_control.publish(True)
                     print("dist bitti")
                     time.sleep(0.5)
                     brake_pub.publish(1)
@@ -341,13 +343,13 @@ if __name__ == "__main__":
                     time.sleep(2)
 
                 
-
+                obstacle_control.publish(False)
                 detection_control.publish(False)               
 
             if detected_sign_number == 10: # saga donus
                 if current_lane == 1: # sag seritten
                     rospy.loginfo("sagdan saga donus basladı")
-                    detection_control.publish(True)
+                    obstacle_control.publish(True)
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
@@ -359,7 +361,7 @@ if __name__ == "__main__":
                     right_depth = depth
                     while distance < right_depth*100 -50:
                         pass
-                    print("dist bitti")
+                    detection_control.publish(True)
                     time.sleep(0.5)  
                     brake_pub.publish(1)
                     time.sleep(2)                
@@ -377,7 +379,7 @@ if __name__ == "__main__":
                     
                 elif current_lane == 0: # sol seritten
                     rospy.loginfo("soldan saga donus basladı")
-                    detection_control.publish(True)
+                    obstacle_control.publish(True)
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
@@ -389,7 +391,7 @@ if __name__ == "__main__":
                     right_depth = depth
                     while distance < right_depth*100 -150:
                         pass
-                    print("dist bitti")
+                    detection_control.publish(True)
                     time.sleep(0.5)
                     brake_pub.publish(1)
                     time.sleep(2)
@@ -406,7 +408,7 @@ if __name__ == "__main__":
                     steering_pub.publish(0)
                     time.sleep(2)
 
-                    
+                obstacle_control.publish(False)
                 detection_control.publish(False)
 
             if detected_sign_number == 19: #kavsak icin gps bilgisi kullanarak giris yerine göre döndüren algoritma
