@@ -310,11 +310,7 @@ if __name__ == "__main__":
     rospy.loginfo("'lane_track_node' service is now available.")
        
     while not rospy.is_shutdown():
-<<<<<<< HEAD
         if not sign_detected or not decision_obstacle:
-=======
-        if not viraj_detected or not decision_obstacle:
->>>>>>> 1b18c3fef61ac66fba159df6840d603b34778d57
             if scan is not None:
                 obstacle_detected = False
                 for angle_index in range (0,1285):
