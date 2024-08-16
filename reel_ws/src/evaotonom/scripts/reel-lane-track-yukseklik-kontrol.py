@@ -138,7 +138,7 @@ def steering_control(image, midpoints, endpoints, areas):
         image = cv2.line(image, ((int(image.shape[1] / 2)-20), int(mid_line_y)),
                         (int(mid_line_x), int(mid_line_y)), (0, 255, 0), 2)                                     # yatay çizgiyi çekiyor
         uzaklik_y = (image.shape[0] - mid_line_y)                                                         # cizgi uzunlugunu bulmaya yarar
-        uzaklik_x = (((image.shape[1] / 2)-20) - mid_line_x)                                            # yolun ortasına aracın uzaklığı
+        uzaklik_x = (((image.shape[1] / 2)) - mid_line_x)                                            # yolun ortasına aracın uzaklığı
         degree = (180 * math.atan(abs(uzaklik_x / uzaklik_y))) / (3.14)                                 # sapma bir açıya dönüştürülür
         steering = int(degree * 1.12)                                                         # araç için oranlanmış değer
 
@@ -216,8 +216,8 @@ if __name__ == "__main__":
     count_1 = 0.0
 
     #Subscribers
-    rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback, queue_size=1)
-    rospy.Subscriber('/decision_algorithm/lane_control', Bool, lane_callback, queue_size=1)
+    rospy.Subscriber('/engel_var_mi', Bool, obstacle_callback, queue_size=1)
+    rospy.Subscriber('/serit_kapat', Bool, lane_callback, queue_size=1)
 
     #Publishers
     motor_power_pub = rospy.Publisher('/stm/motor_power', Int8, queue_size=1)

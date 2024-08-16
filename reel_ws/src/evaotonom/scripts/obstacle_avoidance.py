@@ -6,9 +6,9 @@ from sensor_msgs.msg import LaserScan
 from std_msgs.msg import Bool, Float32, Int8
 import time
 
-def decision_obstacle_callback(msg):
-    global decision_obstacle
-    decision_obstacle = msg.data
+def engel_kapat_callback(msg):
+    global stop_avoidance
+    stop_avoidance = msg.data
 
 def callback(msg):
     global scan
@@ -268,7 +268,7 @@ if __name__ == "__main__":
     scan = None
     current_lane = 1
     traveled_distance = 0
-    decision_obstacle = False
+    stop_avoidance = False
     obstacle_detected = False
     sign_detected = False
     viraj_detected = False
@@ -280,13 +280,13 @@ if __name__ == "__main__":
     rospy.Subscriber('/scan', LaserScan, callback, queue_size=1)
     rospy.Subscriber("/lane_track/current_lane", Int8, current_lane_check, queue_size=1) # 0 sol 1 sağ
     rospy.Subscriber('/stm/read_odometer', Float32, read_odometer, queue_size=1)
-    rospy.Subscriber('/decision_algorithm/obstacle_control', Bool , decision_obstacle_callback, queue_size=1)
+    rospy.Subscriber('/engel_kapat', Bool , engel_kapat_callback, queue_size=1)
 
     #Publishers
     reset_odom = rospy.Publisher('/stm/reset_odometer', Bool, queue_size=1)
     left_signal = rospy.Publisher('/stm/left_signal', Int8, queue_size= 1)
     right_signal = rospy.Publisher('/stm/right_signal', Int8, queue_size=1)
-    obstacle_publisher = rospy.Publisher("/obstacle_detector/obstacle_detection", Bool, queue_size=1)
+    obstacle_publisher = rospy.Publisher("/engel_var_mi", Bool, queue_size=1)
     steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=1)
     throttle_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=1)
     brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=1)
@@ -298,7 +298,7 @@ if __name__ == "__main__":
     rospy.loginfo("'lane_track_node' service is now available.")
        
     while not rospy.is_shutdown():
-        if not sign_detected or not decision_obstacle:
+        if not sign_detected and not stop_avoidance:
             if scan is not None:
                 obstacle_detected = False
                 for angle_index in range (0,1285):

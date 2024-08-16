@@ -43,14 +43,18 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
             if box.conf > 0.7: 
                 x1, y1, x2, y2 = map(int, box.xyxy[0])
                 left_class_id = int(box.cls[0])
+                if left_class_id == 9:
+                    continue
                 left_detections.append((left_class_id, (x1, y1, x2, y2)))
-    
+
     results_right = model(right_image) # SAG GÖRÜNTÜDEN TESPİT YAPAR
     for result in results_right:
         for box in result.boxes:
             if box.conf > 0.7: 
                 x1, y1, x2, y2 = map(int, box.xyxy[0])
                 right_class_id = int(box.cls[0])
+                if right_class_id == 9:
+                    continue
                 right_detections.append((right_class_id, (x1, y1, x2, y2)))
 
         for right_result in right_detections: # SOL VE SAG GORUNTUNUN SONUCLARINI BİRBİRİYLE KIYAS ETMEK İCİN
@@ -277,7 +281,7 @@ if __name__ == '__main__':
     point_cloud_sub = message_filters.Subscriber("/zed2i/zed_node/point_cloud/cloud_registered", PointCloud2)
 
     # Publishers
-    obstacle_detected_sub = rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback)
+    obstacle_detected_sub = rospy.Subscriber('/engel_var_mi', Bool, obstacle_callback)
     ts = message_filters.TimeSynchronizer([left_image_sub, right_image_sub, point_cloud_sub], 10)
     ts.registerCallback(callback)
     position_pub = rospy.Publisher('/sign_detector/position', Float32MultiArray, queue_size=1)

@@ -55,7 +55,7 @@ def gps_to_cartesian(lat, lon):
     return round(x, 2), round(y, 2)
 
 def log_data(event):
-    global latest_latitude, latest_longitude, latest_steering_angle, latest_sign, file_path, current_lane, obstacle_distance, sign_info, depth
+    global latest_latitude, latest_longitude, latest_steering_angle, latest_sign, file_path, current_lane, sign_info, depth
     
     try:
         turkey_tz = pytz.timezone('Europe/Istanbul')
@@ -167,7 +167,7 @@ if __name__ == "__main__":
     rospy.Subscriber('/stm/gps_latitude', Float32, lat_callback)
     rospy.Subscriber('/stm/gps_longitude', Float32, long_callback)
     rospy.Subscriber('/sign_detector/sign_info', Sign, queue_size=10)
-    rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback, queue_size=10)
+    rospy.Subscriber('/engel_var_mi', Bool, obstacle_callback, queue_size=10)
     rospy.Subscriber("/lane_track/current_lane", Int8, current_lane_check)
 
     rospy.Timer(rospy.Duration(1), log_data)

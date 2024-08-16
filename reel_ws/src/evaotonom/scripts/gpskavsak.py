@@ -91,7 +91,7 @@ if __name__ == "__main__":
 
     # Publishers
     kavsak_noktasi_pub = rospy.Publisher("/sign_detector/roundabout", Int8, queue_size=1)
-    obstacle_control_pub = rospy.Publisher("/decision_algortihm/obstacle_control", Bool, queue_size=1)
+    obstacle_control_pub = rospy.Publisher("/engel_kapat", Bool, queue_size=1)
 
     rate = rospy.Rate(1)  # 1 Hz
 
