@@ -9,9 +9,9 @@ from evaotonom.msg import Sign
 
 def sign_callback(msg):
     global detected_sign_number, depth, sign_depth_dict
-    detected_sign_number= msg.sign_index
     depth = msg.depth
-    sign_depth_dict[detected_sign_number] = depth
+    sign_depth_dict[msg.sign_index] = depth
+    detected_sign_number= msg.sign_index
 
 def read_odometer(msg):
     global distance
@@ -87,7 +87,7 @@ if __name__ == "__main__":
                     time.sleep(0.5)
                     brake_pub.publish(0)
                     time.sleep(2)
-                    durak_depth = depth
+                    durak_depth = sign_depth_dict[3]
                     while distance < int(durak_depth) * 100 - 250 : # 8.7 gibi bir değer olabilir
                         pass
                     lane_control.publish(True) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
@@ -157,7 +157,7 @@ if __name__ == "__main__":
                         pass
                     reset_odom.publish(1)
                     time.sleep(0.5) # buradan yukarısı güncellenebilir 
-                    durak_depth = depth
+                    durak_depth = sign_depth_dict[3]
                     while distance < int(durak_depth) * 100 - 800 : # 8.7 gibi bir değer olabilir
                         pass
                     lane_control.publish(True)
@@ -303,7 +303,7 @@ if __name__ == "__main__":
                     time.sleep(0.5)
                     brake_pub.publish(0)
                     time.sleep(2)
-                    left_depth = depth
+                    left_depth = sign_depth_dict[13]
                     while distance < left_depth*100 - 150:
                         pass
                     lane_control.publish(True)
@@ -335,7 +335,7 @@ if __name__ == "__main__":
                     time.sleep(0.5)
                     brake_pub.publish(0)
                     time.sleep(2)
-                    left_depth = depth
+                    left_depth = sign_depth_dict[13]
                     while distance < left_depth*100-50:
                         pass
                     lane_control.publish(True)
@@ -370,7 +370,7 @@ if __name__ == "__main__":
                     time.sleep(0.5)
                     brake_pub.publish(0)
                     time.sleep(2)
-                    right_depth = depth
+                    right_depth = sign_depth_dict[13]
                     while distance < right_depth*100 -50:
                         pass
                     lane_control.publish(True)
@@ -400,7 +400,7 @@ if __name__ == "__main__":
                     time.sleep(0.5)
                     brake_pub.publish(0)
                     time.sleep(2)
-                    right_depth = depth
+                    right_depth = sign_depth_dict[13]
                     while distance < right_depth*100 -150:
                         pass
                     lane_control.publish(True)
@@ -434,7 +434,7 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        kavsak_depth = depth                                    
+                        kavsak_depth = sign_depth_dict[19]                                    
                         while distance < kavsak_depth*100 - 250:
                             pass
                         lane_control.publish(True)
@@ -489,7 +489,7 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        kavsak_depth = depth
+                        kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 500:
                             pass
                         lane_control.publish(True)
@@ -546,7 +546,7 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        kavsak_depth = depth
+                        kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 230:
                             pass
                         lane_control.publish(True)
@@ -603,7 +603,7 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        kavsak_depth = depth
+                        kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 250:
                             pass
                         lane_control.publish(True)
@@ -661,7 +661,7 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        kavsak_depth = depth
+                        kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 250:
                             pass
                         lane_control.publish(True)
@@ -716,7 +716,7 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        kavsak_depth = depth
+                        kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 350:
                             pass
                         lane_control.publish(True)
@@ -773,7 +773,7 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        kavsak_depth = depth                                    
+                        kavsak_depth = sign_depth_dict[19]                                    
                         while distance < kavsak_depth*100 - 250:
                             pass
                         lane_control.publish(True)
@@ -828,7 +828,7 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        kavsak_depth = depth
+                        kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 500:
                             pass
                         lane_control.publish(True)
@@ -885,7 +885,7 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        kavsak_depth = depth                                    
+                        kavsak_depth = sign_depth_dict[19]                                    
                         while distance < kavsak_depth*100 - 250:
                             pass
                         lane_control.publish(True)
@@ -940,7 +940,7 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        kavsak_depth = depth
+                        kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 500:
                             pass
                         lane_control.publish(True)
