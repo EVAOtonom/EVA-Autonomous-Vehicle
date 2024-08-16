@@ -55,7 +55,7 @@ def gps_to_cartesian(lat, lon):
     return round(x, 2), round(y, 2)
 
 def log_data(event):
-    global latest_latitude, latest_longitude, latest_steering_angle, latest_sign, file_path, current_lane, obstacle_distance
+    global latest_latitude, latest_longitude, latest_steering_angle, latest_sign, file_path, current_lane, obstacle_distance, sign_info, depth
     
     try:
         turkey_tz = pytz.timezone('Europe/Istanbul')
@@ -71,7 +71,7 @@ def log_data(event):
         sign_probability = round(random.uniform(0.7, 0.95), 2) if latest_sign != "N/A" else 0
         trafic_lights_probability = round(random.uniform(0.7, 0.95), 2) if latest_sign != "N/A" else 0
         lane = "sol" if current_lane == 0 else "sag"
-
+        depth = depth if depth is not None else "N/A"
         
         # Prepare the data dictionary
         data = {
@@ -86,13 +86,15 @@ def log_data(event):
                 {
                     "pozisyon": lane,
                     "isim": latest_sign,
-                    "olasilik": sign_probability
+                    "olasilik": sign_probability,
+                    "uzaklik": depth
                 }
             ],
             "trafik_isiklari": [
                 {
                     "renk": trafic_lights,
-                    "olasilik": trafic_lights_probability
+                    "olasilik": trafic_lights_probability,
+                    "uzaklik": depth
                 }
             ],
             "engeller": [
@@ -164,7 +166,7 @@ if __name__ == "__main__":
     rospy.Subscriber('/stm/steering_angle', Int8, steering_callback)
     rospy.Subscriber('/stm/gps_latitude', Float32, lat_callback)
     rospy.Subscriber('/stm/gps_longitude', Float32, long_callback)
-    rospy.Subscriber('/sign_detector/sign_info', Sign, queue_size=1)
+    rospy.Subscriber('/sign_detector/sign_info', Sign, queue_size=10)
     rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback, queue_size=10)
     rospy.Subscriber("/lane_track/current_lane", Int8, current_lane_check)
 

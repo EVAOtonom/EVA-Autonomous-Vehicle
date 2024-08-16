@@ -17,8 +17,8 @@ def obstacle_callback(msg):
     obstacle_detected = msg.data
 
 def lane_callback(msg):
-    global sign_detected
-    sign_detected = msg.data
+    global lane_stop
+    lane_stop = msg.data
 
 def initialize_detection_variables():
     midpoints = {label: (0, 0) for label in ['ensol', 'sol', 'sag', 'ensag']}
@@ -157,7 +157,7 @@ def steering_control(image, midpoints, endpoints, areas):
 
 def callback():
     try:
-        if obstacle_detected !=1 and sign_detected != 1:
+        if obstacle_detected !=1 and lane_stop != 1:
             ret, msg = cam.read()
             image, pr = segment_image(msg)
             image, midpoints, endpoints, areas = annotate_image(image, pr)
@@ -174,7 +174,7 @@ if __name__ == "__main__":
     colors = [(0, 0, 0), (128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128)]
     INPUT_SHAPE = [480, 640, 3]  # (Height, Width , Color Format) 
     current_lane_number = None
-    obstacle_detected, sign_detected = (False,) *2
+    obstacle_detected, lane_stop = (False,) *2
     cam = cv2.VideoCapture(2)
     label_names = ['background', 'ensol', 'sol', 'sag', 'ensag']
     labels_color = {
@@ -191,7 +191,7 @@ if __name__ == "__main__":
     
     #Subscribers
     rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback)
-    rospy.Subscriber('/decision_algorithm/lane_control', Bool, decision_callback)
+    rospy.Subscriber('/decision_algorithm/lane_control', Bool, lane_callback)
 
     #Publishers
     motor_power_pub = rospy.Publisher('/stm/motor_power', Int8, queue_size=10)

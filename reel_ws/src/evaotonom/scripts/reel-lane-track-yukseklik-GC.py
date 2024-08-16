@@ -16,9 +16,9 @@ def obstacle_callback(msg):
     global obstacle_detected
     obstacle_detected = msg.data
 
-def decision_callback(msg):
-    global sign_detected
-    sign_detected = msg.data
+def lane_callback(msg):
+    global lane_stop
+    lane_stop = msg.data
 
 def initialize_detection_variables():
     midpoints = {label: (0, 0) for label in ['ensol', 'sol', 'sag', 'ensag']}
@@ -191,7 +191,7 @@ def steering_control(image, midpoints, endpoints, areas):
 
 def callback():
     try:
-        if sign_detected != 1 and obstacle_detected != 1:
+        if lane_stop != 1 and obstacle_detected != 1:
             ret, msg = cam.read()
             image, pr = segment_image(msg)
             image, midpoints, endpoints, areas = annotate_image(image, pr)
@@ -209,7 +209,7 @@ if __name__ == "__main__":
     colors = [(0, 0, 0), (128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128)]
     INPUT_SHAPE = [480, 640, 3]  # (Height, Width , Color Format) 
     current_lane_number = None
-    obstacle_detected, sign_detected = (False,) *2
+    obstacle_detected, lane_stop = (False,) *2
     cam = cv2.VideoCapture(2)
     label_names = ['background', 'ensol', 'sol', 'sag', 'ensag']
     labels_color = {

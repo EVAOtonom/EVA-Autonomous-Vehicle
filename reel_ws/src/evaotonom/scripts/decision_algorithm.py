@@ -8,7 +8,7 @@ from evaotonom.msg import Sign
 #sağa ve sola dönüş değiştirildi diğerleride değiştirilecek
 
 def sign_callback(msg):
-    global detected_sign_number, depth, sign_depth_dict
+    global detected_sign_number, sign_depth_dict
     depth = msg.depth
     sign_depth_dict[msg.sign_index] = depth
     detected_sign_number= msg.sign_index
@@ -16,7 +16,7 @@ def sign_callback(msg):
 def read_odometer(msg):
     global distance
     distance = msg.data
-    
+
 def lane_callback(msg):
     global current_lane
     current_lane = msg.data
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     x1, y1, x2, y2, size, depth = (None,)*6
 
     kavsak_girisi = None
-    
+
     none_sayac = 0
 
     sign_depth_dict = {i: None for i in range(23)}
@@ -55,7 +55,7 @@ if __name__ == "__main__":
 
 
     #Subscribers
-    rospy.Subscriber("/sign_detector/sign_info", Sign, sign_callback, queue_size=1) 
+    rospy.Subscriber("/sign_detector/sign_info", Sign, sign_callback, queue_size=1)
     rospy.Subscriber('/stm/read_odometer', Float32, read_odometer, queue_size=1)
     rospy.Subscriber('/lane_track/current_lane', Int8, lane_callback, queue_size=1)
     rospy.Subscriber('/sign_detector/position', Float32MultiArray,position_callback ,queue_size=1)
@@ -80,132 +80,233 @@ if __name__ == "__main__":
 
             if detected_sign_number == 3: # DURAK KARAR ALGORITMASI
                 if current_lane == 1: # SAG SERITTEYSE
-                    rospy.loginfo(" @@@@@@@@@@ SAG SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ") 
+                    rospy.loginfo(" @@@@@@@@@@ SAG SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ")
                     obstacle_control.publish(True)
-                    brake_pub.publish(1)
-                    time.sleep(2) 
                     reset_odom.publish(1)
-                    time.sleep(0.5)
-                    brake_pub.publish(0)
-                    time.sleep(2)
                     durak_depth = sign_depth_dict[3]
-                    while distance < int(durak_depth) * 100 - 250 : # 8.7 gibi bir değer olabilir
+                    while distance < int(durak_depth) * 100 - 600 : # 8.7 gibi bir değer olabilir
                         pass
                     lane_control.publish(True) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
-                    brake_pub.publish(1)
-                    time.sleep(2)
                     reset_odom.publish(1)
-                    time.sleep(0.5)
-                    right_signal.publish(2)
-                    time.sleep(0.5)
+                    time.sleep(0.2)
                     steering_pub.publish(28)
-                    time.sleep(2)
-                    brake_pub.publish(0)
-                    time.sleep(2)
-                    while distance < 280: # durak giriş azaltıldı  
+                    time.sleep(0.2)
+                    right_signal.publish(10)
+                    time.sleep(0.2)
+                    while distance < 280: # durak giriş azaltıldı
                         pass
                     reset_odom.publish(1)
-                    time.sleep(0.5)
+                    time.sleep(0.2)
                     steering_pub.publish(-40)
-                    time.sleep(2)
+                    time.sleep(0.2)
                     while distance < 300:
                         pass
                     brake_pub.publish(1)
-                    time.sleep(2)
+                    time.sleep(0.2)
                     reset_odom.publish(1)
-                    time.sleep(0.5)
+                    time.sleep(0.2)
                     steering_pub.publish(0)
                     time.sleep(10)
-                    left_signal.publish(2)
-                    time.sleep(4)
+                    left_signal.publish(10)
+                    time.sleep(0.2)
                     steering_pub.publish(-28)
-                    time.sleep(2)
+                    time.sleep(0.2)
                     brake_pub.publish(0)
-                    time.sleep(2)
-                    while distance < 380: #320den 380e
+                    time.sleep(0.2)
+                    while distance < 380:
                         pass
-                    brake_pub.publish(1)
-                    time.sleep(2)
                     steering_pub.publish(32)
-                    time.sleep(2)  
+                    time.sleep(0.2)
                     reset_odom.publish(1)
-                    time.sleep(0.5)
-                    brake_pub.publish(0)
-                    time.sleep(2)
-                    while distance < 250:
+                    time.sleep(0.2)
+                    while distance < 270:
                         pass
                 elif current_lane == 0: # SOL SERITTEYSE
-                    rospy.loginfo(" @@@@@@@@@@ SOL SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ")  
+                    rospy.loginfo(" @@@@@@@@@@ SOL SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ")
                     obstacle_control.publish(True)
-                    brake_pub.publish(1)
-                    time.sleep(2)
                     reset_odom.publish(1)
-                    time.sleep(0.5)
+                    time.sleep(0.2)
                     steering_pub.publish(40)
-                    time.sleep(2)
+                    time.sleep(0.2)
                     brake_pub.publish(0)
                     while distance < 280:
                         pass
-                    brake_pub.publish(1)
-                    time.sleep(2)
                     reset_odom.publish(1)
-                    time.sleep(0.5)
+                    time.sleep(0.2)
                     steering_pub.publish(-40)
-                    time.sleep(2)
-                    brake_pub.publish(0)
-                    time.sleep(2)
+                    time.sleep(0.2)
                     while distance < 150:
                         pass
                     reset_odom.publish(1)
-                    time.sleep(0.5) # buradan yukarısı güncellenebilir 
+                    time.sleep(0.2) # buradan yukarısı güncellenebilir
+                    reset_odom.publish(1)
                     durak_depth = sign_depth_dict[3]
-                    while distance < int(durak_depth) * 100 - 800 : # 8.7 gibi bir değer olabilir
+                    while distance < int(durak_depth) * 100 - 600 : # 8.7 gibi bir değer olabilir
                         pass
-                    lane_control.publish(True)
-                    brake_pub.publish(1)
-                    time.sleep(2)
-                    right_signal.publish(2)
-                    time.sleep(4)
+                    lane_control.publish(True) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
                     reset_odom.publish(1)
-                    time.sleep(0.5)
+                    time.sleep(0.2)
                     steering_pub.publish(28)
-                    time.sleep(2)
-                    brake_pub.publish(0)
-                    while distance < 300:  
+                    time.sleep(0.2)
+                    right_signal.publish(10)
+                    time.sleep(0.2)
+                    while distance < 280: # durak giriş azaltıldı
                         pass
                     reset_odom.publish(1)
-                    time.sleep(0.5)
+                    time.sleep(0.2)
                     steering_pub.publish(-40)
-                    time.sleep(2)
+                    time.sleep(0.2)
                     while distance < 300:
                         pass
                     brake_pub.publish(1)
-                    time.sleep(2)
+                    time.sleep(0.2)
+                    reset_odom.publish(1)
+                    time.sleep(0.2)
                     steering_pub.publish(0)
                     time.sleep(10)
-                    left_signal.publish(2)
-                    time.sleep(4)
+                    left_signal.publish(10)
+                    time.sleep(0.2)
                     steering_pub.publish(-28)
-                    time.sleep(2)
-                    reset_odom.publish(1)
-                    time.sleep(0.5)
+                    time.sleep(0.2)
                     brake_pub.publish(0)
-                    time.sleep(2)
-                    while distance < 320:
+                    time.sleep(0.2)
+                    while distance < 380:
                         pass
-                    brake_pub.publish(1)
-                    time.sleep(2)
                     steering_pub.publish(32)
-                    time.sleep(2)  
+                    time.sleep(0.2)
                     reset_odom.publish(1)
-                    time.sleep(0.5)
-                    brake_pub.publish(0)
-                    time.sleep(2)
-                    while distance < 250:
+                    time.sleep(0.2)
+                    while distance < 270:
                         pass
-                obstacle_control.publish(False)      
-                lane_control.publish(False) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
-                
+
+            # if detected_sign_number == 3: # DURAK KARAR ALGORITMASI
+            #     if current_lane == 1: # SAG SERITTEYSE
+            #         rospy.loginfo(" @@@@@@@@@@ SAG SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ") 
+            #         obstacle_control.publish(1)
+            #         brake_pub.publish(1)
+            #         time.sleep(2) 
+            #         reset_odom.publish(1)
+            #         time.sleep(0.5)
+            #         brake_pub.publish(0)
+            #         time.sleep(2)
+            #         durak_depth = sign_depth_dict[3]
+            #         while distance < int(durak_depth) * 100 - 250 : # 8.7 gibi bir değer olabilir
+            #             pass
+            #         lane_control.publish(1) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
+            #         brake_pub.publish(1)
+            #         time.sleep(2)
+            #         reset_odom.publish(1)
+            #         time.sleep(0.5)
+            #         right_signal.publish(2)
+            #         time.sleep(0.5)
+            #         steering_pub.publish(28)
+            #         time.sleep(2)
+            #         brake_pub.publish(0)
+            #         time.sleep(2)
+            #         while distance < 280: # durak giriş azaltıldı  
+            #             pass
+            #         reset_odom.publish(1)
+            #         time.sleep(0.5)
+            #         steering_pub.publish(-40)
+            #         time.sleep(2)
+            #         while distance < 300:
+            #             pass
+            #         brake_pub.publish(1)
+            #         time.sleep(2)
+            #         reset_odom.publish(1)
+            #         time.sleep(0.5)
+            #         steering_pub.publish(0)
+            #         time.sleep(10)
+            #         left_signal.publish(2)
+            #         time.sleep(4)
+            #         steering_pub.publish(-28)
+            #         time.sleep(2)
+            #         brake_pub.publish(0)
+            #         time.sleep(2)
+            #         while distance < 380: #320den 380e
+            #             pass
+            #         brake_pub.publish(1)
+            #         time.sleep(2)
+            #         steering_pub.publish(32)
+            #         time.sleep(2)  
+            #         reset_odom.publish(1)
+            #         time.sleep(0.5)
+            #         brake_pub.publish(0)
+            #         time.sleep(2)
+            #         while distance < 270:
+            #             pass
+            #     elif current_lane == 0: # SOL SERITTEYSE
+            #         rospy.loginfo(" @@@@@@@@@@ SOL SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ")  
+            #         obstacle_control.publish(1)
+            #         brake_pub.publish(1)
+            #         time.sleep(2)
+            #         reset_odom.publish(1)
+            #         time.sleep(0.5)
+            #         steering_pub.publish(40)
+            #         time.sleep(2)
+            #         brake_pub.publish(0)
+            #         while distance < 280:
+            #             pass
+            #         brake_pub.publish(1)
+            #         time.sleep(2)
+            #         reset_odom.publish(1)
+            #         time.sleep(0.5)
+            #         steering_pub.publish(-40)
+            #         time.sleep(2)
+            #         brake_pub.publish(0)
+            #         time.sleep(2)
+            #         while distance < 150:
+            #             pass
+            #         reset_odom.publish(1)
+            #         time.sleep(0.5) # buradan yukarısı güncellenebilir 
+            #         durak_depth = sign_depth_dict[3]
+            #         while distance < int(durak_depth) * 100 - 800 : # 8.7 gibi bir değer olabilir
+            #             pass
+            #         lane_control.publish(1)
+            #         brake_pub.publish(1)
+            #         time.sleep(2)
+            #         right_signal.publish(2)
+            #         time.sleep(4)
+            #         reset_odom.publish(1)
+            #         time.sleep(0.5)
+            #         steering_pub.publish(28)
+            #         time.sleep(2)
+            #         brake_pub.publish(0)
+            #         while distance < 280:  
+            #             pass
+            #         reset_odom.publish(1)
+            #         time.sleep(0.5)
+            #         steering_pub.publish(-40)
+            #         time.sleep(2)
+            #         while distance < 350:
+            #             pass
+            #         brake_pub.publish(1)
+            #         time.sleep(2)
+            #         steering_pub.publish(0)
+            #         time.sleep(10)
+            #         left_signal.publish(2)
+            #         time.sleep(4)
+            #         steering_pub.publish(-28)
+            #         time.sleep(2)
+            #         reset_odom.publish(1)
+            #         time.sleep(0.5)
+            #         brake_pub.publish(0)
+            #         time.sleep(2)
+            #         while distance < 380:
+            #             pass
+            #         brake_pub.publish(1)
+            #         time.sleep(2)
+            #         steering_pub.publish(32)
+            #         time.sleep(2)  
+            #         reset_odom.publish(1)
+            #         time.sleep(0.5)
+            #         brake_pub.publish(0)
+            #         time.sleep(2)
+            #         while distance < 270:
+            #             pass
+            #     obstacle_control.publish(0)      
+            #     lane_control.publish(0) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
+
             elif detected_sign_number == 2: # DUR
                 lane_control.publish(True)
                 time.sleep(1)
@@ -222,7 +323,7 @@ if __name__ == "__main__":
             elif detected_sign_number == 7: # KIRMIZI IŞIK
                 brake_pub.publish(1)
                 time.sleep(2)
-                
+
             # elif detected_sign_number == 8: # PARK LEVHASINI ORTALAR
             #     if depth is not None:
             #         #os.system("rosnode kill "+ "lane_track_node")
@@ -246,7 +347,7 @@ if __name__ == "__main__":
 
             #         #os.system("rosnode kill "+ "stabil_throttle_node")
             #         #os.system("rosnode kill "+ "sign_detector_node")
-                    
+
             #         #time.sleep(5)
 
             elif detected_sign_number == 8: # PARK LEVHASINA GORE YAY YAPAR
@@ -269,7 +370,7 @@ if __name__ == "__main__":
                             aci *= 3
                         steering_angle = aci * -40/346
                         print("yay")
-                        steering_pub.publish(int(steering_angle)) 
+                        steering_pub.publish(int(steering_angle))
                         none_sayac = 0
                         time.sleep(0.50)
                     while sign_depth_dict[8] > 3.37:
@@ -281,7 +382,7 @@ if __name__ == "__main__":
                         hedef = size / 2
                         steering_angle = (((hedef - sign_midpoint + 208)*0.192) - 40) * -1
                         print("düz")
-                        steering_pub.publish(int(steering_angle)) 
+                        steering_pub.publish(int(steering_angle))
                         none_sayac = 0
                         time.sleep(0.50)
                     #time.sleep(0.1)
@@ -291,7 +392,7 @@ if __name__ == "__main__":
                     rospy.loginfo("Park edildi")
                 else:
                     print("depth is none")
-                
+
             if detected_sign_number == 13: # sola dönüş
                 if current_lane == 1: # sag seritten
                     rospy.loginfo("sagdan sola donus basladı")
@@ -324,7 +425,7 @@ if __name__ == "__main__":
                     steering_pub.publish(0)
                     time.sleep(2)
 
-                
+
                 elif current_lane == 0: # sol seritten
                     rospy.loginfo("soldan sola donus basladı")
                     obstacle_control.publish(True)
@@ -355,9 +456,9 @@ if __name__ == "__main__":
                     steering_pub.publish(0)
                     time.sleep(2)
 
-                
+
                 obstacle_control.publish(False)
-                lane_control.publish(False)               
+                lane_control.publish(False)
 
             if detected_sign_number == 10: # saga donus
                 if current_lane == 1: # sag seritten
@@ -375,9 +476,9 @@ if __name__ == "__main__":
                     while distance < right_depth*100 -50:
                         pass
                     lane_control.publish(True)
-                    time.sleep(0.5)  
+                    time.sleep(0.5)
                     brake_pub.publish(1)
-                    time.sleep(2)                
+                    time.sleep(2)
                     reset_odom.publish(1)
                     time.sleep(0.5)
                     steering_pub.publish(40)
@@ -389,7 +490,7 @@ if __name__ == "__main__":
                     steering_pub.publish(0)
 
 
-                    
+
                 elif current_lane == 0: # sol seritten
                     rospy.loginfo("soldan saga donus basladı")
                     obstacle_control.publish(True)
@@ -435,7 +536,7 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        kavsak_depth = sign_depth_dict[19]                                    
+                        kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 250:
                             pass
                         lane_control.publish(True)
@@ -444,40 +545,40 @@ if __name__ == "__main__":
                         reset_odom.publish(1)
                         time.sleep(0.5)
                         steering_pub.publish(0)
-                        time.sleep(2)                        
+                        time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 250:  
+                        while distance < 250:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
                         steering_pub.publish(36)
-                        time.sleep(2)                        
+                        time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 350:  
+                        while distance < 350:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
                         steering_pub.publish(-22)
-                        time.sleep(2)                        
+                        time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 1050:  
+                        while distance < 1050:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
                         steering_pub.publish(16)
-                        time.sleep(2)                        
+                        time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 350:  
+                        while distance < 350:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -502,7 +603,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 300:  
+                        while distance < 300:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -512,7 +613,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 400:  
+                        while distance < 400:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -522,7 +623,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 1150:  
+                        while distance < 1150:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -532,7 +633,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 350:  
+                        while distance < 350:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -559,7 +660,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 300:  
+                        while distance < 300:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -569,7 +670,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 250:  
+                        while distance < 250:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -579,7 +680,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 350:  
+                        while distance < 350:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -589,14 +690,14 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 300:  
+                        while distance < 300:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
                         lane_control.publish(0)
-                        
+
                     else:
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -626,8 +727,8 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        
-                        while distance < 200: 
+
+                        while distance < 200:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -637,7 +738,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 500:  
+                        while distance < 500:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -647,7 +748,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 300:  
+                        while distance < 300:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -674,7 +775,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 250:  
+                        while distance < 250:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -684,7 +785,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 350:  
+                        while distance < 350:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -694,7 +795,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 1050:  
+                        while distance < 1050:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -704,7 +805,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 350:  
+                        while distance < 350:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -729,7 +830,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 200:  
+                        while distance < 200:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -739,7 +840,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 230:  
+                        while distance < 230:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -749,7 +850,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 1100:  
+                        while distance < 1100:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -759,7 +860,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 350:  
+                        while distance < 350:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -774,7 +875,7 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        kavsak_depth = sign_depth_dict[19]                                    
+                        kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 250:
                             pass
                         lane_control.publish(True)
@@ -783,40 +884,40 @@ if __name__ == "__main__":
                         reset_odom.publish(1)
                         time.sleep(0.5)
                         steering_pub.publish(0)
-                        time.sleep(2)                        
+                        time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 250:  
+                        while distance < 250:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
                         steering_pub.publish(36)
-                        time.sleep(2)                        
+                        time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 350:  
+                        while distance < 350:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
                         steering_pub.publish(-22)
-                        time.sleep(2)                        
+                        time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 1050:  
+                        while distance < 1050:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
                         steering_pub.publish(16)
-                        time.sleep(2)                        
+                        time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 350:  
+                        while distance < 350:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -841,7 +942,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 300:  
+                        while distance < 300:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -851,7 +952,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 400:  
+                        while distance < 400:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -861,7 +962,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 1150:  
+                        while distance < 1150:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -871,7 +972,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 350:  
+                        while distance < 350:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -886,7 +987,7 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        kavsak_depth = sign_depth_dict[19]                                    
+                        kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 250:
                             pass
                         lane_control.publish(True)
@@ -895,40 +996,40 @@ if __name__ == "__main__":
                         reset_odom.publish(1)
                         time.sleep(0.5)
                         steering_pub.publish(0)
-                        time.sleep(2)                        
+                        time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 250:  
+                        while distance < 250:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
                         steering_pub.publish(36)
-                        time.sleep(2)                        
+                        time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 350:  
+                        while distance < 350:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
                         steering_pub.publish(-22)
-                        time.sleep(2)                        
+                        time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 1050:  
+                        while distance < 1050:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
                         steering_pub.publish(16)
-                        time.sleep(2)                        
+                        time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 350:  
+                        while distance < 350:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -953,7 +1054,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 300:  
+                        while distance < 300:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -963,7 +1064,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 400:  
+                        while distance < 400:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -973,7 +1074,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 1150:  
+                        while distance < 1150:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -983,12 +1084,12 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 350:  
+                        while distance < 350:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
                     brake_pub.publish(0)
-                    lane_control.publish(False) 
+                    lane_control.publish(False)
                     obstacle_control.publish(True)

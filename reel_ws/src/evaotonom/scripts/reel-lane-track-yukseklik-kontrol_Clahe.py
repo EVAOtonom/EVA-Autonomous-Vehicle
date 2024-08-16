@@ -16,9 +16,9 @@ def obstacle_callback(msg):
     global obstacle_detected
     obstacle_detected = msg.data
 
-def decision_callback(msg):
-    global sign_detected
-    sign_detected = msg.data
+def lane_callback(msg):
+    global lane_stop
+    lane_stop = msg.data
 
 def initialize_detection_variables():
     midpoints = {label: (0, 0) for label in ['ensol', 'sol', 'sag', 'ensag']}
@@ -186,7 +186,7 @@ def steering_control(image, midpoints, endpoints, areas):
 
 def callback():
     try:
-        if sign_detected != 1 and obstacle_detected != 1:
+        if lane_stop != 1 and obstacle_detected != 1:
             ret, msg = cam.read()
             image, pr = segment_image(msg)
             image, midpoints, endpoints, areas = annotate_image(image, pr)

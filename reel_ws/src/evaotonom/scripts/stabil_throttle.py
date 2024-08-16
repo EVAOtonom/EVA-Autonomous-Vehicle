@@ -38,10 +38,9 @@ if __name__ == '__main__':
 
     # Motor gücü publisher'ı başlat
     motor_power_pub = rospy.Publisher('/stm/motor_power', Int8, queue_size=1)
-
     # Abonelikleri başlat
     rospy.Subscriber('/vehicle/velocity_kmh', Float32, velocity_callback)
-    rospy.Subscriber('/vehicle/brake', Int8, brake_callback)
+    rospy.Subscriber('/stm/brake', Int8, brake_callback)
 
     # Rate belirleme (10 Hz)
     rate = rospy.Rate(1)  # 10 Hz
