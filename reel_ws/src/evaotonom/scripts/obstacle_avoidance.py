@@ -10,7 +10,6 @@ def decision_obstacle_callback(msg):
     global decision_obstacle
     decision_obstacle = msg.data
 
-
 def decision_callback(msg):
     global sign_detected
     sign_detected = msg.data
@@ -277,6 +276,7 @@ if __name__ == "__main__":
     scan = None
     current_lane = 1
     traveled_distance = 0
+    decision_obstacle = False
     obstacle_detected = False
     sign_detected = False
     viraj_detected = False
@@ -308,7 +308,7 @@ if __name__ == "__main__":
     rospy.loginfo("'lane_track_node' service is now available.")
        
     while not rospy.is_shutdown():
-        if not sign_detected or viraj_detected or decision_obstacle:
+        if not sign_detected or not viraj_detected or not decision_obstacle:
             if scan is not None:
                 obstacle_detected = False
                 for angle_index in range (0,1285):

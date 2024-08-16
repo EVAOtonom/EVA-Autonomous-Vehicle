@@ -50,21 +50,21 @@ if __name__ == "__main__":
 
 
     #Subscribers
-    rospy.Subscriber("/sign_detector/sign_info", Sign, sign_callback) 
-    rospy.Subscriber('/stm/read_odometer', Float32, read_odometer)
-    rospy.Subscriber('/lane_track/current_lane', Int8, lane_callback)
-    rospy.Subscriber('/sign_detector/position', Float32MultiArray,position_callback ,queue_size=10)
-    rospy.Subscriber("/sign_detector/roundabout", Int8 , kavsak_callback)
+    rospy.Subscriber("/sign_detector/sign_info", Sign, sign_callback, queue_size=1) 
+    rospy.Subscriber('/stm/read_odometer', Float32, read_odometer, queue_size=1)
+    rospy.Subscriber('/lane_track/current_lane', Int8, lane_callback, queue_size=1)
+    rospy.Subscriber('/sign_detector/position', Float32MultiArray,position_callback ,queue_size=1)
+    rospy.Subscriber("/sign_detector/roundabout", Int8 , kavsak_callback, queue_size=1)
 
     #Publishers
     steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=1)
-    brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=10)
-    detection_control = rospy.Publisher("/decision_algorithm/detection_control", Bool, queue_size=10)
+    brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=1)
+    detection_control = rospy.Publisher("/decision_algorithm/detection_control", Bool, queue_size=1)
     obstacle_control = rospy.Publisher("/decision_algorithm/obstacle_control", Bool, queue_size=1)
-    motor_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=100)
-    reset_odom = rospy.Publisher('/stm/reset_odometer', Bool, queue_size=10)
-    left_signal = rospy.Publisher('/stm/left_signal', Int8, queue_size= 10)
-    right_signal = rospy.Publisher('/stm/right_signal', Int8, queue_size=10)
+    motor_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=1)
+    reset_odom = rospy.Publisher('/stm/reset_odometer', Bool, queue_size=1)
+    left_signal = rospy.Publisher('/stm/left_signal', Int8, queue_size= 1)
+    right_signal = rospy.Publisher('/stm/right_signal', Int8, queue_size=1)
 
     #motor_pub.publish(False)
     detection_control.publish(False)
@@ -75,6 +75,7 @@ if __name__ == "__main__":
             if detected_sign_number == 3: # DURAK KARAR ALGORITMASI
                 if current_lane == 1: # SAG SERITTEYSE
                     rospy.loginfo(" @@@@@@@@@@ SAG SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ") 
+                    obstacle_control.publish(True)
                     brake_pub.publish(1)
                     time.sleep(2) 
                     reset_odom.publish(1)
@@ -972,5 +973,6 @@ if __name__ == "__main__":
                         time.sleep(2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
-                detection_control.publish(False) 
-                obstacle_control.publish(False)
+                    brake_pub.publish(0)
+                    detection_control.publish(False) 
+                    obstacle_control.publish(False)

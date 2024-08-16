@@ -177,7 +177,7 @@ foreach(library ${libraries})
   endif()
 endforeach()
 
-set(evaotonom_EXPORTED_TARGETS "")
+set(evaotonom_EXPORTED_TARGETS "evaotonom_generate_messages_cpp;evaotonom_generate_messages_eus;evaotonom_generate_messages_lisp;evaotonom_generate_messages_nodejs;evaotonom_generate_messages_py")
 # create dummy targets for exported code generation targets to make life of users easier
 foreach(t ${evaotonom_EXPORTED_TARGETS})
   if(NOT TARGET ${t})
@@ -185,7 +185,7 @@ foreach(t ${evaotonom_EXPORTED_TARGETS})
   endif()
 endforeach()
 
-set(depends "roscpp;rospy;std_msgs;sensor_msgs")
+set(depends "roscpp;rospy;std_msgs;sensor_msgs;message_runtime")
 foreach(depend ${depends})
   string(REPLACE " " ";" depend_list ${depend})
   # the package name of the dependency must be kept in a unique variable so that it is not overwritten in recursive calls
@@ -214,7 +214,7 @@ foreach(depend ${depends})
   _list_append_deduplicate(evaotonom_EXPORTED_TARGETS ${${evaotonom_dep}_EXPORTED_TARGETS})
 endforeach()
 
-set(pkg_cfg_extras "")
+set(pkg_cfg_extras "evaotonom-msg-extras.cmake")
 foreach(extra ${pkg_cfg_extras})
   if(NOT IS_ABSOLUTE ${extra})
     set(extra ${evaotonom_DIR}/${extra})

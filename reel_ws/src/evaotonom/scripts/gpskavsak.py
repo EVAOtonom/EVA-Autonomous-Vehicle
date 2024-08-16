@@ -116,6 +116,6 @@ if __name__ == "__main__":
                 kavsak_noktasi_pub.publish(0)
                 viraj_noktasi_pub.publish(0)  
         else:
-            rospy.logwarn("Veri alınamıyor")
+            rospy.logwarn("GPS Verisi alınamıyor")
 
         rate.sleep()

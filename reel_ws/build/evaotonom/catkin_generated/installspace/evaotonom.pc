@@ -5,4 +5,4 @@ Description: Description of evaotonom
 Version: 0.0.0
 Cflags: -I${prefix}/include
 Libs: -L${prefix}/lib -levaotonom
-Requires: roscpp rospy std_msgs sensor_msgs
+Requires: roscpp rospy std_msgs sensor_msgs message_runtime

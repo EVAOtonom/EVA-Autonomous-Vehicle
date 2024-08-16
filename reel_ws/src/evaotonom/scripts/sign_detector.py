@@ -18,10 +18,6 @@ def obstacle_callback(msg):
     global obstacle_detected
     obstacle_detected = msg.data
 
-def decision_callback(msg):
-    global decision_control
-    decision_control = msg.data
-
 def callback(left_image_msg, right_image_msg, point_cloud_msg):
     global depth, last_publish_time, bridge, obstacle_detected, sign_counter, sign_detected, park_counter, not_park_counter
     if obstacle_detected != 1:
@@ -181,7 +177,7 @@ def tabela_bilgi(class_name, depth_in_meters):
             detected_sign.depth = depth_in_meters
             sign_pub.publish(detected_sign)
 
-        elif class_name == "sag" and depth_in_meters is not None and depth_in_meters < 7.0:
+        elif class_name == "sag" and depth_in_meters is not None and depth_in_meters < 10.0:
             detected_sign.sign_index = 10
             detected_sign.depth = depth_in_meters
             sign_pub.publish(detected_sign)
@@ -196,7 +192,7 @@ def tabela_bilgi(class_name, depth_in_meters):
             detected_sign.depth = depth_in_meters
             sign_pub.publish(detected_sign)
 
-        elif class_name == "sol" and depth_in_meters is not None and depth_in_meters < 7.0:
+        elif class_name == "sol" and depth_in_meters is not None and depth_in_meters < 10.0:
             detected_sign.sign_index = 13
             detected_sign.depth = depth_in_meters
             sign_pub.publish(detected_sign)
@@ -252,7 +248,6 @@ if __name__ == '__main__':
     point_cloud = None
     depth = Float32()      
     obstacle_detected = 0
-    decision_control = None
     x1, y1, x2, y2 = (0,) *4
     left_detected = 0
     class_names = {
@@ -284,7 +279,6 @@ if __name__ == '__main__':
 
     # Publishers
     obstacle_detected_sub = rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback)
-    decision_control_sub = rospy.Subscriber('/decision_algorithm/detection_control', Bool, decision_callback)
     ts = message_filters.TimeSynchronizer([left_image_sub, right_image_sub, point_cloud_sub], 10)
     ts.registerCallback(callback)
     position_pub = rospy.Publisher('/sign_detector/position', Float32MultiArray, queue_size=10)

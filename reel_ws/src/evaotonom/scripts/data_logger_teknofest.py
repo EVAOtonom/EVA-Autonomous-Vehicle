@@ -6,16 +6,16 @@ from datetime import datetime
 import pytz
 import random
 import math
-import json
-
+from evaotonom.msg import Sign
 def steering_callback(data):
     global latest_steering_angle
     latest_steering_angle = data.data
 
 def sign_callback(msg):
-    global detected_sign_number, latest_sign
-    detected_sign_number = msg.data
+    global latest_sign, depth
+    detected_sign_number = msg.sign_index
     latest_sign = sign[detected_sign_number]
+    depth = msg.depth
 
 def obstacle_callback(msg):
     global obstacle_detected
@@ -117,7 +117,7 @@ if __name__ == "__main__":
     file_path = "/home/eva/EVA-Autonomous-Vehicle/reel_ws/src/evaotonom/scripts/blackbox.txt"
     latest_sign = None
     latest_steering_angle = None
-    detected_sign_number = None
+    sign_info = None
     obstacle_detected = None
     latest_latitude = None
     latest_longitude = None
@@ -152,9 +152,9 @@ if __name__ == "__main__":
     }
 
     # #Şerit Takibi Bekleme
-    rospy.loginfo("Waiting for 'lane_track_node' service...")
-    rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
-    rospy.loginfo("'lane_track_node' service is now available.")    
+    # rospy.loginfo("Waiting for 'lane_track_node' service...")
+    # rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
+    # rospy.loginfo("'lane_track_node' service is now available.")    
 
     
     with open (file_path,"w") as file:
@@ -164,7 +164,7 @@ if __name__ == "__main__":
     rospy.Subscriber('/stm/steering_angle', Int8, steering_callback)
     rospy.Subscriber('/stm/gps_latitude', Float32, lat_callback)
     rospy.Subscriber('/stm/gps_longitude', Float32, long_callback)
-    rospy.Subscriber('/sign_detector/detected_sign_number', Int8, sign_callback)
+    rospy.Subscriber('/sign_detector/sign_info', Sign, queue_size=10)
     rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback, queue_size=10)
     rospy.Subscriber("/lane_track/current_lane", Int8, current_lane_check)
 
