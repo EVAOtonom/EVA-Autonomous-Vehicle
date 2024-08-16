@@ -10,10 +10,6 @@ def decision_obstacle_callback(msg):
     global decision_obstacle
     decision_obstacle = msg.data
 
-def decision_callback(msg):
-    global sign_detected
-    sign_detected = msg.data
-
 def gps_callback(msg):
     global viraj_detected
     viraj_detected = msg.data
@@ -45,7 +41,7 @@ def avoidance_obstacle(current_lane, kacinma):
         brake_pub.publish(0)
         time.sleep(2)
         print("SAĞ SERIDE GECIYORUM  0-0")
-        while traveled_distance < 250:
+        while traveled_distance < 275:
             pass
         brake_pub.publish(1)
         time.sleep(2)
@@ -58,7 +54,7 @@ def avoidance_obstacle(current_lane, kacinma):
         brake_pub.publish(0)
         time.sleep(0.5)
         print("KENDIMI DUZLUYORUM 0-0")
-        while traveled_distance < 351:
+        while traveled_distance < 326:
             pass
         brake_pub.publish(1)
         time.sleep(2)
@@ -69,7 +65,7 @@ def avoidance_obstacle(current_lane, kacinma):
         brake_pub.publish(0)
         time.sleep(2)
         print("BITIRDIM SOL SERITTE DEVAM EDIYORUM 0-0")
-        while traveled_distance < 200:
+        while traveled_distance < 180:
             pass
         brake_pub.publish(1)
         time.sleep(2)
@@ -118,7 +114,7 @@ def avoidance_obstacle(current_lane, kacinma):
         brake_pub.publish(0)
         time.sleep(2)
         print("SOL SERIDE GECIYORUM")
-        while traveled_distance < 250:
+        while traveled_distance < 275:
             pass
             # brake_pub.publish(1)
             # time.sleep(2)
@@ -129,7 +125,7 @@ def avoidance_obstacle(current_lane, kacinma):
             # brake_pub.publish(0)
             # time.sleep(2)
         print("KENDIMI DUZLUYORUM")
-        while traveled_distance < 351:
+        while traveled_distance < 326:
             pass
             # brake_pub.publish(1)
             # time.sleep(2)
@@ -140,7 +136,7 @@ def avoidance_obstacle(current_lane, kacinma):
             # brake_pub.publish(0)
             # time.sleep(2)
         print("BITIRDIM SOL SERITTE DEVAM EDIYORUM")
-        while traveled_distance < 220:
+        while traveled_distance < 200:
             pass
             # brake_pub.publish(1)
             # time.sleep(2)
@@ -181,7 +177,7 @@ def birinci_bolge_karari_sag():
             for angle_index in range (0,81):
                 distance = scan[angle_index]
                 if distance != float('inf'):
-                    if 3.3 < distance < 3.4:
+                    if 3 < distance < 3.1:
                         rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 2. BÖLGE Sağ")
                         ikinci_bolge_karari_sag()
                         return True
@@ -207,7 +203,7 @@ def ikinci_bolge_karari_sag():
             for angle_index in range (82,185):
                 distance = scan[angle_index]
                 if distance != float('inf'):
-                    if 3.5 < distance < 5.5: #3. bölgede de engel var
+                    if 3.1 < distance < 4.5: #3. bölgede de engel var
                         rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 3. BÖLGE Sağ")
                         ucuncu_bolge_karari_sag()
                         return
@@ -223,7 +219,7 @@ def ikinci_bolge_karari_sol():
             for angle_index in range (1102,1203):
                 distance = scan[angle_index]
                 if distance != float('inf'):
-                    if 3.5 < distance < 5.5: #3. bölgede de engel var
+                    if 3.1 < distance < 4.5: #3. bölgede de engel var
                         rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 3. BÖLGE Sol")
                         ucuncu_bolge_karari_sol()
                         return
@@ -239,7 +235,7 @@ def ucuncu_bolge_karari_sag():
             for angle_index in range (186,215):
                 distance = scan[angle_index]
                 if distance != float('inf'):
-                    if 5.5 < distance < 7:
+                    if 4.5 < distance < 6:
                         rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 4. BÖLGE Sağ")
                         obstacle_detected = True
                         obstacle_publisher.publish(True)
@@ -257,7 +253,7 @@ def ucuncu_bolge_karari_sol():
             for angle_index in range (1067,1101):
                 distance = scan[angle_index]
                 if distance != float('inf'):
-                    if (1067 <= angle_index <= 1101) and  5.5 < distance < 7:
+                    if (1067 <= angle_index <= 1101) and  4.5 < distance < 6:
                         rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 4. BÖLGE Sol")
                         obstacle_detected = True
                         obstacle_publisher.publish(True)
@@ -285,21 +281,20 @@ if __name__ == "__main__":
     rate = rospy.Rate(5)
 
     #Subscribers
-    rospy.Subscriber('/scan', LaserScan, callback, queue_size=10)
+    rospy.Subscriber('/scan', LaserScan, callback, queue_size=1)
     rospy.Subscriber("/lane_track/current_lane", Int8, current_lane_check) # 0 sol 1 sağ
     rospy.Subscriber('/stm/read_odometer', Float32, read_odometer)
-    rospy.Subscriber('/decision_algorithm/detection_control', Bool, decision_callback)
     rospy.Subscriber('/gps_detector/viraj', Bool, gps_callback)
     rospy.Subscriber('/decision_algorithm/obstacle_control', Bool , decision_obstacle_callback)
 
     #Publishers
-    reset_odom = rospy.Publisher('/stm/reset_odometer', Bool, queue_size=10)
-    left_signal = rospy.Publisher('/stm/left_signal', Int8, queue_size= 10)
-    right_signal = rospy.Publisher('/stm/right_signal', Int8, queue_size=10)
-    obstacle_publisher = rospy.Publisher("/obstacle_detector/obstacle_detection", Bool, queue_size=10)
-    steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=100)
-    throttle_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=100)
-    brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=100)
+    reset_odom = rospy.Publisher('/stm/reset_odometer', Bool, queue_size=1)
+    left_signal = rospy.Publisher('/stm/left_signal', Int8, queue_size= 1)
+    right_signal = rospy.Publisher('/stm/right_signal', Int8, queue_size=1)
+    obstacle_publisher = rospy.Publisher("/obstacle_detector/obstacle_detection", Bool, queue_size=1)
+    steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=1)
+    throttle_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=1)
+    brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=1)
     obstacle_publisher.publish(obstacle_detected)
 
     # #Şerit Takibi Bekleme
@@ -308,13 +303,13 @@ if __name__ == "__main__":
     rospy.loginfo("'lane_track_node' service is now available.")
        
     while not rospy.is_shutdown():
-        if not sign_detected or not viraj_detected or not decision_obstacle:
+        if not viraj_detected or not decision_obstacle:
             if scan is not None:
                 obstacle_detected = False
                 for angle_index in range (0,1285):
                     distance = scan[angle_index]
                     if distance != float('inf'):
-                        if ((1265 <= angle_index <= 1285) or (0 <= angle_index <= 20)) and  (3.3 < distance < 3.4):
+                        if ((1265 <= angle_index <= 1285) or (0 <= angle_index <= 20)) and  (3 < distance < 3.1):
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} ARA BÖLGE")
                             if current_lane == 1:
                                 karar = birinci_bolge_karari_sag()
@@ -323,11 +318,11 @@ if __name__ == "__main__":
                             if not karar:
                                 avoidance_obstacle(current_lane,0)
                             break
-                        elif (0 <= angle_index <= 81) and  (3.3 < distance < 3.4) and (current_lane == 0):
+                        elif (0 <= angle_index <= 81) and  (3 < distance < 3.1) and (current_lane == 0):
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 1. BÖLGE SOL")
                             birinci_bolge_karari_sol()
                             break
-                        elif(1205 <= angle_index <= 1285) and (3.3 <= distance <= 3.4) and (current_lane == 1):
+                        elif(1205 <= angle_index <= 1285) and (3 <= distance <= 3.1) and (current_lane == 1):
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 1. BÖLGE SAĞ")
                             birinci_bolge_karari_sag()
                             break
