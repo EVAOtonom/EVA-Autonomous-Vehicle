@@ -11,6 +11,8 @@ def sign_callback(msg):
     global detected_sign_number, depth
     detected_sign_number= msg.sign_index
     depth = msg.depth
+    if detected_sign_number = 8:
+        park_depth = depth
 
 def read_odometer(msg):
     global distance
@@ -248,10 +250,10 @@ if __name__ == "__main__":
             elif detected_sign_number == 8: # PARK LEVHASINA GORE YAY YAPAR
                 lane_control.publish(True)
                 obstacle_control.publish(True)
-                if depth is not None:
+                if park_depth is not None:
                     #os.system("rosnode kill "+ "lane_track_node")
                     #os.system("rosnode kill "+ "obstacle_detector_node")
-                    while depth > 9.0 :
+                    while park_depth > 9.0 :
                         #print (depth)
                         if (x1 == None or x2 == None or size == None) and none_sayac == 0:
                             print("None")
@@ -268,7 +270,7 @@ if __name__ == "__main__":
                         steering_pub.publish(int(steering_angle)) 
                         none_sayac = 0
                         time.sleep(0.50)
-                    while depth > 3.37:
+                    while park_depth > 3.37:
                         if (x1 == None or x2 == None or size == None) and none_sayac == 0:
                             print("None")
                             none_sayac = 1
