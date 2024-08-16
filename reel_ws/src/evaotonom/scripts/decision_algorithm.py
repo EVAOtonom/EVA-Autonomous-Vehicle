@@ -60,7 +60,7 @@ if __name__ == "__main__":
     steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=1)
     brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=10)
     detection_control = rospy.Publisher("/decision_algorithm/detection_control", Bool, queue_size=10)
-    obstacle_control = rospy.Publisher("/decision_algorithm/obstacle_control", Bool, queue_size=10)
+    obstacle_control = rospy.Publisher("/decision_algorithm/obstacle_control", Bool, queue_size=1)
     motor_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=100)
     reset_odom = rospy.Publisher('/stm/reset_odometer', Bool, queue_size=10)
     left_signal = rospy.Publisher('/stm/left_signal', Int8, queue_size= 10)
