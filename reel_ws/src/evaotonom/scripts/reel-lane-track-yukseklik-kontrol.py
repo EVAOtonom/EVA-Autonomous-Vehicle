@@ -11,7 +11,6 @@ import numpy as np
 import copy
 import time
 from collections import deque
-import os
 
 def obstacle_callback(msg):
     global obstacle_detected
@@ -219,6 +218,7 @@ if __name__ == "__main__":
     #Subscribers
     rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback, queue_size=1)
     rospy.Subscriber('/decision_algorithm/lane_control', Bool, lane_callback, queue_size=1)
+    rospy.Subscriber('/decision_algorithm/lane_control', Bool, decision_callback, queue_size=1)
 
     #Publishers
     motor_power_pub = rospy.Publisher('/stm/motor_power', Int8, queue_size=1)

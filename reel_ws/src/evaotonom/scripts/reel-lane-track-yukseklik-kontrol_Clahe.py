@@ -224,14 +224,14 @@ if __name__ == "__main__":
     count_1 = 0.0
 
     #Subscribers
-    rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback)
-    rospy.Subscriber('/decision_algorithm/detection_control', Bool, decision_callback)
+    rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback, queue_size=1)
+    rospy.Subscriber('/decision_algorithm/lane_control', Bool, decision_callback, queue_size=1)
 
     #Publishers
-    motor_power_pub = rospy.Publisher('/stm/motor_power', Int8, queue_size=10)
-    steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=10)
-    lane_publisher = rospy.Publisher("/lane_track/current_lane", Int8, queue_size=10)
-    brake_publisher = rospy.Publisher('/stm/brake', Bool, queue_size=10)
+    motor_power_pub = rospy.Publisher('/stm/motor_power', Int8, queue_size=1)
+    steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=1)
+    lane_publisher = rospy.Publisher("/lane_track/current_lane", Int8, queue_size=1)
+    brake_publisher = rospy.Publisher('/stm/brake', Bool, queue_size=1)
     
     kayit = cv2.VideoWriter(f"/home/eva/Videos/kayit/lane-track-{timer}.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 7.0, (640, 360))
     while not rospy.is_shutdown():

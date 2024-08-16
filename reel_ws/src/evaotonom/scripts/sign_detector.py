@@ -19,81 +19,80 @@ def obstacle_callback(msg):
     obstacle_detected = msg.data
 
 def callback(left_image_msg, right_image_msg, point_cloud_msg):
-    global depth, last_publish_time, bridge, obstacle_detected, sign_counter, sign_detected, park_counter, not_park_counter
-    if obstacle_detected != 1:
-        # Convert images
-        original_left_image = bridge.imgmsg_to_cv2(left_image_msg, "bgr8")
-        original_right_image = bridge.imgmsg_to_cv2(right_image_msg, "bgr8")
+    global depth, last_publish_time, bridge, sign_counter, sign_detected, park_counter, not_park_counter
+    # Convert images
+    original_left_image = bridge.imgmsg_to_cv2(left_image_msg, "bgr8")
+    original_right_image = bridge.imgmsg_to_cv2(right_image_msg, "bgr8")
 
-        # Store original image dimensions
-        original_height, original_width = original_left_image.shape[:2]
+    # Store original image dimensions
+    original_height, original_width = original_left_image.shape[:2]
 
-        # Resize images to 416x416
-        left_image = cv2.resize(original_left_image, (416, 416))
-        right_image = cv2.resize(original_right_image, (416, 416))
-        
-        # Store point cloud
-        point_cloud = point_cloud_msg
-        left_detections = [] 
-        right_detections = []
-        sign_detected = False
+    # Resize images to 416x416
+    left_image = cv2.resize(original_left_image, (416, 416))
+    right_image = cv2.resize(original_right_image, (416, 416))
     
-        results_left = model(left_image) # SOL GÖRÜNTÜDEN TESPİT YAPAR
-        for result in results_left:
-            for box in result.boxes:
-                if box.conf > 0.7: 
-                    x1, y1, x2, y2 = map(int, box.xyxy[0])
-                    left_class_id = int(box.cls[0])
-                    left_detections.append((left_class_id, (x1, y1, x2, y2)))
-        
-        results_right = model(right_image) # SAG GÖRÜNTÜDEN TESPİT YAPAR
-        for result in results_right:
-            for box in result.boxes:
-                if box.conf > 0.7: 
-                    x1, y1, x2, y2 = map(int, box.xyxy[0])
-                    right_class_id = int(box.cls[0])
-                    right_detections.append((right_class_id, (x1, y1, x2, y2)))
+    # Store point cloud
+    point_cloud = point_cloud_msg
+    left_detections = [] 
+    right_detections = []
+    sign_detected = False
 
-            for right_result in right_detections: # SOL VE SAG GORUNTUNUN SONUCLARINI BİRBİRİYLE KIYAS ETMEK İCİN
-                for left_result in left_detections:
-                    class_name_left = class_names[left_result[0]]
-                    class_name_right = class_names[right_result[0]]
+    results_left = model(left_image) # SOL GÖRÜNTÜDEN TESPİT YAPAR
+    for result in results_left:
+        for box in result.boxes:
+            if box.conf > 0.7: 
+                x1, y1, x2, y2 = map(int, box.xyxy[0])
+                left_class_id = int(box.cls[0])
+                left_detections.append((left_class_id, (x1, y1, x2, y2)))
+    
+    results_right = model(right_image) # SAG GÖRÜNTÜDEN TESPİT YAPAR
+    for result in results_right:
+        for box in result.boxes:
+            if box.conf > 0.7: 
+                x1, y1, x2, y2 = map(int, box.xyxy[0])
+                right_class_id = int(box.cls[0])
+                right_detections.append((right_class_id, (x1, y1, x2, y2)))
 
-                    if class_name_left == class_name_right: 
-                        if class_name_right == 'park' or class_name_right == 'engellipark': # PARK VE ENGELLİ PARK İCİN DOGRULAMA 
-                           sign_counter[class_name_right] += 1
-                           if sign_counter[class_name_right] % park_counter == 0:
-                                depth = calculate_depth(point_cloud, (right_result[1]), original_width, original_height)
-                                if depth is not None and math.isnan(depth) == False and math.isinf(depth) == False and depth != -1:                                                
-                                        tabela_bilgi(class_name_right, depth)
-                                        x1, y1, x2, y2 = right_result[1]
-                                        cv2.rectangle(right_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
-                                        label = f'{class_name_right} ({depth:.2f}m)' if depth is not None else class_name_right
-                                        cv2.putText(right_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-                                        print(f"LEVHA: {class_name_right} UZAKLIK: {depth:.2f}m")
-                                        sign_detected = True
+        for right_result in right_detections: # SOL VE SAG GORUNTUNUN SONUCLARINI BİRBİRİYLE KIYAS ETMEK İCİN
+            for left_result in left_detections:
+                class_name_left = class_names[left_result[0]]
+                class_name_right = class_names[right_result[0]]
 
-                        else: # DIGER LEVHALARIN ICIN DOGRULAMA
-                            sign_counter[class_name_right] += 1
-                            if sign_counter[class_name_right] % not_park_counter == 0:
+                if class_name_left == class_name_right: 
+                    if class_name_right == 'park' or class_name_right == 'engellipark': # PARK VE ENGELLİ PARK İCİN DOGRULAMA 
+                        sign_counter[class_name_right] += 1
+                        if sign_counter[class_name_right] % park_counter == 0:
+                            depth = calculate_depth(point_cloud, (right_result[1]), original_width, original_height)
+                            if depth is not None and math.isnan(depth) == False and math.isinf(depth) == False and depth != -1:                                                
+                                    tabela_bilgi(class_name_right, depth)
+                                    x1, y1, x2, y2 = right_result[1]
+                                    cv2.rectangle(right_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
+                                    label = f'{class_name_right} ({depth:.2f}m)' if depth is not None else class_name_right
+                                    cv2.putText(right_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+                                    print(f"LEVHA: {class_name_right} UZAKLIK: {depth:.2f}m")
+                                    sign_detected = True
 
-                                depth = calculate_depth(point_cloud, (right_result[1]), original_width, original_height)
-                                if depth is not None and math.isnan(depth) == False and math.isinf(depth) == False and depth != -1:                                                
-                                        tabela_bilgi(class_name_right, depth)
-                                        x1, y1, x2, y2 = right_result[1]
-                                        cv2.rectangle(right_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
-                                        label = f'{class_name_right} ({depth:.2f}m)' if depth is not None else class_name_right
-                                        cv2.putText(right_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-                                        print(f"LEVHA: {class_name_right} UZAKLIK: {depth:.2f}m")
-                                        sign_detected = True
+                    else: # DIGER LEVHALARIN ICIN DOGRULAMA
+                        sign_counter[class_name_right] += 1
+                        if sign_counter[class_name_right] % not_park_counter == 0:
 
-        if sign_detected == False: # LEVHA ALGILANMADIGI DURUMDA SANIYEDE 1, 23 YAYINLAR
-            current_time = time.time()
-            if current_time - last_publish_time >= 1.0:
-                detected_sign.sign_index = 0
-                detected_sign.depth = 0
-                sign_pub.publish(detected_sign)
-                last_publish_time = current_time
+                            depth = calculate_depth(point_cloud, (right_result[1]), original_width, original_height)
+                            if depth is not None and math.isnan(depth) == False and math.isinf(depth) == False and depth != -1:                                                
+                                    tabela_bilgi(class_name_right, depth)
+                                    x1, y1, x2, y2 = right_result[1]
+                                    cv2.rectangle(right_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
+                                    label = f'{class_name_right} ({depth:.2f}m)' if depth is not None else class_name_right
+                                    cv2.putText(right_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+                                    print(f"LEVHA: {class_name_right} UZAKLIK: {depth:.2f}m")
+                                    sign_detected = True
+
+    if sign_detected == False: # LEVHA ALGILANMADIGI DURUMDA SANIYEDE 1, 23 YAYINLAR
+        current_time = time.time()
+        if current_time - last_publish_time >= 1.0:
+            detected_sign.sign_index = 0
+            detected_sign.depth = 0
+            sign_pub.publish(detected_sign)
+            last_publish_time = current_time
                     
         cv2.imshow("EVA OTONOM LEVHA TESPITI SAG", right_image)
         cv2.waitKey(1)
@@ -284,9 +283,9 @@ if __name__ == '__main__':
     position_pub = rospy.Publisher('/sign_detector/position', Float32MultiArray, queue_size=1)
     sign_pub = rospy.Publisher('/sign_detector/sign_info', Sign, queue_size=1)
 
-    # rospy.loginfo("Waiting for 'lane_track_node' service...")
-    # rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
-    # rospy.loginfo("'lane_track_node' service is now available.")
+    rospy.loginfo("Waiting for 'lane_track_node' service...")
+    rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
+    rospy.loginfo("'lane_track_node' service is now available.")
     
     while not rospy.is_shutdown():
         rate.sleep()
