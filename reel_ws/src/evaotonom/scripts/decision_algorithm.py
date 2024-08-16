@@ -3,17 +3,14 @@
 import rospy
 from std_msgs.msg import Int8, Bool, Float32MultiArray, Float32
 import time
-import os
+from evaotonom.msg import Sign
 
 #sağa ve sola dönüş değiştirildi diğerleride değiştirilecek
 
-def depth_callback(msg):
-    global depth
-    depth= msg.data
-    
 def sign_callback(msg):
-    global detected_sign_number
-    detected_sign_number= msg.data
+    global detected_sign_number, depth
+    detected_sign_number= msg.sign_index
+    depth = msg.depth
 
 def read_odometer(msg):
     global distance
@@ -28,12 +25,9 @@ def kavsak_callback(msg):
     kavsak_girisi = msg.data
 
 def position_callback(msg):
-    global x1,x2,y1,y2,size,depth
-    #x1,y1,x2,y2,depth = None
+    global x1,x2,y1,y2,size
     if len(msg.data) == 6:
-        x1,y1,x2,y2,size,depth = msg.data
-        depth = float(depth)
-    #print("x1 = {}, x2 = {}, y1 = {}, y2 = {} size = {} depth = {}".format(x1,x2,y1,y2,size,depth))
+        x1,y1,x2,y2,size = msg.data
 
 if __name__ == "__main__":
     rospy.init_node("decision_node")
@@ -49,15 +43,14 @@ if __name__ == "__main__":
 
     kavsak_girisi = None
 
-    #ŞERİT TAKİBİ BEKLEME
-    rospy.loginfo("Waiting for 'lane_track_node' service...")
-    rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
-    rospy.loginfo("'lane_track_node' service is now available.")
+    # #ŞERİT TAKİBİ BEKLEME
+    # rospy.loginfo("Waiting for 'lane_track_node' service...")
+    # rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
+    # rospy.loginfo("'lane_track_node' service is now available.")
 
 
     #Subscribers
-    rospy.Subscriber("/sign_detector/detected_sign_number", Int8, sign_callback) 
-    rospy.Subscriber('/sign_detector/depth', Float32, depth_callback ,queue_size=10)
+    rospy.Subscriber("/sign_detector/sign_info", Sign, sign_callback) 
     rospy.Subscriber('/stm/read_odometer', Float32, read_odometer)
     rospy.Subscriber('/lane_track/current_lane', Int8, lane_callback)
     rospy.Subscriber('/sign_detector/position', Float32MultiArray,position_callback ,queue_size=10)
@@ -67,6 +60,7 @@ if __name__ == "__main__":
     steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=1)
     brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=10)
     detection_control = rospy.Publisher("/decision_algorithm/detection_control", Bool, queue_size=10)
+    obstacle_control = rospy.Publisher("/decision_algorithm/obstacle_control", Bool, queue_size=1)
     motor_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=100)
     reset_odom = rospy.Publisher('/stm/reset_odometer', Bool, queue_size=10)
     left_signal = rospy.Publisher('/stm/left_signal', Int8, queue_size= 10)
@@ -288,7 +282,7 @@ if __name__ == "__main__":
             if detected_sign_number == 13: # sola dönüş
                 if current_lane == 1: # sag seritten
                     rospy.loginfo("sagdan sola donus basladı")
-                    detection_control.publish(True)
+                    obstacle_control.publish(True)
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
@@ -300,7 +294,7 @@ if __name__ == "__main__":
                     left_depth = depth
                     while distance < left_depth*100 - 150:
                         pass
-                    print("dist bitti")
+                    detection_control.publish(True)
                     time.sleep(0.5)
                     brake_pub.publish(1)
                     time.sleep(2)
@@ -320,7 +314,7 @@ if __name__ == "__main__":
                 
                 elif current_lane == 0: # sol seritten
                     rospy.loginfo("soldan sola donus basladı")
-                    detection_control.publish(True)
+                    obstacle_control.publish(True)
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
@@ -332,6 +326,7 @@ if __name__ == "__main__":
                     left_depth = depth
                     while distance < left_depth*100-50:
                         pass
+                    detection_control.publish(True)
                     print("dist bitti")
                     time.sleep(0.5)
                     brake_pub.publish(1)
@@ -348,13 +343,13 @@ if __name__ == "__main__":
                     time.sleep(2)
 
                 
-
+                obstacle_control.publish(False)
                 detection_control.publish(False)               
 
             if detected_sign_number == 10: # saga donus
                 if current_lane == 1: # sag seritten
                     rospy.loginfo("sagdan saga donus basladı")
-                    detection_control.publish(True)
+                    obstacle_control.publish(True)
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
@@ -366,7 +361,7 @@ if __name__ == "__main__":
                     right_depth = depth
                     while distance < right_depth*100 -50:
                         pass
-                    print("dist bitti")
+                    detection_control.publish(True)
                     time.sleep(0.5)  
                     brake_pub.publish(1)
                     time.sleep(2)                
@@ -384,7 +379,7 @@ if __name__ == "__main__":
                     
                 elif current_lane == 0: # sol seritten
                     rospy.loginfo("soldan saga donus basladı")
-                    detection_control.publish(True)
+                    obstacle_control.publish(True)
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
@@ -396,7 +391,7 @@ if __name__ == "__main__":
                     right_depth = depth
                     while distance < right_depth*100 -150:
                         pass
-                    print("dist bitti")
+                    detection_control.publish(True)
                     time.sleep(0.5)
                     brake_pub.publish(1)
                     time.sleep(2)
@@ -413,7 +408,7 @@ if __name__ == "__main__":
                     steering_pub.publish(0)
                     time.sleep(2)
 
-                    
+                obstacle_control.publish(False)
                 detection_control.publish(False)
 
             if detected_sign_number == 19: #kavsak icin gps bilgisi kullanarak giris yerine göre döndüren algoritma
