@@ -138,7 +138,7 @@ def steering_control(image, midpoints, endpoints, areas):
         image = cv2.line(image, ((int(image.shape[1] / 2)), int(mid_line_y)),
                         (int(mid_line_x), int(mid_line_y)), (0, 255, 0), 2)                                     # yatay çizgiyi çekiyor
         uzaklik_y = (image.shape[0] - mid_line_y)                                                         # cizgi uzunlugunu bulmaya yarar
-        uzaklik_x = (((image.shape[1] / 2)) - mid_line_x)                                            # yolun ortasına aracın uzaklığı
+        uzaklik_x = (((image.shape[1] / 2)-20) - mid_line_x)                                            # yolun ortasına aracın uzaklığı
         degree = (180 * math.atan(abs(uzaklik_x / uzaklik_y))) / (3.14)                                 # sapma bir açıya dönüştürülür
         steering = int(degree * 1.12)                                                         # araç için oranlanmış değer
 
