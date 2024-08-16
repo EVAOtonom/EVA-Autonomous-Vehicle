@@ -972,5 +972,6 @@ if __name__ == "__main__":
                         time.sleep(2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
+                brake_pub.publish(0)
                 detection_control.publish(False) 
                 obstacle_control.publish(False)
