@@ -413,9 +413,9 @@ if __name__ == "__main__":
                 detection_control.publish(False)
 
             if detected_sign_number == 19: #kavsak icin gps bilgisi kullanarak giris yerine göre döndüren algoritma
-                rospy.loginfo("kavsak donusu basladı")
                 obstacle_control.publish(False)
                 if kavsak_girisi == 1:
+                    rospy.loginfo("@@@@@@@@@kavsak donusu basladı 1. giris")
                     if current_lane == 1:
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -527,6 +527,7 @@ if __name__ == "__main__":
                         reset_odom.publish(1)
                         time.sleep(0.5)
                 elif kavsak_girisi == 2: #distance ile
+                    rospy.loginfo("@@@@@@@@@kavsak donusu basladı 2. giris")
                     if current_lane == 1:
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -641,6 +642,7 @@ if __name__ == "__main__":
                         reset_odom.publish(1)
                         time.sleep(0.5)
                 elif kavsak_girisi == 3:
+                    rospy.loginfo("@@@@@@@@@kavsak donusu basladı 3. giris")
                     if current_lane == 1:
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -752,6 +754,7 @@ if __name__ == "__main__":
                         reset_odom.publish(1)
                         time.sleep(0.5)
                 elif kavsak_girisi == 4:
+                    rospy.loginfo("@@@@@@@@@kavsak donusu basladı 4. giris")
                     if current_lane == 1:
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -863,6 +866,7 @@ if __name__ == "__main__":
                         reset_odom.publish(1)
                         time.sleep(0.5)
                 elif kavsak_girisi == 5: ################DENEME
+                    rospy.loginfo("@@@@@@@@@kavsak donusu basladı 5. giris")
                     if current_lane == 1:
                         brake_pub.publish(1)
                         time.sleep(2)
