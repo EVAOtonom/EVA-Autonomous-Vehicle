@@ -282,17 +282,10 @@ if __name__ == "__main__":
 
     #Subscribers
     rospy.Subscriber('/scan', LaserScan, callback, queue_size=1)
-<<<<<<< HEAD
     rospy.Subscriber("/lane_track/current_lane", Int8, current_lane_check, queue_size=1) # 0 sol 1 sağ
     rospy.Subscriber('/stm/read_odometer', Float32, read_odometer, queue_size=1)
     rospy.Subscriber('/decision_algorithm/lane_control', Bool, decision_callback, queue_size=1)
     rospy.Subscriber('/decision_algorithm/obstacle_control', Bool , decision_obstacle_callback, queue_size=1)
-=======
-    rospy.Subscriber("/lane_track/current_lane", Int8, current_lane_check) # 0 sol 1 sağ
-    rospy.Subscriber('/stm/read_odometer', Float32, read_odometer)
-    rospy.Subscriber('/gps_detector/viraj', Bool, gps_callback)
-    rospy.Subscriber('/decision_algorithm/obstacle_control', Bool , decision_obstacle_callback)
->>>>>>> 1b18c3fef61ac66fba159df6840d603b34778d57
 
     #Publishers
     reset_odom = rospy.Publisher('/stm/reset_odometer', Bool, queue_size=1)
