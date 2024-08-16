@@ -131,11 +131,11 @@ def steering_control(image, midpoints, endpoints, areas):
             cv2.putText(image, 'UCGEN CIZILEMEDI',(15, 40), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
             print("SERIT TAKIBI YAPILAMIYOR, UCGEN CIZILEMEDI")
 
-        image = cv2.line(image, ((int(image.shape[1] / 2)), 332),
-                        ((int(image.shape[1] / 2)), int(mid_line_y)), (0, 255, 0), 2)                       # düz çizgiyi çekiyor
-        image = cv2.line(image, ((int(image.shape[1] / 2)), 332),
+        image = cv2.line(image, ((int(image.shape[1] / 2)-20), 332),
+                        ((int(image.shape[1] / 2)-20), int(mid_line_y)), (0, 255, 0), 2)                       # düz çizgiyi çekiyor
+        image = cv2.line(image, ((int(image.shape[1] / 2)-20), 332),
                         (int(mid_line_x), int(mid_line_y)), (0, 255, 0), 2)                                 # çapraz çizgiyi çekiyor
-        image = cv2.line(image, ((int(image.shape[1] / 2)), int(mid_line_y)),
+        image = cv2.line(image, ((int(image.shape[1] / 2)-20), int(mid_line_y)),
                         (int(mid_line_x), int(mid_line_y)), (0, 255, 0), 2)                                     # yatay çizgiyi çekiyor
         uzaklik_y = (image.shape[0] - mid_line_y)                                                         # cizgi uzunlugunu bulmaya yarar
         uzaklik_x = (((image.shape[1] / 2)-20) - mid_line_x)                                            # yolun ortasına aracın uzaklığı
