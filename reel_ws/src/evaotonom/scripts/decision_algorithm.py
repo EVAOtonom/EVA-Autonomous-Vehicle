@@ -65,19 +65,17 @@ if __name__ == "__main__":
     steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=1)
     brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=1)
     lane_control = rospy.Publisher("/decision_algorithm/lane_control", Bool, queue_size=1)
-    detection_control = rospy.Publisher("/decision_algorithm/lane_control", Bool, queue_size=1)
     obstacle_control = rospy.Publisher("/decision_algorithm/obstacle_control", Bool, queue_size=1)
     motor_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=1)
     reset_odom = rospy.Publisher('/stm/reset_odometer', Bool, queue_size=1)
     left_signal = rospy.Publisher('/stm/left_signal', Int8, queue_size= 1)
     right_signal = rospy.Publisher('/stm/right_signal', Int8, queue_size=1)
 
-    #motor_pub.publish(False)
-    lane_control.publish(False)
+    #motor_pub.publish(0)
+    lane_control.publish(0)
 
     while not rospy.is_shutdown():
         if detected_sign_number != None:
-
             if detected_sign_number == 3: # DURAK KARAR ALGORITMASI
                 if current_lane == 1: # SAG SERITTEYSE
                     rospy.loginfo(" @@@@@@@@@@ SAG SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ")
@@ -308,13 +306,13 @@ if __name__ == "__main__":
             #     lane_control.publish(0) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
 
             elif detected_sign_number == 2: # DUR
-                lane_control.publish(True)
+                lane_control.publish(1)
                 time.sleep(1)
                 brake_pub.publish(1)
                 time.sleep(6)
                 brake_pub.publish(0)
                 time.sleep(2)
-                lane_control.publish(False)
+                lane_control.publish(0)
 
             elif detected_sign_number == 15: # YEŞİL IŞIK elif detected_sign_number == 23 çıkarıldı
                 brake_pub.publish(0)
@@ -341,9 +339,9 @@ if __name__ == "__main__":
             #         time.sleep(2)
             #         brake_pub.publish(1)
             #         time.sleep(2)
-            #         detected_sign_number = True
+            #         detected_sign_number = 1
             #         rospy.loginfo("Park edildi")
-            #         detection_control.publish(True)
+            #         detection_control.publish(1)
 
             #         #os.system("rosnode kill "+ "stabil_throttle_node")
             #         #os.system("rosnode kill "+ "sign_detector_node")
@@ -351,8 +349,8 @@ if __name__ == "__main__":
             #         #time.sleep(5)
 
             elif detected_sign_number == 8: # PARK LEVHASINA GORE YAY YAPAR
-                lane_control.publish(True)
-                obstacle_control.publish(True)
+                lane_control.publish(1)
+                obstacle_control.publish(1)
                 if sign_depth_dict[8] is not None:
                     #os.system("rosnode kill "+ "lane_track_node")
                     #os.system("rosnode kill "+ "obstacle_detector_node")
@@ -388,7 +386,7 @@ if __name__ == "__main__":
                     #time.sleep(0.1)
                     brake_pub.publish(1)
                     time.sleep(2)
-                    detected_sign_number = True
+                    detected_sign_number = 1
                     rospy.loginfo("Park edildi")
                 else:
                     print("depth is none")
@@ -396,7 +394,7 @@ if __name__ == "__main__":
             if detected_sign_number == 13: # sola dönüş
                 if current_lane == 1: # sag seritten
                     rospy.loginfo("sagdan sola donus basladı")
-                    obstacle_control.publish(True)
+                    obstacle_control.publish(1)
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
@@ -408,7 +406,7 @@ if __name__ == "__main__":
                     left_depth = sign_depth_dict[13]
                     while distance < left_depth*100 - 150:
                         pass
-                    lane_control.publish(True)
+                    lane_control.publish(1)
                     time.sleep(0.5)
                     brake_pub.publish(1)
                     time.sleep(2)
@@ -428,7 +426,7 @@ if __name__ == "__main__":
 
                 elif current_lane == 0: # sol seritten
                     rospy.loginfo("soldan sola donus basladı")
-                    obstacle_control.publish(True)
+                    obstacle_control.publish(1)
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
@@ -440,7 +438,7 @@ if __name__ == "__main__":
                     left_depth = sign_depth_dict[13]
                     while distance < left_depth*100-50:
                         pass
-                    lane_control.publish(True)
+                    lane_control.publish(1)
                     print("dist bitti")
                     time.sleep(0.5)
                     brake_pub.publish(1)
@@ -463,7 +461,7 @@ if __name__ == "__main__":
             if detected_sign_number == 10: # saga donus
                 if current_lane == 1: # sag seritten
                     rospy.loginfo("sagdan saga donus basladı")
-                    obstacle_control.publish(True)
+                    obstacle_control.publish(1)
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
@@ -493,7 +491,7 @@ if __name__ == "__main__":
 
                 elif current_lane == 0: # sol seritten
                     rospy.loginfo("soldan saga donus basladı")
-                    obstacle_control.publish(True)
+                    obstacle_control.publish(1)
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
@@ -505,7 +503,7 @@ if __name__ == "__main__":
                     right_depth = sign_depth_dict[13]
                     while distance < right_depth*100 -150:
                         pass
-                    lane_control.publish(True)
+                    lane_control.publish(1)
                     time.sleep(0.5)
                     brake_pub.publish(1)
                     time.sleep(2)
@@ -522,11 +520,11 @@ if __name__ == "__main__":
                     steering_pub.publish(0)
                     time.sleep(2)
 
-                obstacle_control.publish(False)
-                lane_control.publish(False)
+                obstacle_control.publish(0)
+                lane_control.publish(0)
 
             if detected_sign_number == 19: #kavsak icin gps bilgisi kullanarak giris yerine göre döndüren algoritma
-                obstacle_control.publish(True)
+                obstacle_control.publish(1)
                 if kavsak_girisi == 1:
                     rospy.loginfo("@@@@@@@@@kavsak donusu basladı 1. giris")
                     if current_lane == 1:
@@ -539,7 +537,7 @@ if __name__ == "__main__":
                         kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 250:
                             pass
-                        lane_control.publish(True)
+                        lane_control.publish(1)
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
@@ -594,7 +592,7 @@ if __name__ == "__main__":
                         kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 500:
                             pass
-                        lane_control.publish(True)
+                        lane_control.publish(1)
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
@@ -651,7 +649,7 @@ if __name__ == "__main__":
                         kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 230:
                             pass
-                        lane_control.publish(True)
+                        lane_control.publish(1)
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
@@ -708,7 +706,7 @@ if __name__ == "__main__":
                         kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 250:
                             pass
-                        lane_control.publish(True)
+                        lane_control.publish(1)
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
@@ -766,7 +764,7 @@ if __name__ == "__main__":
                         kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 250:
                             pass
-                        lane_control.publish(True)
+                        lane_control.publish(1)
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
@@ -821,7 +819,7 @@ if __name__ == "__main__":
                         kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 350:
                             pass
-                        lane_control.publish(True)
+                        lane_control.publish(1)
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
@@ -878,7 +876,7 @@ if __name__ == "__main__":
                         kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 250:
                             pass
-                        lane_control.publish(True)
+                        lane_control.publish(1)
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
@@ -933,7 +931,7 @@ if __name__ == "__main__":
                         kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 500:
                             pass
-                        lane_control.publish(True)
+                        lane_control.publish(1)
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
@@ -990,7 +988,7 @@ if __name__ == "__main__":
                         kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 250:
                             pass
-                        lane_control.publish(True)
+                        lane_control.publish(1)
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
@@ -1045,7 +1043,7 @@ if __name__ == "__main__":
                         kavsak_depth = sign_depth_dict[19]
                         while distance < kavsak_depth*100 - 500:
                             pass
-                        lane_control.publish(True)
+                        lane_control.publish(1)
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)

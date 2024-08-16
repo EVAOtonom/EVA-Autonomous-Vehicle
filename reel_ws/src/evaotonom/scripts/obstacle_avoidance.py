@@ -10,10 +10,6 @@ def decision_obstacle_callback(msg):
     global decision_obstacle
     decision_obstacle = msg.data
 
-def decision_callback(msg):
-    global sign_detected
-    sign_detected = msg.data
-
 def callback(msg):
     global scan
     scan = msg.ranges
@@ -284,7 +280,6 @@ if __name__ == "__main__":
     rospy.Subscriber('/scan', LaserScan, callback, queue_size=1)
     rospy.Subscriber("/lane_track/current_lane", Int8, current_lane_check, queue_size=1) # 0 sol 1 sağ
     rospy.Subscriber('/stm/read_odometer', Float32, read_odometer, queue_size=1)
-    rospy.Subscriber('/decision_algorithm/lane_control', Bool, decision_callback, queue_size=1)
     rospy.Subscriber('/decision_algorithm/obstacle_control', Bool , decision_obstacle_callback, queue_size=1)
 
     #Publishers
