@@ -26,7 +26,7 @@ def kavsak_callback(msg):
 
 def position_callback(msg):
     global x1,x2,y1,y2,size
-    if len(msg.data) == 6:
+    if len(msg.data) == 5:
         x1,y1,x2,y2,size = msg.data
 
 if __name__ == "__main__":
