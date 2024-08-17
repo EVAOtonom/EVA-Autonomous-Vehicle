@@ -404,7 +404,7 @@ if __name__ == "__main__":
                     brake_pub.publish(0)
                     time.sleep(2)
                     left_depth = sign_depth_dict[13]
-                    while distance < left_depth*100 - 150:
+                    while distance < left_depth*100 - 200:
                         pass
                     lane_control.publish(1)
                     time.sleep(0.5)
@@ -501,7 +501,7 @@ if __name__ == "__main__":
                     brake_pub.publish(0)
                     time.sleep(2)
                     right_depth = sign_depth_dict[13]
-                    while distance < right_depth*100 -150:
+                    while distance < right_depth*100 -200:
                         pass
                     lane_control.publish(1)
                     time.sleep(0.5)
