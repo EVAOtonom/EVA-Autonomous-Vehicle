@@ -43,9 +43,9 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
             if box.conf > 0.7: 
                 x1, y1, x2, y2 = map(int, box.xyxy[0])
                 left_class_id = int(box.cls[0])
-                if left_class_id == 9:
+                if left_class_id == 9: # park yasak ise
                     continue
-                left_detections.append((left_class_id, (x1, y1, x2, y2)))
+                left_detections.append((left_class_id, (x1, y1, x2, y2), box.conf))
 
     results_right = model(right_image) # SAG GÖRÜNTÜDEN TESPİT YAPAR
     for result in results_right:
@@ -53,9 +53,9 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
             if box.conf > 0.7: 
                 x1, y1, x2, y2 = map(int, box.xyxy[0])
                 right_class_id = int(box.cls[0])
-                if right_class_id == 9:
+                if right_class_id == 9: # park yasak ise
                     continue
-                right_detections.append((right_class_id, (x1, y1, x2, y2)))
+                right_detections.append((right_class_id, (x1, y1, x2, y2), box.conf))
 
         for right_result in right_detections: # SOL VE SAG GORUNTUNUN SONUCLARINI BİRBİRİYLE KIYAS ETMEK İCİN
             for left_result in left_detections:
@@ -63,7 +63,7 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
                 class_name_right = class_names[right_result[0]]
 
                 if class_name_left == class_name_right: 
-                    if class_name_right == 'park' or class_name_right == 'engellipark': # PARK VE ENGELLİ PARK İCİN DOGRULAMA 
+                    if class_name_right == 'park' or class_name_right == 'engellipark' and right_result[2]> 0.9: # PARK VE ENGELLİ PARK İCİN DOGRULAMA 
                         sign_counter[class_name_right] += 1
                         if sign_counter[class_name_right] % park_counter == 0:
                             depth = calculate_depth(point_cloud, (right_result[1]), original_width, original_height)
