@@ -138,18 +138,25 @@ def steering_control(image, midpoints, endpoints, areas):
         cv2.putText(image, f"tekerlek acisi: {steering}", (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
         cv2.putText(image, f"ucgen aci: {degree}", (15, 55), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
         if areas['ensol'] > areas['ensag']: # Mevcut şerit bilgisini ekrana yazdırır
-            cv2.putText(image, 'arac SAG seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
             current_lane_number = 1
         elif areas ['ensag'] > areas ['ensol']: 
-            cv2.putText(image, 'arac SOL seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
             current_lane_number = 0
-        else:
-            if current_lane_number == 0:
-                cv2.putText(image, 'arac SOL seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
-            elif current_lane_number == 1:
-                cv2.putText(image, 'arac SAG seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
+                
+        lanes.append(current_lane_number)
+        
+        if len(lanes) >30:
+            lanes.pop(0)
+            
+        count_0 = lanes.count(0)
+        count_1 = lanes.count(1)
+        
+        if count_0 / 30.0 >= 0.75:
+            cv2.putText(image, 'arac SOL seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
+            lane_publisher.publish(0)
 
-        lane_publisher.publish(current_lane_number)    
+        if count_1 /30.0 >= 0.75:
+            cv2.putText(image, 'arac SAG seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
+            lane_publisher.publish(1)    
 
         #print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
         cv2.imshow("EVA OTONOM LANE TRACK", image)
@@ -171,6 +178,9 @@ if __name__ == "__main__":
     rospy.init_node('lane_track_node') 
 
     #Variables
+    lanes = []
+    count_0 = 0.0
+    count_1 = 0.0
     model = load_model(f'{os.path.dirname(__file__)}/en-iyisi.h5', compile=False)
     colors = [(0, 0, 0), (128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128)]
     INPUT_SHAPE = [480, 640, 3]  # (Height, Width , Color Format) 
