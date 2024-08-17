@@ -50,7 +50,7 @@ def resize_image(image, size):
 
 def segment_image(msg):
     global label_names, labels_color, model
-    image = Image.fromarray(cv2.cvtColor(msg, cv2.COLOR_BGR2RGB))
+    image = Image.open(msg)
     image = cvtColor(image) #RGB Sorgusu ve doğrulaması yapar / kaldırılabilir
     orj_img = copy.deepcopy(image) 
     orj_img_height = np.array(image).shape[0]
@@ -158,8 +158,9 @@ def steering_control(image, midpoints, endpoints, areas):
 def callback():
     try:
         if obstacle_detected !=1 and lane_stop != 1:
-            ret, msg = cam.read()
-            image, pr = segment_image(msg)
+            ret, frame = cam.read()
+            cv2.imwrite("frame.jpg", frame)
+            image, pr = segment_image("frame.jpg")
             image, midpoints, endpoints, areas = annotate_image(image, pr)
             steering_control(image, midpoints, endpoints, areas)
         rate.sleep()
@@ -170,7 +171,7 @@ if __name__ == "__main__":
     rospy.init_node('lane_track_node') 
 
     #Variables
-    model = load_model(f'{os.path.dirname(os.path.abspath(__file__))}/tumVeriSetiyleSeritTakibiModeli.h5', compile=False)
+    model = load_model(f'{os.path.dirname(__file__)}/en-iyisi.h5', compile=False)
     colors = [(0, 0, 0), (128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128)]
     INPUT_SHAPE = [480, 640, 3]  # (Height, Width , Color Format) 
     current_lane_number = None
@@ -184,23 +185,30 @@ if __name__ == "__main__":
         'ensag': (0, 0, 255)   # Mavi
     }
     initialize_detection_variables()
+    rate = rospy.Rate(2)
+    timer = time.strftime("%d.%m-%H:%M")
+    obstacle_detected = False
+    mid_line_x = 320
+    mid_line_y = 180
     #Otonom sinyalini bekleme
-    rospy.loginfo("Kumandadan komut bekleniyor...")
-    rospy.wait_for_message('/stm/check_otonom', Bool, timeout=100) # Kumandadan otonom tuşuna basılmasını bekler.
-    rospy.loginfo("Otonom komutu geldi şerit takibi başlıyor.")
+    # rospy.loginfo("Kumandadan komut bekleniyor...")
+    # rospy.wait_for_message('/stm/check_otonom', Bool, timeout=100) # Kumandadan otonom tuşuna basılmasını bekler.
+    # rospy.loginfo("Otonom komutu geldi şerit takibi başlıyor.")
     
     #Subscribers
-    rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback)
-    rospy.Subscriber('/decision_algorithm/lane_control', Bool, lane_callback)
+    rospy.Subscriber('/engel_var_mi', Bool, obstacle_callback, queue_size=1)
+    rospy.Subscriber('/serit_kapat', Bool, lane_callback, queue_size=1)
 
     #Publishers
-    motor_power_pub = rospy.Publisher('/stm/motor_power', Int8, queue_size=10)
-    steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=10)
-    lane_publisher = rospy.Publisher("/lane_track/current_lane", Int8, queue_size=10)
-    brake_publisher = rospy.Publisher('/stm/brake', Bool, queue_size=10)
-    rate = rospy.Rate(2)
-    time.sleep(3)
-    obstacle_detected = False
-    motor_power_pub.publish(1)
+    motor_power_pub = rospy.Publisher('/stm/motor_power', Int8, queue_size=1)
+    steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=1)
+    lane_publisher = rospy.Publisher("/lane_track/current_lane", Int8, queue_size=1)
+    brake_publisher = rospy.Publisher('/stm/brake', Bool, queue_size=1)
+
+    kayit = cv2.VideoWriter(f"/home/eva/Videos/kayit/lane-track-{timer}.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 7.0, (640, 360))
+
     while not rospy.is_shutdown():
         callback()
+
+kayit.release()
+

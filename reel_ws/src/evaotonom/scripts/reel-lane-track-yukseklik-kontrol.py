@@ -10,6 +10,7 @@ import math
 import numpy as np
 import copy
 import time
+import os
 from collections import deque
 
 def obstacle_callback(msg):
@@ -50,7 +51,7 @@ def resize_image(image, size):
 
 def segment_image(msg):
     global label_names, labels_color, model
-    image = Image.fromarray(cv2.cvtColor(msg, cv2.COLOR_BGR2RGB))
+    image = Image.open(msg)
     image = cvtColor(image) #RGB Sorgusu ve doğrulaması yapar / kaldırılabilir
     orj_img = copy.deepcopy(image) 
     orj_img_height = np.array(image).shape[0]
@@ -97,6 +98,7 @@ def annotate_image (blended_image_array, prediction):
         cv2.circle(blended_image_array, (midpoints[label_name][0], midpoints[label_name][1]), 10, labels_color[label_name], -1) # şeritlerin orta noktasına bi nokta
         cv2.putText(blended_image_array, f"orta {str(label_name)}",(midpoints[label_name][0], midpoints[label_name][1]+20),cv2.FONT_HERSHEY_SIMPLEX, 0.5, labels_color[label_name], 2)
     return blended_image_array, midpoints, endpoints, areas
+
 def steering_control(image, midpoints, endpoints, areas):
         global current_lane_number, kayit, mid_line_y, mid_line_x, count_0, count_1
         if areas['sol'] <= 50: # sol şerit pikseli 50'den fazla ise orta noktasını alıyor
@@ -180,8 +182,9 @@ def steering_control(image, midpoints, endpoints, areas):
 def callback():
     try:
         if lane_stop != 1 and obstacle_detected != 1:
-            ret, msg = cam.read()
-            image, pr = segment_image(msg)
+            ret, frame = cam.read()
+            cv2.imwrite("frame.jpg", frame)
+            image, pr = segment_image("frame.jpg")
             image, midpoints, endpoints, areas = annotate_image(image, pr)
             steering_control(image, midpoints, endpoints, areas)
             rate.sleep()
@@ -192,7 +195,7 @@ if __name__ == "__main__":
     rospy.init_node('lane_track_node') 
 
     #Variables
-    model = load_model('/home/eva/EVA-Autonomous-Vehicle/reel_ws/src/evaotonom/scripts/tumVeriSetiyleSeritTakibiModeli.h5', compile=False)# /home/eva/Desktop/modeller/16batch.h5 |#/home/eva/Desktop/modeller/az-veri-jabra.h5
+    model = load_model(f'{os.path.dirname(__file__)}/en-iyisi.h5', compile=False)# /home/eva/Desktop/modeller/16batch.h5 |#/home/eva/Desktop/modeller/az-veri-jabra.h5
     colors = [(0, 0, 0), (128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128)]
     INPUT_SHAPE = [480, 640, 3]  # (Height, Width , Color Format) 
     current_lane_number = None

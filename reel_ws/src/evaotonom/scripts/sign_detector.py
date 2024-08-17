@@ -71,7 +71,7 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
                                     tabela_bilgi(class_name_right, depth)
                                     x1, y1, x2, y2 = right_result[1]
                                     cv2.rectangle(right_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
-                                    label = f'{class_name_right} ({depth:.2f}m)' if depth is not None else class_name_right
+                                    label = f'{class_name_right} ({depth:.2f}m)'
                                     cv2.putText(right_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                                     print(f"LEVHA: {class_name_right} UZAKLIK: {depth:.2f}m")
                                     sign_detected = True
@@ -85,22 +85,22 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
                                     tabela_bilgi(class_name_right, depth)
                                     x1, y1, x2, y2 = right_result[1]
                                     cv2.rectangle(right_image, (x1, y1), (x2, y2), (255, 0, 0), 2)
-                                    label = f'{class_name_right} ({depth:.2f}m)' if depth is not None else class_name_right
+                                    label = f'{class_name_right} ({depth:.2f}m)'
                                     cv2.putText(right_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                                     print(f"LEVHA: {class_name_right} UZAKLIK: {depth:.2f}m")
                                     sign_detected = True
 
+    cv2.imshow("EVA OTONOM LEVHA TESPITI SAG", right_image)
+    cv2.waitKey(1)
+
     if sign_detected == False: # LEVHA ALGILANMADIGI DURUMDA SANIYEDE 1, 23 YAYINLAR
         current_time = time.time()
         if current_time - last_publish_time >= 1.0:
-            detected_sign.sign_index = 0
+            detected_sign.sign_index = 23
             detected_sign.depth = 0
             sign_pub.publish(detected_sign)
             last_publish_time = current_time
                     
-        cv2.imshow("EVA OTONOM LEVHA TESPITI SAG", right_image)
-        cv2.waitKey(1)
-
 def calculate_depth(point_cloud, boundingbox, width, height):
     # Scale bounding box coordinates back to the original image size
     x_center = int((boundingbox[0] + boundingbox[2]) / 2 * (width / 416))
@@ -243,6 +243,10 @@ def tabela_bilgi(class_name, depth_in_meters):
 if __name__ == '__main__':
     rospy.init_node('zed_object_detection')
 
+    rospy.loginfo("Waiting for 'lane_track_node' service...")
+    rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
+    rospy.loginfo("'lane_track_node' service is now available.")
+    
     # Veriables
     model = YOLO('/home/eva/EVA-Autonomous-Vehicle/reel_ws/src/evaotonom/scripts/sol300best.pt')
     bridge = CvBridge()
@@ -286,10 +290,6 @@ if __name__ == '__main__':
     ts.registerCallback(callback)
     position_pub = rospy.Publisher('/sign_detector/position', Float32MultiArray, queue_size=1)
     sign_pub = rospy.Publisher('/sign_detector/sign_info', Sign, queue_size=1)
-
-    rospy.loginfo("Waiting for 'lane_track_node' service...")
-    rospy.wait_for_message("/lane_track/current_lane",Int8,timeout=100) # Şerit takibinin mevcut şerit bilgisini göndermesini bekler.
-    rospy.loginfo("'lane_track_node' service is now available.")
     
     while not rospy.is_shutdown():
         rate.sleep()
