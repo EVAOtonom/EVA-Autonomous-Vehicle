@@ -103,7 +103,7 @@ if __name__ == "__main__":
 
                     if area_num in range(6, 9): 
                         obstacle_control_pub.publish(1)
-                        rospy.loginfo("viraj ETK")
+                        rospy.loginfo("viraj")
 
                     else:
                         kavsak_noktasi_pub.publish(area_num)
