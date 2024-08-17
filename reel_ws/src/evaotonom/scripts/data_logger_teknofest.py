@@ -76,17 +76,37 @@ def log_data(event):
         lane = "sol" if current_lane == 0 else "sag"
         depth = depth if depth is not None else "N/A"
         
+        # Prepare the data dictionary
         data = {
             "takim_ismi": "EVAOTONOM",
             "direksiyon_acisi": steering_angle,
             "hiz": speed,
-            "koordinat": {"x": x, "y": y},
-            "tabelalar": [{"pozisyon": lane, "isim": sign_name, "olasilik": sign_probability, "uzaklik": depth}],
-            "trafik_isiklari": [{"renk": trafic_lights, "olasilik": trafic_lights_probability, "uzaklik": depth}],
-            "engeller": [{"uzaklik": obstacle}],
+            "koordinat": {
+                "x": x,
+                "y": y
+            },
+            "tabelalar": [
+                {
+                    "pozisyon": lane,
+                    "isim": latest_sign,
+                    "olasilik": sign_probability,
+                    "uzaklik": depth
+                }
+            ],
+            "trafik_isiklari": [
+                {
+                    "renk": trafic_lights,
+                    "olasilik": trafic_lights_probability,
+                    "uzaklik": depth
+                }
+            ],
+            "engeller": [
+                {
+                    "uzaklik": obstacle
+                }
+            ],
             "zaman_damgasi": f"{zaman_damgasi}"
         }
-        
         log_entry = f"{data}, \n"
         with open(file_path, "a") as file:
             file.write(log_entry)
