@@ -10,6 +10,7 @@ import math
 import numpy as np
 import copy
 import time
+import os
 from collections import deque
 
 def obstacle_callback(msg):
@@ -50,7 +51,7 @@ def resize_image(image, size):
 
 def segment_image(msg):
     global label_names, labels_color, model
-    image = Image.fromarray(cv2.cvtColor(msg, cv2.COLOR_BGR2RGB))
+    image = Image.open(msg)
     image = cvtColor(image) #RGB Sorgusu ve doğrulaması yapar / kaldırılabilir
 
     ######################################################
@@ -59,9 +60,8 @@ def segment_image(msg):
         radiance[:,:,i] = np.power(radiance[:,:,i] / float(np.max(radiance[:,:,i])), 0.7)
     radiance = np.clip(radiance*255,0,255)
     image = np.uint8(radiance)
-    ############################################
-
-
+    ######################################################
+    
     orj_img = copy.deepcopy(image) 
     orj_img_height = np.array(image).shape[0]
     orj_img_width = np.array(image).shape[1] 
@@ -74,7 +74,7 @@ def segment_image(msg):
     prediction = prediction[int((INPUT_SHAPE[0] - new_img_height) // 2):int((INPUT_SHAPE[0] - new_img_height) // 2 + new_img_height),
             int((INPUT_SHAPE[1] - new_img_width) // 2):int((INPUT_SHAPE[1] - new_img_width) // 2 + new_img_width)] # model tahminini orjinal görüntüye oranlar
     prediction = cv2.resize(prediction, (orj_img_width, orj_img_height), interpolation=cv2.INTER_LINEAR)
-
+    
     prediction = prediction.argmax(axis=-1) #her piksel için class olma olasılığı en yüksek hangisiyse onu bulur
 
     seg_img = np.reshape(np.array(colors, np.uint8)[np.reshape(prediction, [-1])], [orj_img_height, orj_img_width, -1]) #her piksele ait olduğu classa göre renk atanır
@@ -107,8 +107,9 @@ def annotate_image (blended_image_array, prediction):
         cv2.circle(blended_image_array, (midpoints[label_name][0], midpoints[label_name][1]), 10, labels_color[label_name], -1) # şeritlerin orta noktasına bi nokta
         cv2.putText(blended_image_array, f"orta {str(label_name)}",(midpoints[label_name][0], midpoints[label_name][1]+20),cv2.FONT_HERSHEY_SIMPLEX, 0.5, labels_color[label_name], 2)
     return blended_image_array, midpoints, endpoints, areas
+
 def steering_control(image, midpoints, endpoints, areas):
-        global current_lane_number, kayit, kosul, mid_line_y, mid_line_x, count_0, count_1
+        global current_lane_number, kayit, mid_line_y, mid_line_x, count_0, count_1
         if areas['sol'] <= 50: # sol şerit pikseli 50'den fazla ise orta noktasını alıyor
             midpoints['sol'] = (0, 0)
         if areas['sag'] <= 50: # sag şerit pikseli 50'den fazla ise orta noktasını alıyor
@@ -139,15 +140,13 @@ def steering_control(image, midpoints, endpoints, areas):
             mid_line_x = midpoints['sag'][0] - 200                     # sag seridin orta noktasından 150 piksel çıkartarak yolun ortasını buluyor
         else:
             cv2.putText(image, 'UCGEN CIZILEMEDI',(15, 40), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
-            mid_line_x = 320
-            mid_line_y = 180
             print("SERIT TAKIBI YAPILAMIYOR, UCGEN CIZILEMEDI")
 
-        image = cv2.line(image, ((int(image.shape[1] / 2)), 332),
-                        ((int(image.shape[1] / 2)), int(mid_line_y)), (0, 255, 0), 2)                       # düz çizgiyi çekiyor
-        image = cv2.line(image, ((int(image.shape[1] / 2)), 332),
+        image = cv2.line(image, ((int(image.shape[1] / 2)-20), 332),
+                        ((int(image.shape[1] / 2)-20), int(mid_line_y)), (0, 255, 0), 2)                       # düz çizgiyi çekiyor
+        image = cv2.line(image, ((int(image.shape[1] / 2)-20), 332),
                         (int(mid_line_x), int(mid_line_y)), (0, 255, 0), 2)                                 # çapraz çizgiyi çekiyor
-        image = cv2.line(image, ((int(image.shape[1] / 2)), int(mid_line_y)),
+        image = cv2.line(image, ((int(image.shape[1] / 2)-20), int(mid_line_y)),
                         (int(mid_line_x), int(mid_line_y)), (0, 255, 0), 2)                                     # yatay çizgiyi çekiyor
         uzaklik_y = (image.shape[0] - mid_line_y)                                                         # cizgi uzunlugunu bulmaya yarar
         uzaklik_x = (((image.shape[1] / 2)) - mid_line_x)                                            # yolun ortasına aracın uzaklığı
@@ -174,7 +173,7 @@ def steering_control(image, midpoints, endpoints, areas):
         if current_lane_number in [0, 1]:
 
             lanes.append(current_lane_number)
-
+        
             count_0 = lanes.count(0)
             count_1 = lanes.count(1)
         if count_0 / 20.0 >= 0.73:
@@ -192,20 +191,20 @@ def steering_control(image, midpoints, endpoints, areas):
 def callback():
     try:
         if lane_stop != 1 and obstacle_detected != 1:
-            ret, msg = cam.read()
-            image, pr = segment_image(msg)
+            ret, frame = cam.read()
+            cv2.imwrite("frame.jpg", frame)
+            image, pr = segment_image("frame.jpg")
             image, midpoints, endpoints, areas = annotate_image(image, pr)
             steering_control(image, midpoints, endpoints, areas)
             rate.sleep()
     except Exception as e:
         print("SERIT TAKIBI HATASI: " + str(e))
-
+    
 if __name__ == "__main__":
     rospy.init_node('lane_track_node') 
 
     #Variables
-    #rate = rospy.Rate(2)
-    model = load_model('/home/eva/Desktop/modeller/tum-veri-seti-13.08.h5', compile=False)
+    model = load_model(f'{os.path.dirname(__file__)}/en-iyisi.h5', compile=False)# /home/eva/Desktop/modeller/16batch.h5 |#/home/eva/Desktop/modeller/az-veri-jabra.h5
     colors = [(0, 0, 0), (128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128)]
     INPUT_SHAPE = [480, 640, 3]  # (Height, Width , Color Format) 
     current_lane_number = None
@@ -229,17 +228,17 @@ if __name__ == "__main__":
     count_1 = 0.0
 
     #Subscribers
-    rospy.Subscriber('/obstacle_detector/obstacle_detection', Bool, obstacle_callback)
-    rospy.Subscriber('/decision_algorithm/detection_control', Bool, decision_callback)
+    rospy.Subscriber('/engel_var_mi', Bool, obstacle_callback, queue_size=1)
+    rospy.Subscriber('/serit_kapat', Bool, lane_callback, queue_size=1)
 
     #Publishers
     motor_power_pub = rospy.Publisher('/stm/motor_power', Int8, queue_size=1)
     steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=1)
     lane_publisher = rospy.Publisher("/lane_track/current_lane", Int8, queue_size=1)
     brake_publisher = rospy.Publisher('/stm/brake', Bool, queue_size=1)
-
+        
     kayit = cv2.VideoWriter(f"/home/eva/Videos/kayit/lane-track-{timer}.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 7.0, (640, 360))
     while not rospy.is_shutdown():
         callback()
-
+    
 kayit.release()
