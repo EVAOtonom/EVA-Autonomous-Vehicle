@@ -37,7 +37,7 @@ def avoidance_obstacle(current_lane, kacinma):
         brake_pub.publish(0)
         time.sleep(2)
         print("SAĞ SERIDE GECIYORUM  0-0")
-        while traveled_distance < 275:
+        while traveled_distance < 230:
             pass
         brake_pub.publish(1)
         time.sleep(2)
@@ -50,7 +50,7 @@ def avoidance_obstacle(current_lane, kacinma):
         brake_pub.publish(0)
         time.sleep(0.5)
         print("KENDIMI DUZLUYORUM 0-0")
-        while traveled_distance < 326:
+        while traveled_distance < 300:
             pass
         brake_pub.publish(1)
         time.sleep(2)
