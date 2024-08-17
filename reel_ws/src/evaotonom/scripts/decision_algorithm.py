@@ -418,7 +418,7 @@ if __name__ == "__main__":
                     time.sleep(2)
                     brake_pub.publish(0)
                     time.sleep(2)
-                    while distance < 475:
+                    while distance < 500:
                         pass
                     steering_pub.publish(0)
                     time.sleep(2)
@@ -515,7 +515,7 @@ if __name__ == "__main__":
                     time.sleep(0.5)
                     brake_pub.publish(0)
                     time.sleep(2)
-                    while distance < 400:
+                    while distance < 500:
                         pass
                     steering_pub.publish(0)
                     time.sleep(2)
