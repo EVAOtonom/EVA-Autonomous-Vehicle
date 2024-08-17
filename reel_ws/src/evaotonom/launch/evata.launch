@@ -6,7 +6,7 @@
   <node name="decision_node" pkg="evaotonom" type="decision_algorithm.py" output="screen"/>
   <node name="obstacle_detector_node" pkg="evaotonom" type="obstacle_avoidance.py" output="screen"/>
   <node name="gps_checker" pkg="evaotonom" type="gpskavsak.py" output="screen"/>
-    <node name="zed_object_detection" pkg="evaotonom" type="sign_detector.py" output="screen"/>
+  <node name="zed_object_detection" pkg="evaotonom" type="sign_detector.py" output="screen"/>
   <node name="gps_coordinates" pkg="evaotonom" type="gpsdegerleri.py" output="screen"/>
   <node name="stabil_velocity_node" pkg="evaotonom"> type="velocity.py" output="screen"/>
   <node name="data_logger_node" pkg="evaotonom" type="data_logger_teknofest.py" output="screen"/>

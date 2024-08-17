@@ -11,7 +11,6 @@ import numpy as np
 import copy
 import time
 import os
-from collections import deque
 
 def obstacle_callback(msg):
     global obstacle_detected
@@ -155,24 +154,25 @@ def steering_control(image, midpoints, endpoints, areas):
         cv2.putText(image, f"ucgen aci: {degree}", (15, 55), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
 
         if areas['ensol'] > areas['ensag']: # Mevcut şerit bilgisini ekrana yazdırır
-            cv2.putText(image, 'arac SAG seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
             current_lane_number = 1
         elif areas ['ensag'] > areas ['ensol']: 
-            cv2.putText(image, 'arac SOL seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
             current_lane_number = 0
-
-        if current_lane_number in [0, 1]:
-
-            lanes.append(current_lane_number)
+                
+        lanes.append(current_lane_number)
         
-            count_0 = lanes.count(0)
-            count_1 = lanes.count(1)
-        if count_0 / 20.0 >= 0.73:
-            cv2.putText(image, 'arac SOL seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
+        if len(lanes) >30:
+            lanes.pop(0)
+            
+        count_0 = lanes.count(0)
+        count_1 = lanes.count(1)
+        
+        if count_0 / 30.0 >= 0.75:
+            cv2.putText(image, 'arac SOL seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
             lane_publisher.publish(0)
-        elif count_1 / 20.0 >= 0.73:
-            cv2.putText(image, 'arac SAG seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
-            lane_publisher.publish(1) 
+
+        if count_1 /30.0 >= 0.75:
+            cv2.putText(image, 'arac SAG seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
+            lane_publisher.publish(1)    
 
         #print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
         kayit.write(image)
@@ -195,6 +195,9 @@ if __name__ == "__main__":
     rospy.init_node('lane_track_node') 
 
     #Variables
+    lanes = []
+    count_0 = 0.0
+    count_1 = 0.0
     model = load_model(f'{os.path.dirname(__file__)}/en-iyisi.h5', compile=False)# /home/eva/Desktop/modeller/16batch.h5 |#/home/eva/Desktop/modeller/az-veri-jabra.h5
     colors = [(0, 0, 0), (128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128)]
     INPUT_SHAPE = [480, 640, 3]  # (Height, Width , Color Format) 
@@ -214,9 +217,6 @@ if __name__ == "__main__":
     obstacle_detected = False
     mid_line_x = 320
     mid_line_y = 180
-    lanes = deque(maxlen=30) # maxlen istenilen veri sayısı 
-    count_0 = 0.0
-    count_1 = 0.0
 
     #Subscribers
     rospy.Subscriber('/engel_var_mi', Bool, obstacle_callback, queue_size=1)

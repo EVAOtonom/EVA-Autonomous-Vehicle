@@ -37,7 +37,7 @@ def avoidance_obstacle(current_lane, kacinma):
         brake_pub.publish(0)
         time.sleep(2)
         print("SAĞ SERIDE GECIYORUM  0-0")
-        while traveled_distance < 275:
+        while traveled_distance < 230:
             pass
         brake_pub.publish(1)
         time.sleep(2)
@@ -45,12 +45,12 @@ def avoidance_obstacle(current_lane, kacinma):
         time.sleep(0.5)
         steering_pub.publish(-40)
         time.sleep(4)
-        right_signal.publish(5)
+        left_signal.publish(5)
         time.sleep(0.5)
         brake_pub.publish(0)
         time.sleep(0.5)
         print("KENDIMI DUZLUYORUM 0-0")
-        while traveled_distance < 326:
+        while traveled_distance < 300:
             pass
         brake_pub.publish(1)
         time.sleep(2)
@@ -77,12 +77,8 @@ def avoidance_obstacle(current_lane, kacinma):
         time.sleep(0.5)
         steering_pub.publish(40)
         time.sleep(2.5)
-        right_signal.publish(5)
-        time.sleep(0.5)
         rospy.loginfo(f"SOLDAN BÜYÜK KAÇIŞ BAŞLIYOR 0-1")
-        reset_odom.publish(1)
-        time.sleep(0.5)
-        left_signal.publish(2)
+        left_signal.publish(5)
         time.sleep(0.5)
         brake_pub.publish(0)
         time.sleep(2)

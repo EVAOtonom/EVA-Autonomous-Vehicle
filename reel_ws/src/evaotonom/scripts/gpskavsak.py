@@ -102,13 +102,13 @@ if __name__ == "__main__":
                 if is_within_area(latitude, longitude, rect_area):
 
                     if area_num in range(6, 9): 
-                        obstacle_control_pub.publish(1)   
+                        obstacle_control_pub.publish(1)
+                        rospy.loginfo("viraj")
 
                     else:
                         kavsak_noktasi_pub.publish(area_num)
                         rospy.loginfo(f"Kavşak: {area_num}")
                         found_area = True
-                        print(latitude,longitude)
                         break
 
             if not found_area:
