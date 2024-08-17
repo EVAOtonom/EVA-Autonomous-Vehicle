@@ -19,7 +19,7 @@ def obstacle_callback(msg):
     obstacle_detected = msg.data
 
 def callback(left_image_msg, right_image_msg, point_cloud_msg):
-    global depth, last_publish_time, bridge, sign_counter, sign_detected, park_counter, not_park_counter
+    global depth, last_publish_time, bridge, sign_counter, sign_detected, park_counter, not_park_counter, x1, x2, y1, y2 # x1 x2 ve y1 y2 ler global e güncellenerek başka fonksiyonlarda paylaşılabileceko
     # Convert images
     original_left_image = bridge.imgmsg_to_cv2(left_image_msg, "bgr8")
     original_right_image = bridge.imgmsg_to_cv2(right_image_msg, "bgr8")
