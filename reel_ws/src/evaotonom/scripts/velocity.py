@@ -41,6 +41,9 @@ def odometer_callback(msg):
     previous_odom = current_odom
     previous_time = current_time
 
+    control_motor_power()
+    rate.sleep()
+
 def control_motor_power():
     global current_velocity, brake_status, motor_power_pub
     
@@ -49,9 +52,9 @@ def control_motor_power():
     if brake_status:
         motor_power_pub.publish(0)
     else:
-        if current_velocity > 2.0:
+        if current_velocity > 2.5:
             motor_power_pub.publish(0)
-        elif current_velocity < 1.65:
+        elif current_velocity < 2.25:
             motor_power_pub.publish(6)
 
 if __name__ == '__main__':
@@ -73,6 +76,8 @@ if __name__ == '__main__':
 
     rate = rospy.Rate(3)  
 
-    while not rospy.is_shutdown():
-        control_motor_power()
-        rate.sleep()
+    rospy.spin()
+
+    # while not rospy.is_shutdown():
+    #     control_motor_power()
+    #     rate.sleep()

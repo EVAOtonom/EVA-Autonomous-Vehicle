@@ -80,6 +80,20 @@ def annotate_image (blended_image_array, prediction):
         y_coordinates, x_coordinates = np.where(prediction == label)
         if len(y_coordinates) == 0 or len(x_coordinates) == 0: # etikete ait hiç bir piksel yoksa for döngüsünü atlar
             continue
+        
+        if label_name == "ensol":
+            y_coordinates = y_coordinates[x_coordinates < 275]
+            x_coordinates = x_coordinates[x_coordinates < 275]
+        elif label_name == "sol":
+            y_coordinates = y_coordinates[x_coordinates < 400]
+            x_coordinates = x_coordinates[x_coordinates < 400]
+        elif label_name == 'sag':
+            y_coordinates = y_coordinates[x_coordinates > 250]
+            x_coordinates = x_coordinates[x_coordinates > 250]
+        elif label_name == "ensag":
+            y_coordinates = y_coordinates[x_coordinates > 365]
+            x_coordinates = x_coordinates[x_coordinates > 365]
+
         areas[label_name] = len(y_coordinates) # kaç piksel varsa o kadar alan
         if areas[label_name] < 50:
             continue
@@ -98,7 +112,7 @@ def annotate_image (blended_image_array, prediction):
         cv2.putText(blended_image_array, f"orta {str(label_name)}",(midpoints[label_name][0], midpoints[label_name][1]+20),cv2.FONT_HERSHEY_SIMPLEX, 0.5, labels_color[label_name], 2)
     return blended_image_array, midpoints, endpoints, areas
 
-def steering_control(image, midpoints, endpoints, areas):
+def steering_control(image, midpoints, areas):
         global current_lane_number, kayit, mid_line_y, mid_line_x, count_0, count_1
         if areas['sol'] <= 50: # sol şerit pikseli 50'den fazla ise orta noktasını alıyor
             midpoints['sol'] = (0, 0)
@@ -180,17 +194,14 @@ def steering_control(image, midpoints, endpoints, areas):
         cv2.waitKey(1)
 
 def callback():
-    try:
-        if lane_stop != 1 and obstacle_detected != 1:
-            ret, frame = cam.read()
-            cv2.imwrite("frame.jpg", frame)
-            image, pr = segment_image("frame.jpg")
-            image, midpoints, endpoints, areas = annotate_image(image, pr)
-            steering_control(image, midpoints, endpoints, areas)
-            rate.sleep()
-    except Exception as e:
-        print("SERIT TAKIBI HATASI: " + str(e))
-    
+    if lane_stop != 1 and obstacle_detected != 1:
+        ret, frame = cam.read()
+        cv2.imwrite("frame.jpg", frame)
+        image, pr = segment_image("frame.jpg")
+        image, midpoints, endpoints, areas = annotate_image(image, pr)
+        steering_control(image, midpoints, areas)
+    rate.sleep()
+
 if __name__ == "__main__":
     rospy.init_node('lane_track_node') 
 

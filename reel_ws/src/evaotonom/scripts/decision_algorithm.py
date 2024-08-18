@@ -6,6 +6,9 @@ import time
 from evaotonom.msg import Sign
 
 #sağa ve sola dönüş değiştirildi diğerleride değiştirilecek
+def engel_callback(msg):
+    global detected_obstacle
+    detected_obstacle = msg.data
 
 def sign_callback(msg):
     global detected_sign_number, sign_depth_dict
@@ -60,6 +63,7 @@ if __name__ == "__main__":
     rospy.Subscriber('/lane_track/current_lane', Int8, lane_callback, queue_size=1)
     rospy.Subscriber('/sign_detector/position', Float32MultiArray,position_callback ,queue_size=1)
     rospy.Subscriber("/sign_detector/roundabout", Int8 , kavsak_callback, queue_size=1)
+    rospy.Subscriber("/engel_var_mi", Bool , engel_callback, queue_size=1)
 
     #Publishers
     steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=1)
@@ -79,7 +83,6 @@ if __name__ == "__main__":
             if detected_sign_number == 3: # DURAK KARAR ALGORITMASI
                 if current_lane == 1: # SAG SERITTEYSE
                     rospy.loginfo(" @@@@@@@@@@ SAG SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ") 
-                    obstacle_control.publish(1)
                     brake_pub.publish(1)
                     time.sleep(2) 
                     reset_odom.publish(1)
@@ -100,7 +103,12 @@ if __name__ == "__main__":
                     time.sleep(2)
                     brake_pub.publish(0)
                     time.sleep(2)
-                    while distance < 310: # durak giriş arttı 
+                    while distance < 100: # durak giriş arttı 
+                        pass
+                    if detected_obstacle == 1:
+                        break
+                    obstacle_control.publish(1)
+                    while distance < 210: # durak giriş arttı 
                         pass
                     reset_odom.publish(1)
                     time.sleep(0.5)
@@ -133,31 +141,99 @@ if __name__ == "__main__":
                     while distance < 270:
                         pass
                 elif current_lane == 0: # SOL SERITTEYSE
+                    # rospy.loginfo(" @@@@@@@@@@ SOL SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ")  
+                    # obstacle_control.publish(1)
+                    # brake_pub.publish(1)
+                    # time.sleep(2)
+                    # reset_odom.publish(1)
+                    # time.sleep(0.5)
+                    # brake_pub.publish(0)
+                    # durak_depth = sign_depth_dict[3]
+                    # while distance < int(durak_depth) * 100 - 900 : 
+                    #     pass
+                    # lane_control.publish(1) 
+                    # brake_pub.publish(1)
+                    # time.sleep(2)
+                    # right_signal.publish(5)
+                    # time.sleep(0.2)
+                    # reset_odom.publish(1)
+                    # time.sleep(0.5)
+                    # steering_pub.publish(30)
+                    # time.sleep(2)
+                    # brake_pub.publish(0)
+                    # while distance < 580:  
+                    #     pass
+                    # reset_odom.publish(1)
+                    # time.sleep(0.5)
+                    # steering_pub.publish(-30)
+                    # time.sleep(2)
+                    # while distance < 350:
+                    #     pass
+                    # brake_pub.publish(1)
+                    # time.sleep(2)
+                    # steering_pub.publish(0)
+                    # time.sleep(10)
+                    # left_signal.publish(5)
+                    # time.sleep(0.2)
+                    # steering_pub.publish(-28)
+                    # time.sleep(2)
+                    # reset_odom.publish(1)
+                    # time.sleep(0.5)
+                    # brake_pub.publish(0)
+                    # time.sleep(2)
+                    # while distance < 380:
+                    #     pass
+                    # brake_pub.publish(1)
+                    # time.sleep(2)
+                    # steering_pub.publish(32)
+                    # time.sleep(2)  
+                    # reset_odom.publish(1)
+                    # time.sleep(0.5)
+                    # brake_pub.publish(0)
+                    # time.sleep(2)
+                    # while distance < 270:
+                    #     pass
                     rospy.loginfo(" @@@@@@@@@@ SOL SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ")  
                     obstacle_control.publish(1)
                     brake_pub.publish(1)
                     time.sleep(2)
                     reset_odom.publish(1)
                     time.sleep(0.5)
+                    steering_pub.publish(40)
+                    time.sleep(2)
                     brake_pub.publish(0)
+                    while distance < 330:
+                        pass
+                    brake_pub.publish(1)
+                    time.sleep(2)
+                    reset_odom.publish(1)
+                    time.sleep(0.5)
+                    steering_pub.publish(-40)
+                    time.sleep(2)
+                    brake_pub.publish(0)
+                    time.sleep(2)
+                    while distance < 200:
+                        pass
+                    reset_odom.publish(1)
+                    time.sleep(0.5) # buradan yukarısı güncellenebilir 
                     durak_depth = sign_depth_dict[3]
-                    while distance < int(durak_depth) * 100 - 900 : 
+                    while distance < int(durak_depth) * 100 - 1050 : # 8.7 gibi bir değer olabilir
                         pass
                     lane_control.publish(1)
                     brake_pub.publish(1)
                     time.sleep(2)
-                    right_signal.publish(5)
-                    time.sleep(0.2)
+                    right_signal.publish(2)
+                    time.sleep(4)
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    steering_pub.publish(30)
+                    steering_pub.publish(28)
                     time.sleep(2)
                     brake_pub.publish(0)
-                    while distance < 580:  
+                    while distance < 280:  
                         pass
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    steering_pub.publish(-30)
+                    steering_pub.publish(-40)
                     time.sleep(2)
                     while distance < 350:
                         pass
@@ -165,8 +241,8 @@ if __name__ == "__main__":
                     time.sleep(2)
                     steering_pub.publish(0)
                     time.sleep(10)
-                    left_signal.publish(5)
-                    time.sleep(0.2)
+                    left_signal.publish(2)
+                    time.sleep(4)
                     steering_pub.publish(-28)
                     time.sleep(2)
                     reset_odom.publish(1)
@@ -185,6 +261,7 @@ if __name__ == "__main__":
                     time.sleep(2)
                     while distance < 270:
                         pass
+
                 obstacle_control.publish(0)      
                 lane_control.publish(0) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
 
@@ -505,7 +582,7 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                     brake_pub.publish(0)
                     lane_control.publish(False)
-                    obstacle_control.publish(True)
+                    obstacle_control.publish(False)
 
                 elif kavsak_girisi == 2: #distance ile
                     rospy.loginfo("@@@@@@@@@kavsak donusu basladı 2. giris")
@@ -632,7 +709,7 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                     brake_pub.publish(0)
                     lane_control.publish(False)
-                    obstacle_control.publish(True)
+                    obstacle_control.publish(False)
                 elif kavsak_girisi == 3:
                     rospy.loginfo("@@@@@@@@@kavsak donusu basladı 3. giris")
                     if current_lane == 1:
@@ -755,7 +832,7 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                     brake_pub.publish(0)
                     lane_control.publish(False)
-                    obstacle_control.publish(True)
+                    obstacle_control.publish(False)
                 elif kavsak_girisi == 4:
                     rospy.loginfo("@@@@@@@@@kavsak donusu basladı 4. giris")
                     if current_lane == 1:
@@ -876,7 +953,7 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                     brake_pub.publish(0)
                     lane_control.publish(False)
-                    obstacle_control.publish(True)
+                    obstacle_control.publish(False)
                 elif kavsak_girisi == 5: ################DENEME
                     rospy.loginfo("@@@@@@@@@kavsak donusu basladı 5. giris")
                     if current_lane == 1:
@@ -991,4 +1068,4 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                     brake_pub.publish(0)
                     lane_control.publish(False)
-                    obstacle_control.publish(True)
+                    obstacle_control.publish(False)

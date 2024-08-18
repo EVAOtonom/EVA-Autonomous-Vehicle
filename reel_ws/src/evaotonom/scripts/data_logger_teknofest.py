@@ -45,7 +45,6 @@ def gps_to_cartesian(lat, lon):
     R = 6371000  # Radius of Earth in meters
     origin_lat = 40.7902815
     origin_lon = 29.5089662
-
     lat_rad = math.radians(lat)
     lon_rad = math.radians(lon)
     origin_lat_rad = math.radians(origin_lat)
@@ -58,9 +57,9 @@ def gps_to_cartesian(lat, lon):
     y = delta_lat * R
     return round(x, 2), round(y, 2)
 
+
 def log_data(event):
     global latest_latitude, latest_longitude, latest_steering_angle, latest_sign, file_path, current_lane, sign_info, depth
-    
     try:
         turkey_tz = pytz.timezone('Europe/Istanbul')
         turkey_time = datetime.now(turkey_tz)
@@ -88,7 +87,7 @@ def log_data(event):
             "tabelalar": [
                 {
                     "pozisyon": lane,
-                    "isim": latest_sign,
+                    "isim": sign_name,
                     "olasilik": sign_probability,
                     "uzaklik": depth
                 }
@@ -111,9 +110,9 @@ def log_data(event):
         with open(file_path, "a") as file:
             file.write(log_entry)
             file.flush()
-
     except Exception as e:
-        print("DATA LOGGER HATASI: " + str(e))
+        print(f"DATA LOGGER HATASI: {e}")
+
 
 if __name__ == "__main__":
     rospy.init_node('data_logger_node')
@@ -123,8 +122,8 @@ if __name__ == "__main__":
     latest_steering_angle = None
     sign_info = None
     obstacle_detected = None
-    latest_latitude = None
-    latest_longitude = None
+    latest_latitude = 0
+    latest_longitude = 0
     depth = None
     current_lane = None
     speed = None
@@ -147,7 +146,7 @@ if __name__ == "__main__":
     rospy.Subscriber('/sign_detector/sign_info', Sign, sign_callback)
     rospy.Subscriber('/engel_var_mi', Bool, obstacle_callback)
     rospy.Subscriber("/lane_track/current_lane", Int8, current_lane_check)
-    rospy.Subscriber('/vehicle/velocity', Float32, velocity_callback)
+    rospy.Subscriber('/vehicle/velocity_kmh', Float32, velocity_callback)
 
     rospy.Timer(rospy.Duration(1), log_data)
     rospy.spin()

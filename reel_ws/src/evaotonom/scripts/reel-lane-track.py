@@ -124,7 +124,7 @@ def steering_control(image, midpoints, endpoints, areas):
         image = cv2.line(image, ((int(image.shape[1] / 2))+350, int(mid_line_y)),
                         (int(mid_line_x)+50, int(mid_line_y)), (0, 255, 0), 2)                                     # yatay çizgiyi çekiyor
         uzaklik_y = (image.shape[0] - mid_line_y)                                                         # cizgi uzunlugunu bulmaya yarar
-        uzaklik_x = (((image.shape[1] / 2)+50) - mid_line_x)                                          # yolun ortasına aracın uzaklığı
+        uzaklik_x = (((image.shape[1] / 2)) - mid_line_x)                                          # yolun ortasına aracın uzaklığı
         degree = (180 * math.atan(abs(uzaklik_x / uzaklik_y))) / (3.14)                                 # sapma bir açıya dönüştürülür
         steering = int(degree* 1.12)                                                          # araç için oranlanmış değer
 
@@ -195,7 +195,7 @@ if __name__ == "__main__":
         'ensag': (0, 0, 255)   # Mavi
     }
     initialize_detection_variables()
-    rate = rospy.Rate(2)
+    rate = rospy.Rate(3)
     timer = time.strftime("%d.%m-%H:%M")
     obstacle_detected = False
     mid_line_x = 320
