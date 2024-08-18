@@ -152,7 +152,7 @@ if __name__ == "__main__":
                         time.sleep(0.5)
                         brake_pub.publish(0)
                         durak_depth = sign_depth_dict[3]
-                        while distance < int(durak_depth) * 100 - 900 : 
+                        while distance < int(durak_depth) * 100 - 1100 : 
                             pass
                         lane_control.publish(1)
                         brake_pub.publish(1)
@@ -161,10 +161,10 @@ if __name__ == "__main__":
                         time.sleep(0.2)
                         reset_odom.publish(1)
                         time.sleep(0.5)
-                        steering_pub.publish(30)
+                        steering_pub.publish(25)
                         time.sleep(2)
                         brake_pub.publish(0)
-                        while distance < 580:  
+                        while distance < 500:  
                             pass
                         reset_odom.publish(1)
                         time.sleep(0.5)
