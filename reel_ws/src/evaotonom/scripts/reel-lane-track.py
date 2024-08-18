@@ -117,14 +117,14 @@ def steering_control(image, midpoints, endpoints, areas):
             cv2.putText(image, 'UCGEN CIZILEMEDI',(15, 40), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
             print("UCGEN CIZILEMEDI")
 
-        image = cv2.line(image, ((int(image.shape[1] / 2))-15, 332),
-                        ((int(image.shape[1] / 2))-15, int(mid_line_y)), (0, 255, 0), 2)                       # düz çizgiyi çekiyor
-        image = cv2.line(image, ((int(image.shape[1] / 2))-15, 332),
-                        (int(mid_line_x)-15, int(mid_line_y)), (0, 255, 0), 2)                                 # çapraz çizgiyi çekiyor
-        image = cv2.line(image, ((int(image.shape[1] / 2))-15, int(mid_line_y)),
-                        (int(mid_line_x)-15, int(mid_line_y)), (0, 255, 0), 2)                                     # yatay çizgiyi çekiyor
+        image = cv2.line(image, ((int(image.shape[1] / 2))+50, 332),
+                        ((int(image.shape[1] / 2))+30, int(mid_line_y)), (0, 255, 0), 2)                       # düz çizgiyi çekiyor
+        image = cv2.line(image, ((int(image.shape[1] / 2))+50, 332),
+                        (int(mid_line_x)+50, int(mid_line_y)), (0, 255, 0), 2)                                 # çapraz çizgiyi çekiyor
+        image = cv2.line(image, ((int(image.shape[1] / 2))+350, int(mid_line_y)),
+                        (int(mid_line_x)+50, int(mid_line_y)), (0, 255, 0), 2)                                     # yatay çizgiyi çekiyor
         uzaklik_y = (image.shape[0] - mid_line_y)                                                         # cizgi uzunlugunu bulmaya yarar
-        uzaklik_x = (((image.shape[1] / 2)) - mid_line_x)                                          # yolun ortasına aracın uzaklığı
+        uzaklik_x = (((image.shape[1] / 2)+50) - mid_line_x)                                          # yolun ortasına aracın uzaklığı
         degree = (180 * math.atan(abs(uzaklik_x / uzaklik_y))) / (3.14)                                 # sapma bir açıya dönüştürülür
         steering = int(degree* 1.12)                                                          # araç için oranlanmış değer
 

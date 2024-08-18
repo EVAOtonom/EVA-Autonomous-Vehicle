@@ -44,14 +44,14 @@ def odometer_callback(msg):
 def control_motor_power():
     global current_velocity, brake_status, motor_power_pub
     
-    rospy.loginfo(f"Current Velocity: {current_velocity}, Brake Status: {brake_status}")
+    #rospy.loginfo(f"Current Velocity: {current_velocity}, Brake Status: {brake_status}")
     
     if brake_status:
         motor_power_pub.publish(0)
     else:
-        if current_velocity > 3.0:
+        if current_velocity > 2.0:
             motor_power_pub.publish(0)
-        elif current_velocity < 2.5:
+        elif current_velocity < 1.65:
             motor_power_pub.publish(6)
 
 if __name__ == '__main__':
