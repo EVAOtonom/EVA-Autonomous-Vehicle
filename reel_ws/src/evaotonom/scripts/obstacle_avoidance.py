@@ -179,7 +179,7 @@ def birinci_bolge_karari_sol():
     if not sign_detected:
         if scan is not None:
             obstacle_detected = False
-            for angle_index in range (1204,1285):
+            for angle_index in range (1204,1284):
                 distance = scan[angle_index]
                 if distance != float('inf'):
                     if 3 < distance < 3.4:
@@ -297,10 +297,10 @@ if __name__ == "__main__":
         if not sign_detected and not stop_avoidance:
             if scan is not None:
                 obstacle_detected = False
-                for angle_index in range (0,1285):
+                for angle_index in range (0,1284):
                     distance = scan[angle_index]
                     if distance != float('inf'):
-                        if ((1265 <= angle_index <= 1285) or (0 <= angle_index <= 20)) and  (3 < distance < 3.1):
+                        if ((1265 <= angle_index <= 1284) or (0 <= angle_index <= 20)) and  (3 < distance < 3.1):
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} ARA BÖLGE")
                             if current_lane == 1:
                                 karar = birinci_bolge_karari_sag()
@@ -313,7 +313,7 @@ if __name__ == "__main__":
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 1. BÖLGE SOL")
                             birinci_bolge_karari_sol()
                             break
-                        elif(1205 <= angle_index <= 1285) and (3 <= distance <= 3.1) and (current_lane == 1):
+                        elif(1205 <= angle_index <= 1284) and (3 <= distance <= 3.1) and (current_lane == 1):
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 1. BÖLGE SAĞ")
                             birinci_bolge_karari_sag()
                             break
