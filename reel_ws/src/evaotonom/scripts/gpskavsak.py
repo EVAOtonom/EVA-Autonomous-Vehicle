@@ -76,7 +76,30 @@ if __name__ == "__main__":
             (40.789845, 29.509463),     # sol alt
             (40.789910, 29.509383),     # sağ alt
             (40.789859, 29.509313)      # sağ üst
+        ],
+
+###############################################önemli Noktalar#################################################
+        9: [
+
+            (40.789722, 29.509158),     # sağ alt       önemli nokta 1    
+            (40.789722, 29.509158),     # sol alt            
+            (40.789733, 29.509255),     # sol üst           
+            (40.789769, 29.509228)      # sağ üst
+        ],
+        10: [
+            (40.790133, 29.508994),     # sağ alt       önemli nokta 2
+            (40.790097, 29.509032),     # sağ üst         
+            (40.790152, 29.509112),     # sol üst
+            (40.790190, 29.509050)      # sol alt
+        ],
+        11: [
+            (40.790178, 29.509346),     # sağ alt       DENEME nokta 
+            (40.790154, 29.509383),     # sağ üst         
+            (40.790205, 29.509378),     # sol üst
+            (40.790178, 29.509405)      # sol alt
         ]
+
+
 
     }
 
@@ -92,6 +115,7 @@ if __name__ == "__main__":
     # Publishers
     kavsak_noktasi_pub = rospy.Publisher("/sign_detector/roundabout", Int8, queue_size=1)
     obstacle_control_pub = rospy.Publisher("/engel_kapat", Bool, queue_size=1)
+    onemli_nokta_pub = rospy.Publisher("/gpskavsak/rota")
 
     rate = rospy.Rate(1)  # 1 Hz
 
@@ -105,16 +129,21 @@ if __name__ == "__main__":
                         obstacle_control_pub.publish(1)
                         rospy.loginfo("viraj")
 
-                    else:
+                    elif area_num in range(1,6):
                         kavsak_noktasi_pub.publish(area_num)
                         rospy.loginfo(f"Kavşak: {area_num}")
                         found_area = True
-                        break
+
+                    elif area_num == 9:
+                        onemli_nokta_pub.publish(9)
+                    
+                    else:
+                        pass
 
             if not found_area:
                 kavsak_noktasi_pub.publish(0)
                 obstacle_control_pub.publish(0)   
         else:
-            rospy.logwarn("GPS Kavsak verisi alınamıyor")
+            rospy.logwarn("GPS kavsak verisi alınamıyor")
 
         rate.sleep()
