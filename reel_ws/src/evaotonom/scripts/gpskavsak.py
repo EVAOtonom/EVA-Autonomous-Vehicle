@@ -134,9 +134,12 @@ if __name__ == "__main__":
                         rospy.loginfo(f"Kavşak: {area_num}")
                         found_area = True
 
-                    elif area_num == 9:
+                    elif area_num == 9: # 2. duraktan sonra
                         onemli_nokta_pub.publish(9)
-                    
+                    elif area_num == 10: # 3. durak sonraki ışıklar
+                        onemli_nokta_pub.publish(10)
+                    elif area_num == 11: # park deneme
+                        onemli_nokta_pub.publish(11)
                     else:
                         pass
 
