@@ -166,11 +166,11 @@ def steering_control(image, midpoints, endpoints, areas):
         count_0 = lanes.count(0)
         count_1 = lanes.count(1)
         
-        if count_0 / 30.0 >= 0.75:
+        if count_0 / 30.0 >= 0.50:
             cv2.putText(image, 'arac SOL seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
             lane_publisher.publish(0)
 
-        if count_1 /30.0 >= 0.75:
+        if count_1 /30.0 >= 0.50:
             cv2.putText(image, 'arac SAG seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
             lane_publisher.publish(1)    
 
