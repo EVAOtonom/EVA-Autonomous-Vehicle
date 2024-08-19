@@ -225,7 +225,7 @@ def tabela_bilgi(class_name, depth_in_meters):
             detected_sign.depth = depth_in_meters
             sign_pub.publish(detected_sign)
 
-        elif class_name == "ikiliyon" and depth_in_meters is not None and depth_in_meters < 6.5:
+        elif class_name == "ikiliyon" and depth_in_meters is not None and depth_in_meters < 20.0:
             detected_sign.sign_index = 20
             detected_sign.depth = depth_in_meters
             sign_pub.publish(detected_sign)
