@@ -604,7 +604,7 @@ if __name__ == "__main__":
 
                 elif kavsak_girisi == 2: ###################durak sayacı ekli
                     rospy.loginfo("@@@@@@@@@kavsak donusu basladı 2. giris duraga ", durak_counter," defa girildi")
-                    if durak_counter == 2:
+                    if durak_counter == 2:    # 
                         if current_lane == 1:
                             brake_pub.publish(1)
                             time.sleep(2)
@@ -660,6 +660,25 @@ if __name__ == "__main__":
                             time.sleep(2)
                             while distance < 300:
                                 pass
+                            reset_odom.publish(1)
+                            time.sleep(0.5)
+                            left_signal.publish(4)
+                            time.sleep(0.2)                    
+                            steering_pub.publish(-28)
+                            time.sleep(2)
+                            while distance < 310:
+                                pass
+                            reset_odom.publish(1)
+                            time.sleep(0.5)
+                            steering_pub.publish(40)
+                            time.sleep(2)
+                            while distance < 300:
+                                pass                    
+                            steering_pub.publish(0)
+                            time.sleep(2)
+                            lane_control.publish(0)
+                elif current_lane ==1 #sağ şeritteyse
+                    pass
 
                         else:
                             brake_pub.publish(1)
