@@ -323,7 +323,6 @@ if __name__ == "__main__":
     throttle_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=1)
     brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=1)
     park_yeri = rospy.Publisher("/park_yeri", Int8, queue_size=1)
-
     obstacle_publisher.publish(obstacle_detected)
 
     # #Şerit Takibi Bekleme
@@ -351,7 +350,7 @@ if __name__ == "__main__":
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 1. BÖLGE SAĞ")
                             birinci_bolge_karari_sag()
                             break
-        if park == 12: #park alanı bilgisi
+        if park == 9: #park alanı bilgisi
             brake_pub.publish(1)
             time.sleep(0.5)
             if scan is not None:

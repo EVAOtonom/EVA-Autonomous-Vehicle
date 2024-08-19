@@ -26,8 +26,7 @@ if __name__ == "__main__":
     longitude = None
     birinci_counter = 0
     ikinci_counter = 0
-    deneme_counter = 0
-    park_counter = 0
+    park_flag = False  # Park için bayrak
     
     rect_areas = {
         1: [
@@ -37,9 +36,9 @@ if __name__ == "__main__":
             (40.789726, 29.508954)   # sol üst
         ],
         2: [
-            (40.789781, 29.509203),  # sol alt
+            (40.789766, 29.509219),  # sol alt
             (40.789825, 29.509142),  # sağ alt
-            (40.789736, 29.509139),  # sol üst
+            (40.789719, 29.509155),  # sol üst
             (40.789791, 29.509091)   # sağ üst
         ],
         3: [
@@ -54,13 +53,6 @@ if __name__ == "__main__":
             (40.789999, 29.508946),  # sağ alt
             (40.789962, 29.508899)   # sağ üst
         ],
-        # 5: [
-        #     (40.789887, 29.509510), #sol üst
-        #     (40.789917, 29.509575), #sol alt
-        #     (40.789960, 29.509508), #sağ alt
-        #     (40.789923, 29.509449) #sağ üst
-        # ],
-
 ###############################################Donus Noktalari#################################################
         6: [
             
@@ -85,25 +77,6 @@ if __name__ == "__main__":
 
 ###############################################önemli Noktalar#################################################
         9: [
-
-            (40.789738, 29.509163),     # sağ alt       önemli nokta 1    
-            (40.789662, 29.509238),     # sol alt            
-            (40.789624, 29.509171),     # sol üst           
-            (40.789705, 29.509104)      # sağ üst
-        ],
-        10: [
-            (40.790161, 29.509016),     # sağ alt       önemli nokta 2
-            (40.790130, 29.508983),     # sağ üst         
-            (40.790089, 29.509026),     # sol üst
-            (40.790114, 29.509067)      # sol alt
-        ],
-        11: [
-            (40.790178, 29.509346),     # sağ alt       DENEME nokta 
-            (40.790154, 29.509383),     # sağ üst         
-            (40.790205, 29.509378),     # sol üst
-            (40.790178, 29.509405)      # sol alt
-        ],
-        12: [
             (40.790157, 29.509209),     # sağ alt       park nokta 
             (40.790134, 29.509158),     # sağ üst         
             (40.790100, 29.509196),     # sol üst
@@ -144,35 +117,15 @@ if __name__ == "__main__":
                         kavsak_noktasi_pub.publish(area_num)
                         rospy.loginfo(f"Kavşak: {area_num}")
                         found_area = True
-
-                    elif area_num == 9: # 2. duraktan sonra
-                        if birinci_counter != 1:
-                            birinci_counter = birinci_counter + 1
-                            onemli_nokta_pub.publish(9)
-                        else:
-                            pass
-
-                    elif area_num == 10: # 3. durak sonraki ışıklar
-                        if birinci_counter != 1:
-                            ikinci_counter = birinci_counter + 1
-                            onemli_nokta_pub.publish(10)
-                        else:
-                            pass
-                    elif area_num == 11: # ışıklardan parka deneme
-                        if birinci_counter != 1:
-                            deneme_counter = birinci_counter + 1
-                            onemli_nokta_pub.publish(11)
                             
-                    elif area_num == 12: # parka giris noktasi deneme
-                        if birinci_counter != 1:
-                            park_counter = park_counter + 1
-                            onemli_nokta_pub.publish(12)
-                    else:
-                        pass
+                    elif area_num == 9 and not park_flag:  # park işlemi için bayrak kontrolü
+                        park_flag = True  # Bir kere yayınlandığında bayrak ayarlanır
+                        onemli_nokta_pub.publish(9)
+                        rospy.loginfo("Park noktası: 9")
 
             if not found_area:
                 kavsak_noktasi_pub.publish(0)
-                obstacle_control_pub.publish(0)   
+                obstacle_control_pub.publish(0)  
         else:
             rospy.logwarn("GPS kavsak verisi alınamıyor")
 

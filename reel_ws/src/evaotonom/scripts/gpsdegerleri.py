@@ -25,8 +25,6 @@ if __name__ == "__main__":
     longitude = None
     file_path = "/home/eva/EVA-Autonomous-Vehicle/reel_ws/src/evaotonom/scripts/kordinatlar.txt"
 
-    with open(file_path, "w") as file:
-        file.write("")
         
     # Subscribers
     rospy.Subscriber('/stm/gps_latitude', Float32, latitude_callback)
