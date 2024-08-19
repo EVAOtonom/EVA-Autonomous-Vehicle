@@ -350,7 +350,7 @@ if __name__ == "__main__":
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 1. BÖLGE SAĞ")
                             birinci_bolge_karari_sag()
                             break
-        if park == 12: #park alanı bilgisi
+        if park == 9: #park alanı bilgisi
             brake_pub.publish(1)
             time.sleep(0.5)
             if scan is not None:
