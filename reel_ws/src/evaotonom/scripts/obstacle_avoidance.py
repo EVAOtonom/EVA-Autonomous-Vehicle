@@ -97,8 +97,6 @@ def avoidance_obstacle(current_lane, kacinma):
         print("BITIRDIM SOL SERITTE DEVAM EDIYORUM 0-0")
         while traveled_distance < 180:
             pass
-        brake_pub.publish(1)
-        time.sleep(2)
         obstacle_detected = False
         obstacle_publisher.publish(obstacle_detected)
 
