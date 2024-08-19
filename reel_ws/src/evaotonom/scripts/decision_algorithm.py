@@ -509,7 +509,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 250:
+                        while distance < 350:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -529,7 +529,7 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 1080:
+                        while distance < 1180:
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
