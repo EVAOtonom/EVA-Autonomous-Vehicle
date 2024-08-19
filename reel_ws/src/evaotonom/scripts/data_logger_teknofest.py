@@ -66,7 +66,7 @@ def log_data(event):
         zaman_damgasi = turkey_time.isoformat()   # ISO-8601 string
         
         x, y = gps_to_cartesian(latest_latitude, latest_longitude)
-        steering_angle = latest_steering_angle if latest_steering_angle is not None else "N/A"
+        steering_angle = latest_steering_angle if latest_steering_angle is not None else 0
         sign_name = latest_sign if latest_sign is not None and latest_sign not in ['kirmizi', 'yesil'] else "N/A"
         trafic_lights = latest_sign if latest_sign in ['kirmizi', 'yesil'] else "N/A"
         obstacle = 3.50 if obstacle_detected is not None else 40.0
