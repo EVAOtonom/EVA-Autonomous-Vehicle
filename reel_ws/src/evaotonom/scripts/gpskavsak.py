@@ -26,8 +26,7 @@ if __name__ == "__main__":
     longitude = None
     birinci_counter = 0
     ikinci_counter = 0
-    deneme_counter = 0
-    park_counter = 0
+    park_flag = False  # Park için bayrak
     
     rect_areas = {
         1: [
@@ -119,13 +118,10 @@ if __name__ == "__main__":
                         rospy.loginfo(f"Kavşak: {area_num}")
                         found_area = True
                             
-                    elif area_num == 9: # parka giris noktasi deneme
-                        if park_counter < 1:
-                            park_counter = park_counter + 1
-                            onemli_nokta_pub.publish(12)
-                    
-                else :
-                    area_num = None
+                    elif area_num == 9 and not park_flag:  # park işlemi için bayrak kontrolü
+                        park_flag = True  # Bir kere yayınlandığında bayrak ayarlanır
+                        onemli_nokta_pub.publish(9)
+                        rospy.loginfo("Park noktası: 9")
 
             if not found_area:
                 kavsak_noktasi_pub.publish(0)
