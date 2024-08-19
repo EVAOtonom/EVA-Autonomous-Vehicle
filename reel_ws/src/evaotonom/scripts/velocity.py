@@ -52,9 +52,9 @@ def control_motor_power():
     if brake_status:
         motor_power_pub.publish(0)
     else:
-        if current_velocity > 2.2:
+        if current_velocity > 2.5:
             motor_power_pub.publish(0)
-        elif current_velocity < 2.0:
+        elif current_velocity < 2.2:
             motor_power_pub.publish(6)
 
 if __name__ == '__main__':
