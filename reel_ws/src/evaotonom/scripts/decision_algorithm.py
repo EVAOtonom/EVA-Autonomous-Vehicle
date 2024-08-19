@@ -94,7 +94,6 @@ if __name__ == "__main__":
                 if durak_counter < 3:
                     if current_lane == 1: # SAG SERITTEYSE
                         rospy.loginfo(" @@@@@@@@@@ SAG SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ") 
-                        obstacle_control.publish(1)
                         brake_pub.publish(1)
                         time.sleep(2) 
                         reset_odom.publish(1)
@@ -102,7 +101,7 @@ if __name__ == "__main__":
                         brake_pub.publish(0)
                         time.sleep(2)
                         durak_depth = sign_depth_dict[3]
-                        while distance < durak_depth * 100 - 600 : 
+                        while distance < durak_depth * 100 - 700 : 
                             pass
                         lane_control.publish(1) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
                         brake_pub.publish(1)
@@ -115,37 +114,45 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 310: # durak giriş arttı 
-                            pass
-                        reset_odom.publish(1)
-                        time.sleep(0.5)
-                        steering_pub.publish(-40)
-                        time.sleep(2)
-                        while distance < 300:
-                            pass
-                        brake_pub.publish(1)
-                        time.sleep(2)
-                        reset_odom.publish(1)
-                        time.sleep(0.5)
-                        steering_pub.publish(0)
-                        time.sleep(10)
-                        left_signal.publish(5)
-                        time.sleep(0.2)
-                        steering_pub.publish(-28)
-                        time.sleep(2)
-                        brake_pub.publish(0)
-                        time.sleep(2)
-                        while distance < 400: #320den 380e
-                            pass
-                        brake_pub.publish(1)
-                        time.sleep(2)
-                        steering_pub.publish(32)
-                        time.sleep(2)  
-                        reset_odom.publish(1)
-                        time.sleep(0.5)
-                        brake_pub.publish(0)
-                        time.sleep(2)
-                        while distance < 270:
+                        while distance < 110: # durak giriş arttı 
+                            if detected_obstacle == 1:
+                                engel_var = 1
+                                break
+                        if engel_var == 0:
+                            obstacle_control.publish(1)
+                            while distance < 200:
+                                pass
+                            reset_odom.publish(1)
+                            time.sleep(0.5)
+                            steering_pub.publish(-40)
+                            time.sleep(2)
+                            while distance < 300:
+                                pass
+                            brake_pub.publish(1)
+                            time.sleep(2)
+                            reset_odom.publish(1)
+                            time.sleep(0.5)
+                            steering_pub.publish(0)
+                            time.sleep(10)
+                            left_signal.publish(5)
+                            time.sleep(0.2)
+                            steering_pub.publish(-28)
+                            time.sleep(2)
+                            brake_pub.publish(0)
+                            time.sleep(2)
+                            while distance < 470: #320den 380e
+                                pass
+                            brake_pub.publish(1)
+                            time.sleep(2)
+                            steering_pub.publish(32)
+                            time.sleep(2)  
+                            reset_odom.publish(1)
+                            time.sleep(0.5)
+                            brake_pub.publish(0)
+                            time.sleep(2)
+                            while distance < 270:
+                                pass
+                        else:
                             pass
                     elif current_lane == 0: # SOL SERITTEYSE
                         # rospy.loginfo(" @@@@@@@@@@ SOL SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ")  
@@ -213,13 +220,13 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 310: # durak giriş arttı 
+                        while distance < 310: 
                             pass
                         reset_odom.publish(1)
                         time.sleep(0.5)
                         steering_pub.publish(-40)
                         time.sleep(2)
-                        while distance < 300:
+                        while distance < 300: # sag seride gecti
                             pass
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -231,38 +238,44 @@ if __name__ == "__main__":
                         time.sleep(2)
                         brake_pub.publish(0)
                         time.sleep(2)
-                        while distance < 270: # durak giriş arttı 
-                            pass
-                        reset_odom.publish(1)
-                        time.sleep(0.5)
-                        steering_pub.publish(-40)
-                        time.sleep(2)
-                        while distance < 300:
-                            pass
-                        brake_pub.publish(1)
-                        time.sleep(2)
-                        reset_odom.publish(1)
-                        time.sleep(0.5)
-                        steering_pub.publish(0)
-                        time.sleep(10)
-                        left_signal.publish(5)
-                        time.sleep(0.2)
-                        steering_pub.publish(-28)
-                        time.sleep(2)
-                        brake_pub.publish(0)
-                        time.sleep(2)
-                        while distance < 400: #320den 380e
-                            pass
-                        brake_pub.publish(1)
-                        time.sleep(2)
-                        steering_pub.publish(32)
-                        time.sleep(2)  
-                        reset_odom.publish(1)
-                        time.sleep(0.5)
-                        brake_pub.publish(0)
-                        time.sleep(2)
-                        while distance < 270:
-                            pass
+                        while distance < 110: # durak giriş arttı 
+                            if detected_obstacle == 1:
+                                engel_var = 1
+                                break
+                        if engel_var == 0:
+                            obstacle_control.publish(1)
+                            while distance < 200:
+                                pass
+                            reset_odom.publish(1)
+                            time.sleep(0.5)
+                            steering_pub.publish(-40)
+                            time.sleep(2)
+                            while distance < 300:
+                                pass
+                            brake_pub.publish(1)
+                            time.sleep(2)
+                            reset_odom.publish(1)
+                            time.sleep(0.5)
+                            steering_pub.publish(0)
+                            time.sleep(10)
+                            left_signal.publish(5)
+                            time.sleep(0.2)
+                            steering_pub.publish(-28)
+                            time.sleep(2)
+                            brake_pub.publish(0)
+                            time.sleep(2)
+                            while distance < 470: #320den 380e
+                                pass
+                            brake_pub.publish(1)
+                            time.sleep(2)
+                            steering_pub.publish(32)
+                            time.sleep(2) 4 
+                            reset_odom.publish(1)
+                            time.sleep(0.5)
+                            brake_pub.publish(0)
+                            time.sleep(2)
+                            while distance < 270:
+                                pass
                     obstacle_control.publish(0)      
                     lane_control.publish(0) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
                 else:
@@ -304,7 +317,7 @@ if __name__ == "__main__":
                         aci = (hedef - sign_midpoint)
                         if aci < 0:
                             aci *= 3
-                        steering_angle = aci * -60/346
+                        steering_angle = aci * -50/346
                         print("yay")
                         steering_pub.publish(int(steering_angle))
                         none_sayac = 0
@@ -349,7 +362,7 @@ if __name__ == "__main__":
                     steering_pub.publish(0)
                     time.sleep(2)
                     lane_control.publish(0)
-                elif current_lane ==1 #sağ şeritteyse
+                elif current_lane ==1: #sağ şeritteyse
                     pass
                 
             if detected_sign_number == 13: # sola dönüş
@@ -677,9 +690,6 @@ if __name__ == "__main__":
                             steering_pub.publish(0)
                             time.sleep(2)
                             lane_control.publish(0)
-                elif current_lane ==1 #sağ şeritteyse
-                    pass
-
                         else:
                             brake_pub.publish(1)
                             time.sleep(2)
@@ -741,6 +751,9 @@ if __name__ == "__main__":
                         lane_control.publish(False)
                         obstacle_control.publish(False)
                     elif durak_counter == 1:
+                        if current_lane ==1: #sağ şeritteyse
+                            pass
+
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)

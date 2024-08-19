@@ -303,6 +303,7 @@ if __name__ == "__main__":
     sign_detected = False
     viraj_detected = False
     detected_sign_number = False
+    park = 0
     HelperArray3 = []
     rate = rospy.Rate(5)
 
@@ -321,6 +322,8 @@ if __name__ == "__main__":
     steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=1)
     throttle_pub = rospy.Publisher("/stm/motor_power", Int8, queue_size=1)
     brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=1)
+    park_yeri = rospy.Publisher("/park_yeri", Int8, queue_size=1)
+
     obstacle_publisher.publish(obstacle_detected)
 
     # #Şerit Takibi Bekleme
