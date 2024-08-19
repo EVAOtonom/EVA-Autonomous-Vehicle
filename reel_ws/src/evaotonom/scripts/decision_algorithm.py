@@ -497,10 +497,10 @@ if __name__ == "__main__":
                 obstacle_control.publish(0)
                 lane_control.publish(0)
 
-            if detected_sign_number == 19: #kavsak icin gps bilgisi kullanarak giris yerine göre döndüren algoritma
+            if detected_sign_number == 19: #kavsak icin gps bilgisi kullanarak giris yerine gore donduren algoritma
                 obstacle_control.publish(1)
                 if kavsak_girisi == 1:
-                    rospy.loginfo("@@@@@@@@@kavsak donusu basladı 1. giris")
+                    rospy.loginfo("@@@@@@@@@kavsak donusu basladi 1. giris")
                     if current_lane == 1:
                         brake_pub.publish(1)
                         time.sleep(2)
@@ -615,11 +615,11 @@ if __name__ == "__main__":
                     lane_control.publish(False)
                     obstacle_control.publish(False)
 
-                elif kavsak_girisi == 2: ###################durak sayacı ekli
-                    rospy.loginfo("@@@@@@@@@kavsak donusu basladı 2. giris duraga ", durak_counter," defa girildi")
+                elif kavsak_girisi == 2: ###################durak sayaci ekli
+                    rospy.loginfo("@@@@@@@@@kavsak donusu basladi 2. giris duraga ", durak_counter," defa girildi")
                     if durak_counter == 2:  
                         if current_lane == 1:
-                            rospy.loginfo("@@@@@@@@@kavsak donusu basladı 2. giris sağ şerit ")
+                            rospy.loginfo("@@@@@@@@@kavsak donusu basladi 2. giris sag serit ")
                             brake_pub.publish(1)
                             time.sleep(2)
                             reset_odom.publish(1)
@@ -692,7 +692,7 @@ if __name__ == "__main__":
                             time.sleep(2)
                             lane_control.publish(0)
                         else:
-                            rospy.loginfo("@@@@@@@@@kavsak donusu basladı 2. giris sol şerit ")
+                            rospy.loginfo("@@@@@@@@@kavsak donusu basladi 2. giris sol serit ")
                             brake_pub.publish(1)
                             time.sleep(2)
                             reset_odom.publish(1)
@@ -754,7 +754,7 @@ if __name__ == "__main__":
                         obstacle_control.publish(False)
                         
                     elif durak_counter == 1:
-                        if current_lane ==1: #sağ şeritteyse
+                        if current_lane ==1: #sag seritteyse
                             pass
 
                         brake_pub.publish(1)
@@ -813,7 +813,7 @@ if __name__ == "__main__":
                             pass
 
                         else:
-                            rospy.loginfo("@@@@@@@@@kavsak donusu basladı 2. giris sol şerit durak çıkışına ")
+                            rospy.loginfo("@@@@@@@@@kavsak donusu basladi 2. giris sol serit durak cikisina ")
                             brake_pub.publish(1)
                             time.sleep(2)
                             reset_odom.publish(1)
@@ -873,10 +873,10 @@ if __name__ == "__main__":
                         obstacle_control.publish(False)
 
                 elif kavsak_girisi == 3:
-                    rospy.loginfo("@@@@@@@@@kavsak donusu basladı 3. giris duraga ", durak_counter," defa girildi")
+                    rospy.loginfo("@@@@@@@@@kavsak donusu basladi 3. giris duraga ", durak_counter," defa girildi")
                     if durak_counter == 2:
                         if current_lane == 1:
-                            rospy.loginfo("@@@@@@@@@kavsak donusu basladı 3. giris sağ şerit ikinci cikis ")
+                            rospy.loginfo("@@@@@@@@@kavsak donusu basladi 3. giris sag serit ikinci cikis ")
                             brake_pub.publish(1)
                             time.sleep(2)
                             reset_odom.publish(1)
@@ -932,7 +932,7 @@ if __name__ == "__main__":
                             while distance < 350:
                                 pass
                         else:
-                            rospy.loginfo("@@@@@@@@@kavsak donusu basladı 3. giris sol şerit 2. çıkışa ")
+                            rospy.loginfo("@@@@@@@@@kavsak donusu basladi 3. giris sol serit 2. cikisa ")
                             brake_pub.publish(1)
                             time.sleep(2)
                             reset_odom.publish(1)
@@ -992,7 +992,7 @@ if __name__ == "__main__":
                         obstacle_control.publish(False)
                     elif durak_counter == 1:
                         if current_lane == 1:
-                            rospy.loginfo("@@@@@@@@@kavsak donusu basladı 3. giris sağ şerit durak çıkışına ")
+                            rospy.loginfo("@@@@@@@@@kavsak donusu basladi 3. giris sag serit durak cikisina ")
                             brake_pub.publish(1)
                             time.sleep(2)
                             reset_odom.publish(1)
@@ -1048,7 +1048,7 @@ if __name__ == "__main__":
                             while distance < 200:
                                 pass
                         else:
-                            rospy.loginfo("@@@@@@@@@kavsak donusu basladı 3. giris sol şerit durak çıkışına ")
+                            rospy.loginfo("@@@@@@@@@kavsak donusu basladi 3. giris sol serit durak cikisina ")
                             brake_pub.publish(1)
                             time.sleep(2)
                             reset_odom.publish(1)
@@ -1109,9 +1109,9 @@ if __name__ == "__main__":
                         obstacle_control.publish(False)
 
                 elif kavsak_girisi == 4:
-                    rospy.loginfo("@@@@@@@@@kavsak donusu basladı 4. giris")
+                    rospy.loginfo("@@@@@@@@@kavsak donusu basladi 4. giris")
                     if current_lane == 1:
-                        rospy.loginfo("4. giris sağ şeritten")
+                        rospy.loginfo("4. giris sag seritten")
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
@@ -1166,7 +1166,7 @@ if __name__ == "__main__":
                             pass
 
                     else:
-                        rospy.loginfo("4. giris sol şeritten")
+                        rospy.loginfo("4. giris sol seritten")
                         brake_pub.publish(1)
                         time.sleep(2)
                         reset_odom.publish(1)
@@ -1224,6 +1224,5 @@ if __name__ == "__main__":
                     brake_pub.publish(0)
                     lane_control.publish(False)
                     obstacle_control.publish(False)
-
 
             
