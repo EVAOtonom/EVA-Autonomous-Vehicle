@@ -303,6 +303,7 @@ if __name__ == "__main__":
     sign_detected = False
     viraj_detected = False
     detected_sign_number = False
+    park = 0
     HelperArray3 = []
     rate = rospy.Rate(5)
 
