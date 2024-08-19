@@ -6,6 +6,10 @@ from sensor_msgs.msg import LaserScan
 from std_msgs.msg import Bool, Float32, Int8
 import time
 
+def park_yeri_callback(msg):
+    global park
+    park = msg.data
+    
 def engel_kapat_callback(msg):
     global stop_avoidance
     stop_avoidance = msg.data
@@ -277,6 +281,7 @@ if __name__ == "__main__":
     rospy.Subscriber("/lane_track/current_lane", Int8, current_lane_check, queue_size=1) # 0 sol 1 sağ
     rospy.Subscriber('/stm/read_odometer', Float32, read_odometer, queue_size=1)
     rospy.Subscriber('/engel_kapat', Bool , engel_kapat_callback, queue_size=1)
+    rospy.Subscriber("/gpskavsak/rota",Int8, park_yeri_callback, queue_size=1)
 
     #Publishers
     reset_odom = rospy.Publisher('/stm/reset_odometer', Bool, queue_size=1)
