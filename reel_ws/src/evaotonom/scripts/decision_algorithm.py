@@ -616,7 +616,7 @@ if __name__ == "__main__":
                     obstacle_control.publish(False)
 
                 elif kavsak_girisi == 2: ###################durak sayaci ekli
-                    rospy.loginfo("@@@@@@@@@kavsak donusu basladi 2. giris duraga ", durak_counter," defa girildi")
+                    rospy.loginfo(f"@@@@@@@@@kavsak donusu basladi 2. giris duraga {durak_counter} defa girildi")
                     if durak_counter == 2:  
                         if current_lane == 1:
                             rospy.loginfo("@@@@@@@@@kavsak donusu basladi 2. giris sag serit ")
@@ -873,7 +873,7 @@ if __name__ == "__main__":
                         obstacle_control.publish(False)
 
                 elif kavsak_girisi == 3:
-                    rospy.loginfo("@@@@@@@@@kavsak donusu basladi 3. giris duraga ", durak_counter," defa girildi")
+                    rospy.loginfo(f"@@@@@@@@@kavsak donusu basladi 3. giris duraga  {durak_counter} defa girildi")
                     if durak_counter == 2:
                         if current_lane == 1:
                             rospy.loginfo("@@@@@@@@@kavsak donusu basladi 3. giris sag serit ikinci cikis ")
@@ -1224,5 +1224,241 @@ if __name__ == "__main__":
                     brake_pub.publish(0)
                     lane_control.publish(False)
                     obstacle_control.publish(False)
+
+                # elif kavsak_girisi == 3:
+                #     rospy.loginfo(f"@@@@@@@@@kavsak donusu basladi 3. giris duraga  {durak_counter} defa girildi")
+                #     if durak_counter == 2:
+                #         if current_lane == 1:
+                #             rospy.loginfo("@@@@@@@@@kavsak donusu basladi 3. giris sag serit ikinci cikis ")
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             kavsak_depth = sign_depth_dict[19]
+                #             while distance < kavsak_depth*100 - 250:
+                #                 pass
+                #             lane_control.publish(1)
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             right_signal.publish(6)
+                #             time.sleep(0.5)
+                #             steering_pub.publish(0)
+                #             time.sleep(2)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             while distance < 250:
+                #                 pass
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             steering_pub.publish(36)
+                #             time.sleep(2)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             while distance < 350:
+                #                 pass
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             steering_pub.publish(-22)
+                #             time.sleep(2)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             while distance < 1118:
+                #                 pass
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             right_signal.publish(6)
+                #             time.sleep(0.5)
+                #             steering_pub.publish(16)
+                #             time.sleep(2)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             while distance < 350:
+                #                 pass
+                #         else:
+                #             rospy.loginfo("@@@@@@@@@kavsak donusu basladi 3. giris sol serit 2. cikisa ")
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             kavsak_depth = sign_depth_dict[19]
+                #             while distance < kavsak_depth*100 - 400:
+                #                 pass
+                #             lane_control.publish(1)
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             right_signal.publish(6)
+                #             time.sleep(0.5)
+                #             steering_pub.publish(0)
+                #             time.sleep(2)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             while distance < 350:
+                #                 pass
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             steering_pub.publish(36)
+                #             time.sleep(2)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             while distance < 430:
+                #                 pass
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             steering_pub.publish(-25)
+                #             time.sleep(2)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             while distance < 1200:
+                #                 pass
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             right_signal.publish(6)
+                #             time.sleep(0.5)
+                #             steering_pub.publish(16)
+                #             time.sleep(2)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             while distance < 350:
+                #                 pass
+                #         brake_pub.publish(0)
+                #         lane_control.publish(False)
+                #         obstacle_control.publish(False)
+                #     elif durak_counter == 1:
+                #         if current_lane == 1:
+                #             rospy.loginfo("@@@@@@@@@kavsak donusu basladi 3. giris sag serit durak cikisina ")
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             kavsak_depth = sign_depth_dict[19]
+                #             while distance < kavsak_depth*100 - 250:
+                #                 pass
+                #             lane_control.publish(1)
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             right_signal.publish(6)
+                #             time.sleep(0.5)
+                #             steering_pub.publish(0)
+                #             time.sleep(2)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             while distance < 300:
+                #                 pass
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             steering_pub.publish(36)
+                #             time.sleep(2)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             while distance < 280:
+                #                 pass
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             steering_pub.publish(-20)
+                #             time.sleep(2)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             while distance < 350:
+                #                 pass
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             right_signal.publish(6)
+                #             time.sleep(0.5)
+                #             steering_pub.publish(25)
+                #             time.sleep(2)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             while distance < 200:
+                #                 pass
+                #         else:
+                #             rospy.loginfo("@@@@@@@@@kavsak donusu basladi 3. giris sol serit durak cikisina ")
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             kavsak_depth = sign_depth_dict[19]
+                #             while distance < kavsak_depth*100 - 350:
+                #                 pass
+                #             lane_control.publish(1)
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             right_signal.publish(6)
+                #             time.sleep(0.5)
+                #             steering_pub.publish(0)
+                #             time.sleep(2)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             while distance < 300:
+                #                 pass                        
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             steering_pub.publish(36)
+                #             time.sleep(2)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             while distance < 380:
+                #                 pass
+
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             steering_pub.publish(-20)
+                #             time.sleep(2)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             while distance < 450:
+                #                 pass
+                #             brake_pub.publish(1)
+                #             time.sleep(2)
+                #             reset_odom.publish(1)
+                #             time.sleep(0.5)
+                #             right_signal.publish(6)
+                #             time.sleep(0.5)
+                #             steering_pub.publish(20)
+                #             time.sleep(2)
+                #             brake_pub.publish(0)
+                #             time.sleep(2)
+                #             while distance < 200:
+                #                 pass
+                #         brake_pub.publish(0)
+                #         lane_control.publish(False)
+                #         obstacle_control.publish(False)
 
             
