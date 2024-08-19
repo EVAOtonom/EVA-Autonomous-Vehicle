@@ -317,5 +317,30 @@ if __name__ == "__main__":
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 1. BÖLGE SAĞ")
                             birinci_bolge_karari_sag()
                             break
-                        
+        if park == 12: #park alanı bilgisi
+            if scan is not None:
+                obstacle_detected = False
+                for angle_index_park in range (0,200):
+                    distance = scan[angle_index_park]
+                    if distance != float('inf'):
+                        if (4 <= angle_index <= 60) and  (9.51 < distance < 9.9):
+                            rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 1. PARK YERİ")
+                            obstacle_detected = True
+                            park_yeri.publish(1)
+                            break             
+                        elif (61 <= angle_index <= 108) and  (9.9 < distance < 11.2):
+                            rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 2. PARK YERİ")
+                            obstacle_detected = True
+                            park_yeri.publish(2)
+                            break             
+                        elif (109 <= angle_index <= 143) and  (11.2 < distance < 12.65):
+                            rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 3. PARK YERİ")
+                            obstacle_detected = True
+                            park_yeri.publish(3)
+                            break             
+                        elif (144 <= angle_index <= 180) and  (12.65 < distance < 14.5):
+                            rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 4. PARK YERİ")
+                            obstacle_detected = True
+                            park_yeri.publish(4)
+                            break                                  
         rate.sleep()
