@@ -1,4 +1,5 @@
 <launch>
   <node pkg="evaotonom" type="tk_obstacle_detector.py" name="obstacle_detect" output="screen" />
+  <node pkg="evaotonom" type="lidar_sdk.py" name="lidar_sdk" output="screen"/>
   <node pkg="evaotonom" type="reel-lane-track-yukseklik-kontrol.py" name="lane_track_node" output="screen" />
 </launch>  
