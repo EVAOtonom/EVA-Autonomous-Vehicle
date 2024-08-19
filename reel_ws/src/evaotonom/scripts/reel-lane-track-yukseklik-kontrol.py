@@ -179,24 +179,24 @@ def steering_control(image, midpoints, areas):
         cv2.putText(image, f"tekerlek acisi: {steering}", (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
         cv2.putText(image, f"ucgen aci: {degree}", (15, 55), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
 
-        if areas['ensol'] > areas['ensag']: # Mevcut şerit bilgisini ekrana yazdırır
+        if areas['ensol'] > areas['ensag'] and areas["sol"]< areas["sag"]: # Mevcut şerit bilgisini ekrana yazdırır
             current_lane_number = 1
-        elif areas ['ensag'] > areas ['ensol']: 
+        elif areas ['ensag'] > areas ['ensol'] and areas["sag"] < areas["sol"]:
             current_lane_number = 0
                 
         lanes.append(current_lane_number)
         
-        if len(lanes) >30:
+        if len(lanes) > 10:
             lanes.pop(0)
             
         count_0 = lanes.count(0)
         count_1 = lanes.count(1)
         
-        if count_0 / 30.0 >= 0.50:
+        if count_0 / 10.0 >= 0.50:
             cv2.putText(image, 'arac SOL seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
             lane_publisher.publish(0)
 
-        if count_1 /30.0 >= 0.50:
+        if count_1 /10.0 >= 0.50:
             cv2.putText(image, 'arac SAG seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
             lane_publisher.publish(1)    
 
