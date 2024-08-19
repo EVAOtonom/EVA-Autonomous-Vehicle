@@ -1,3 +1,0 @@
-<launch>
-  <node pkg="evaotonom" type="launch_sequence.py" name="sequence_launcher" output="screen" />
-</launch>  
