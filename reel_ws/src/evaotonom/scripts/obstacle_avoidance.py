@@ -27,6 +27,36 @@ def read_odometer(msg):
     traveled_distance = msg.data
 
 
+def ara_bolge_karari():
+    global tespit
+    if not sign_detected and not stop_avoidance:
+        if scan is not None:
+            for angle_index in range (0,1284):
+                distance = scan[angle_index]
+                if distance != float('inf'):
+                    if tespit - 15 < 0:
+                        if ((1284 - tespit <= angle_index <= 1284) or (0 <= angle_index <= tespit + 15) ) and  (3 < distance < 3.1):
+                            rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} ARA BÖLGE")
+                            if current_lane == 1:
+                                karar = birinci_bolge_karari_sag()
+                            else:
+                                karar = birinci_bolge_karari_sol()
+                            if not karar:
+                                avoidance_obstacle(current_lane,0)
+                            break
+                    elif tespit + 15 > 1284:
+                        if ((1284 >= angle_index >= tespit - 15) or (0 <= angle_index <= 1284 - tespit)) and  (3 < distance < 3.1):
+                            rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} ARA BÖLGE")
+                            if current_lane == 1:
+                                karar = birinci_bolge_karari_sag()
+                            else:
+                                karar = birinci_bolge_karari_sol()
+                            if not karar:
+                                avoidance_obstacle(current_lane,0)
+                            break
+                        else:
+                            break
+
 def avoidance_obstacle(current_lane, kacinma):
     if current_lane == 0 and kacinma == 0:
         brake_pub.publish(1)
@@ -305,14 +335,10 @@ if __name__ == "__main__":
                 for angle_index in range (0,1284):
                     distance = scan[angle_index]
                     if distance != float('inf'):
-                        if ((1265 <= angle_index <= 1284) or (0 <= angle_index <= 20)) and  (3 < distance < 3.1):
+                        if ((1265 <= angle_index <= 1284) or (0 <= angle_index <= 35)) and  (3 < distance < 3.1):
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} ARA BÖLGE")
-                            if current_lane == 1:
-                                karar = birinci_bolge_karari_sag()
-                            else:
-                                karar = birinci_bolge_karari_sol()
-                            if not karar:
-                                avoidance_obstacle(current_lane,0)
+                            tespit = angle_index
+                            ara_bolge_karari()
                             break
                         elif (0 <= angle_index <= 81) and  (3 < distance < 3.1) and (current_lane == 0):
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 1. BÖLGE SOL")
