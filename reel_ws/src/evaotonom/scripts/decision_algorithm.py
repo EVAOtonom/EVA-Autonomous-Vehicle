@@ -332,6 +332,8 @@ if __name__ == "__main__":
             if detected_sign_number == 20: #ikili yön
                 if current_lane ==0: #sol şeritteyse
                     lane_control.publish(1)
+                    reset_odom.publish(1)
+                    time.sleep(0.5)
                     steering_pub.publish(28)
                     time.sleep(2)
                     while distance < 300:
