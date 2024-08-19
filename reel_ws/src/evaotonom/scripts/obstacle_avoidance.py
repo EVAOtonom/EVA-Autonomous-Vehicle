@@ -349,6 +349,8 @@ if __name__ == "__main__":
                             birinci_bolge_karari_sag()
                             break
         if park == 12: #park alanı bilgisi
+            brake_pub.publish(1)
+            time.sleep(0.5)
             if scan is not None:
                 obstacle_detected = False
                 for angle_index_park in range (0,200):
@@ -373,5 +375,7 @@ if __name__ == "__main__":
                             rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance} 4. PARK YERİ")
                             obstacle_detected = True
                             park_yeri.publish(4)
-                            break                                  
+                            break  
+                brake_pub.publish(0)
+                time.sleep(0.5)
         rate.sleep()
