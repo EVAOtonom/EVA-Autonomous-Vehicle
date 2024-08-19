@@ -4,10 +4,19 @@ import rospy
 from std_msgs.msg import Float32, Int8, Bool
 from time import time
 
+# Global variables
+current_velocity = 0.0
+brake_status = False
+previous_odom = None
+previous_time = None
+last_brake_change_time = None
+brake_pub = None
+
 # Callback functions
 def brake_callback(msg):
-    global brake_status
+    global brake_status, last_brake_change_time
     brake_status = msg.data
+    last_brake_change_time = time()  # Update the time when brake status changes
 
 def odometer_callback(msg):
     global previous_odom, previous_time, velocity_pub, current_velocity
@@ -46,8 +55,7 @@ def odometer_callback(msg):
 
 def control_motor_power():
     global current_velocity, brake_status, motor_power_pub
-    
-    #rospy.loginfo(f"Current Velocity: {current_velocity}, Brake Status: {brake_status}")
+
     
     if brake_status:
         motor_power_pub.publish(0)
@@ -57,25 +65,26 @@ def control_motor_power():
         elif current_velocity < 2.2:
             motor_power_pub.publish(6)
 
+def check_brake_status():
+    global last_brake_change_time, brake_pub
+    
+    if last_brake_change_time is not None and (time() - last_brake_change_time) > 35:
+        brake_pub.publish(Bool(False))  
+        last_brake_change_time = time()  
+
 if __name__ == '__main__':
     rospy.init_node('stabil_velocity_node')
 
-
-    
     # Global variables
-    current_velocity = 0.0
-    brake_status = False
-    previous_odom = None
-    previous_time = None
+    last_brake_change_time = None
 
-    # Wait for the lane tracking node to be ready
     rospy.loginfo("Waiting for 'lane_track_node' service...")
-    rospy.wait_for_message("/lane_track/current_lane", Int8, timeout=100)
     rospy.loginfo("'lane_track_node' service is now available.")
 
     # Publishers
     motor_power_pub = rospy.Publisher('/stm/motor_power', Int8, queue_size=1)
     velocity_pub = rospy.Publisher('/vehicle/velocity_kmh', Float32, queue_size=1)
+    brake_pub = rospy.Publisher('/stm/brake', Bool, queue_size=1)
 
     # Subscribers
     rospy.Subscriber('/stm/brake', Bool, brake_callback)
@@ -85,6 +94,3 @@ if __name__ == '__main__':
 
     rospy.spin()
 
-    # while not rospy.is_shutdown():
-    #     control_motor_power()
-    #     rate.sleep()
