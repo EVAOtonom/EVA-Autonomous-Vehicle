@@ -15,18 +15,15 @@ def callback(data):
 
 if __name__ == "__main__":
     rospy.init_node('obstacle_detect')
-
-    # rospy.wait_for_message("/current_lane", timeout=10)
-    rospy.Subscriber('/scan', LaserScan, callback, queue_size=10)
-    rospy.Subscriber('/current_lane', Int32, lane_callback, queue_size=10)
-
+    rospy.Subscriber('/scan', LaserScan, callback, queue_size=1)
+    
     # Veriables
     scan = None
-    current_lane = None
     rate = rospy.Rate(1)
 
     # Publishers
-    obstacle_publisher = rospy.Publisher("/obstacle/obstacledetection_cmd", Bool, queue_size=10)
+    brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=1)
+    obstacle_publisher = rospy.Publisher("/obstacle/obstacledetection_cmd", Bool, queue_size=1)
 
 while not rospy.is_shutdown():
     if scan is not None:
@@ -34,15 +31,6 @@ while not rospy.is_shutdown():
         for angle_index in range (0,1285):
             distance = scan[angle_index]
             if distance != float('inf'):
-                if angle_index <= 72 and angle_index >= 0 and distance < 2:
-                    rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
-                    obstacle_detected = True
-                    obstacle_publisher.publish(True)
-                if angle_index <= 1285 and angle_index > 1180 and distance < 2:
-                    rospy.loginfo(f" ENGEL VAR açı:{angle_index} mesafe: {distance}")
-                    obstacle_detected = True
-                    obstacle_publisher.publish(True)        
-                           
-        if not obstacle_detected:
-            obstacle_publisher.publish(False)
+                if ((1250 <= angle_index <= 1284) or (0 <= angle_index <= 35)) and  (3 < distance < 3.1):  
+                    brake_pub.publish(1)
     rate.sleep()
