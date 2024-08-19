@@ -328,7 +328,20 @@ if __name__ == "__main__":
                     rospy.loginfo("Park edildi")
                 else:
                     print("depth is none")
-
+                    
+            if detected_sign_number == 20: #ikili yön
+                if current_lane ==0: #sol şeritteyse
+                    lane_control.publish(1)
+                    steering_pub.publish(28)
+                    time.sleep(2)
+                    while distance < 300:
+                        pass
+                    steering_pub.publish(0)
+                    time.sleep(2)
+                    lane_control.publish(0)
+                elif current_lane ==1 #sağ şeritteyse
+                    pass
+                
             if detected_sign_number == 13: # sola dönüş
                 if current_lane == 1: # sag seritten
                     rospy.loginfo("sagdan sola donus basladı")
