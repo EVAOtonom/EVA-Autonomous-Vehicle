@@ -5,10 +5,6 @@ import rospy
 from sensor_msgs.msg import LaserScan
 from std_msgs.msg import Bool, Int32
 
-def lane_callback(msg):
-    global current_lane
-    current_lane = msg.data
-
 def callback(data):
     global scan
     scan = data.ranges
