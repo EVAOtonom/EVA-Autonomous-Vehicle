@@ -24,6 +24,10 @@ if __name__ == "__main__":
     # Variables
     latitude = None
     longitude = None
+    birinci_counter = 0
+    ikinci_counter = 0
+    deneme_counter = 0
+    
     rect_areas = {
         1: [
             (40.789775, 29.509026),  # sol alt
@@ -76,7 +80,30 @@ if __name__ == "__main__":
             (40.789845, 29.509463),     # sol alt
             (40.789910, 29.509383),     # sağ alt
             (40.789859, 29.509313)      # sağ üst
+        ],
+
+###############################################önemli Noktalar#################################################
+        9: [
+
+            (40.789738, 29.509163),     # sağ alt       önemli nokta 1    
+            (40.789662, 29.509238),     # sol alt            
+            (40.789624, 29.509171),     # sol üst           
+            (40.789705, 29.509104)      # sağ üst
+        ],
+        10: [
+            (40.790161, 29.509016),     # sağ alt       önemli nokta 2
+            (40.790130, 29.508983),     # sağ üst         
+            (40.790089, 29.509026),     # sol üst
+            (40.790114, 29.509067)      # sol alt
+        ],
+        11: [
+            (40.790178, 29.509346),     # sağ alt       DENEME nokta 
+            (40.790154, 29.509383),     # sağ üst         
+            (40.790205, 29.509378),     # sol üst
+            (40.790178, 29.509405)      # sol alt
         ]
+
+
 
     }
 
@@ -92,6 +119,7 @@ if __name__ == "__main__":
     # Publishers
     kavsak_noktasi_pub = rospy.Publisher("/sign_detector/roundabout", Int8, queue_size=1)
     obstacle_control_pub = rospy.Publisher("/engel_kapat", Bool, queue_size=1)
+    onemli_nokta_pub = rospy.Publisher("/gpskavsak/rota",Int8, queue_size=1)
 
     rate = rospy.Rate(1)  # 1 Hz
 
@@ -105,16 +133,35 @@ if __name__ == "__main__":
                         obstacle_control_pub.publish(1)
                         rospy.loginfo("viraj")
 
-                    else:
+                    elif area_num in range(1,6):
                         kavsak_noktasi_pub.publish(area_num)
                         rospy.loginfo(f"Kavşak: {area_num}")
                         found_area = True
-                        break
+
+                    elif area_num == 9: # 2. duraktan sonra
+                        if birinci_counter != 1:
+                            birinci_counter = birinci_counter + 1
+                            onemli_nokta_pub.publish(9)
+                        else:
+                            pass
+
+                    elif area_num == 10: # 3. durak sonraki ışıklar
+                        if birinci_counter != 1:
+                            ikinci_counter = birinci_counter + 1
+                            onemli_nokta_pub.publish(10)
+                        else:
+                            pass
+                    elif area_num == 11: # park deneme
+                        if birinci_counter != 1:
+                            deneme_counter = birinci_counter + 1
+                            onemli_nokta_pub.publish(11)
+                    else:
+                        pass
 
             if not found_area:
                 kavsak_noktasi_pub.publish(0)
                 obstacle_control_pub.publish(0)   
         else:
-            rospy.logwarn("GPS Kavsak verisi alınamıyor")
+            rospy.logwarn("GPS kavsak verisi alınamıyor")
 
         rate.sleep()

@@ -63,7 +63,7 @@ def callback(left_image_msg, right_image_msg, point_cloud_msg):
                 class_name_right = class_names[right_result[0]]
 
                 if class_name_left == class_name_right: 
-                    if class_name_right == 'park' or class_name_right == 'engellipark' and right_result[2]> 0.9: # PARK VE ENGELLİ PARK İCİN DOGRULAMA 
+                    if class_name_right == 'park' or class_name_right == 'engellipark' and right_result[2]> 0.95: # PARK VE ENGELLİ PARK İCİN DOGRULAMA 
                         sign_counter[class_name_right] += 1
                         if sign_counter[class_name_right] % park_counter == 0:
                             depth = calculate_depth(point_cloud, (right_result[1]), original_width, original_height)

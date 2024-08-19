@@ -64,7 +64,6 @@ def segment_image(msg):
     prediction = prediction[int((INPUT_SHAPE[0] - new_img_height) // 2):int((INPUT_SHAPE[0] - new_img_height) // 2 + new_img_height),
             int((INPUT_SHAPE[1] - new_img_width) // 2):int((INPUT_SHAPE[1] - new_img_width) // 2 + new_img_width)] # model tahminini orjinal görüntüye oranlar
     prediction = cv2.resize(prediction, (orj_img_width, orj_img_height), interpolation=cv2.INTER_LINEAR)
-    
     prediction = prediction.argmax(axis=-1) #her piksel için class olma olasılığı en yüksek hangisiyse onu bulur
 
     seg_img = np.reshape(np.array(colors, np.uint8)[np.reshape(prediction, [-1])], [orj_img_height, orj_img_width, -1]) #her piksele ait olduğu classa göre renk atanır
@@ -81,22 +80,7 @@ def annotate_image (blended_image_array, prediction):
         if len(y_coordinates) == 0 or len(x_coordinates) == 0: # etikete ait hiç bir piksel yoksa for döngüsünü atlar
             continue
         
-        if label_name == "ensol":
-            y_coordinates = y_coordinates[x_coordinates < 275]
-            x_coordinates = x_coordinates[x_coordinates < 275]
-        elif label_name == "sol":
-            y_coordinates = y_coordinates[x_coordinates < 400]
-            x_coordinates = x_coordinates[x_coordinates < 400]
-        elif label_name == 'sag':
-            y_coordinates = y_coordinates[x_coordinates > 250]
-            x_coordinates = x_coordinates[x_coordinates > 250]
-        elif label_name == "ensag":
-            y_coordinates = y_coordinates[x_coordinates > 365]
-            x_coordinates = x_coordinates[x_coordinates > 365]
-
         areas[label_name] = len(y_coordinates) # kaç piksel varsa o kadar alan
-        if areas[label_name] < 50:
-            continue
         midpoints[label_name] = ( int(np.mean(x_coordinates)), int(np.mean(y_coordinates)) ) # her etiketin x ve y'de ortalaması bulunur 
         max_y_idx = np.argmax(y_coordinates) 
         min_y_idx = np.argmin(y_coordinates)
@@ -112,56 +96,31 @@ def annotate_image (blended_image_array, prediction):
         cv2.putText(blended_image_array, f"orta {str(label_name)}",(midpoints[label_name][0], midpoints[label_name][1]+20),cv2.FONT_HERSHEY_SIMPLEX, 0.5, labels_color[label_name], 2)
     return blended_image_array, midpoints, endpoints, areas
 
-def steering_control(image, midpoints, areas):
-        global current_lane_number, kayit, mid_line_y, mid_line_x, count_0, count_1
+def steering_control(image, midpoints, endpoints, areas):
+        global current_lane_number
         if areas['sol'] <= 50: # sol şerit pikseli 50'den fazla ise orta noktasını alıyor
             midpoints['sol'] = (0, 0)
         if areas['sag'] <= 50: # sag şerit pikseli 50'den fazla ise orta noktasını alıyor
             midpoints['sag'] = (0, 0)
         #image = image[:, :, ::-1].copy() # renk kanallarını tersine çevirir, muhtemelen başka kütüphanede işlemek için düzenleme işlemidir
-        if midpoints['sol'] != (0, 0) and midpoints['sag'] != (0, 0): # şeritlerin orta noktası hesaplanabiliyorsa koşulu
-            if abs(midpoints["sag"][0] - midpoints["sol"][0]) < 200:
-                if areas["sol"] > areas["sag"]:
-                    mid_line_x = midpoints['sol'][0] + 200
-                else:
-                    mid_line_x = midpoints['sag'][0] - 200
-            else:
-                mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
-            if abs (midpoints["sol"][1]-midpoints["sag"][1]) < 10: 
-                mid_line_y = (midpoints['sol'][1] + midpoints['sag'][1]) / 2
-                #mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
-            else:
-                #mid_line_x = (midpoints['sol'][0] + midpoints['sag'][0]) / 2
-                if areas["sol"] > areas["sag"]:
-                    mid_line_y = midpoints["sol"][1]
-                else:
-                    mid_line_y = midpoints["sag"][1]
-        elif midpoints['sag'] == (0, 0) and midpoints['sol'] != (0, 0): # sagın orta noktası yok solun orta noktası var koşulu
-            mid_line_y = midpoints['sol'][1]
-            mid_line_x = midpoints['sol'][0] + 200                      # sol şeride 150 ekleyerek sag şeritsiz yolun ortasını buluyor
-        elif midpoints['sol'] == (0, 0) and midpoints['sag'] != (0, 0): # solun orta noktası yok sagın orta noktası var koşulu
-            mid_line_y = midpoints['sag'][1]
-            mid_line_x = midpoints['sag'][0] - 200                     # sag seridin orta noktasından 150 piksel çıkartarak yolun ortasını buluyor
+        if current_lane_number == 0:
+            mid_line_x = midpoints['sag'][0] - 200
+        elif current_lane_number == 1:
+            mid_line_x = midpoints['sol'][0] + 200
         else:
             cv2.putText(image, 'UCGEN CIZILEMEDI',(15, 40), cv2.FONT_HERSHEY_SIMPLEX, 2, (255, 0, 0), 2)
-            print("SERIT TAKIBI YAPILAMIYOR, UCGEN CIZILEMEDI")
+            print("UCGEN CIZILEMEDI")
 
-        image = cv2.line(image, ((int(image.shape[1] / 2)-20), 332),
-                        ((int(image.shape[1] / 2)-20), int(mid_line_y)), (0, 255, 0), 2)                       # düz çizgiyi çekiyor
-        image = cv2.line(image, ((int(image.shape[1] / 2)-20), 332),
-                        (int(mid_line_x), int(mid_line_y)), (0, 255, 0), 2)                                 # çapraz çizgiyi çekiyor
-        image = cv2.line(image, ((int(image.shape[1] / 2)-20), int(mid_line_y)),
-                        (int(mid_line_x), int(mid_line_y)), (0, 255, 0), 2)                                     # yatay çizgiyi çekiyor
-        if current_lane_number == 0:
-            offset = 20
-        elif current_lane_number == 1:
-            offset = -20
-        else:
-            offset = 0
+        image = cv2.line(image, ((int(image.shape[1] / 2))+50, 332),
+                        ((int(image.shape[1] / 2))+30, int(mid_line_y)), (0, 255, 0), 2)                       # düz çizgiyi çekiyor
+        image = cv2.line(image, ((int(image.shape[1] / 2))+50, 332),
+                        (int(mid_line_x)+50, int(mid_line_y)), (0, 255, 0), 2)                                 # çapraz çizgiyi çekiyor
+        image = cv2.line(image, ((int(image.shape[1] / 2))+350, int(mid_line_y)),
+                        (int(mid_line_x)+50, int(mid_line_y)), (0, 255, 0), 2)                                     # yatay çizgiyi çekiyor
         uzaklik_y = (image.shape[0] - mid_line_y)                                                         # cizgi uzunlugunu bulmaya yarar
-        uzaklik_x = (((image.shape[1] / 2)+offset) - mid_line_x)                                            # yolun ortasına aracın uzaklığı
+        uzaklik_x = (((image.shape[1] / 2)) - mid_line_x)                                          # yolun ortasına aracın uzaklığı
         degree = (180 * math.atan(abs(uzaklik_x / uzaklik_y))) / (3.14)                                 # sapma bir açıya dönüştürülür
-        steering = int(degree * 1.12)                                                         # araç için oranlanmış değer
+        steering = int(degree* 1.12)                                                          # araç için oranlanmış değer
 
         if uzaklik_x > 0:                                 #saga döndürür
             steering = -steering
@@ -172,7 +131,6 @@ def steering_control(image, midpoints, areas):
 
         cv2.putText(image, f"tekerlek acisi: {steering}", (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
         cv2.putText(image, f"ucgen aci: {degree}", (15, 55), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
-
         if areas['ensol'] > areas['ensag']: # Mevcut şerit bilgisini ekrana yazdırır
             current_lane_number = 1
         elif areas ['ensag'] > areas ['ensol']: 
@@ -186,28 +144,30 @@ def steering_control(image, midpoints, areas):
         count_0 = lanes.count(0)
         count_1 = lanes.count(1)
         
-        if count_0 / 30.0 >= 0.50:
+        if count_0 / 30.0 >= 0.75:
             cv2.putText(image, 'arac SOL seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2)
             lane_publisher.publish(0)
 
-        if count_1 /30.0 >= 0.50:
+        if count_1 /30.0 >= 0.75:
             cv2.putText(image, 'arac SAG seritte',(15,80),cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
             lane_publisher.publish(1)    
 
         #print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
-        kayit.write(image)
         cv2.imshow("EVA OTONOM LANE TRACK", image)
         cv2.waitKey(1)
 
 def callback():
-    if lane_stop != 1 and obstacle_detected != 1:
-        ret, frame = cam.read()
-        cv2.imwrite("frame.jpg", frame)
-        image, pr = segment_image("frame.jpg")
-        image, midpoints, endpoints, areas = annotate_image(image, pr)
-        steering_control(image, midpoints, areas)
-    rate.sleep()
-
+    try:
+        if obstacle_detected !=1 and lane_stop != 1:
+            ret, frame = cam.read()
+            cv2.imwrite("frame.jpg", frame)
+            image, pr = segment_image("frame.jpg")
+            image, midpoints, endpoints, areas = annotate_image(image, pr)
+            steering_control(image, midpoints, endpoints, areas)
+        rate.sleep()
+    except Exception as e:
+        print("SERIT TAKIBI HATASI: " + str(e))
+    
 if __name__ == "__main__":
     rospy.init_node('lane_track_node') 
 
@@ -215,7 +175,7 @@ if __name__ == "__main__":
     lanes = []
     count_0 = 0.0
     count_1 = 0.0
-    model = load_model(f'{os.path.dirname(__file__)}/en-iyisi.h5', compile=False)# /home/eva/Desktop/modeller/16batch.h5 |#/home/eva/Desktop/modeller/az-veri-jabra.h5
+    model = load_model(f'{os.path.dirname(__file__)}/en-iyisi.h5', compile=False)
     colors = [(0, 0, 0), (128, 0, 0), (0, 128, 0), (128, 128, 0), (0, 0, 128)]
     INPUT_SHAPE = [480, 640, 3]  # (Height, Width , Color Format) 
     current_lane_number = None
@@ -229,12 +189,16 @@ if __name__ == "__main__":
         'ensag': (0, 0, 255)   # Mavi
     }
     initialize_detection_variables()
-    rate = rospy.Rate(2)
+    rate = rospy.Rate(3)
     timer = time.strftime("%d.%m-%H:%M")
     obstacle_detected = False
     mid_line_x = 320
     mid_line_y = 180
-
+    #Otonom sinyalini bekleme
+    # rospy.loginfo("Kumandadan komut bekleniyor...")
+    # rospy.wait_for_message('/stm/check_otonom', Bool, timeout=100) # Kumandadan otonom tuşuna basılmasını bekler.
+    # rospy.loginfo("Otonom komutu geldi şerit takibi başlıyor.")
+    
     #Subscribers
     rospy.Subscriber('/engel_var_mi', Bool, obstacle_callback, queue_size=1)
     rospy.Subscriber('/serit_kapat', Bool, lane_callback, queue_size=1)
@@ -244,9 +208,11 @@ if __name__ == "__main__":
     steering_pub = rospy.Publisher("/stm/steering_angle", Int8, queue_size=1)
     lane_publisher = rospy.Publisher("/lane_track/current_lane", Int8, queue_size=1)
     brake_publisher = rospy.Publisher('/stm/brake', Bool, queue_size=1)
-        
+
     kayit = cv2.VideoWriter(f"/home/eva/Videos/kayit/lane-track-{timer}.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 7.0, (640, 360))
+
     while not rospy.is_shutdown():
         callback()
-    
+
 kayit.release()
+

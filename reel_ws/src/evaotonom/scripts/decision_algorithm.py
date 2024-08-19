@@ -33,6 +33,10 @@ def position_callback(msg):
     if len(msg.data) == 5:
         x1,y1,x2,y2,size = msg.data
 
+def rota_callback(msg):
+    global rota
+    rota = msg.data    
+
 if __name__ == "__main__":
     rospy.init_node("decision_node")
 
@@ -47,7 +51,11 @@ if __name__ == "__main__":
 
     kavsak_girisi = None
 
+    rota = None
+
     none_sayac = 0
+    
+    durak_counter = 0
 
     sign_depth_dict = {i: None for i in range(23)}
 
@@ -63,6 +71,7 @@ if __name__ == "__main__":
     rospy.Subscriber('/lane_track/current_lane', Int8, lane_callback, queue_size=1)
     rospy.Subscriber('/sign_detector/position', Float32MultiArray,position_callback ,queue_size=1)
     rospy.Subscriber("/sign_detector/roundabout", Int8 , kavsak_callback, queue_size=1)
+    rospy.Subscriber("/gpskavsak/rota", Int8, rota_callback,queue_size=1)
     rospy.Subscriber("/engel_var_mi", Bool , engel_callback, queue_size=1)
 
     #Publishers
@@ -81,189 +90,183 @@ if __name__ == "__main__":
     while not rospy.is_shutdown():
         if detected_sign_number != None:
             if detected_sign_number == 3: # DURAK KARAR ALGORITMASI
-                if current_lane == 1: # SAG SERITTEYSE
-                    rospy.loginfo(" @@@@@@@@@@ SAG SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ") 
-                    brake_pub.publish(1)
-                    time.sleep(2) 
-                    reset_odom.publish(1)
-                    time.sleep(0.5)
-                    brake_pub.publish(0)
-                    time.sleep(2)
-                    durak_depth = sign_depth_dict[3]
-                    while distance < int(durak_depth) * 100 - 600 : 
-                        pass
-                    lane_control.publish(1) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
-                    brake_pub.publish(1)
-                    time.sleep(2)
-                    reset_odom.publish(1)
-                    time.sleep(0.5)
-                    right_signal.publish(5)
-                    time.sleep(0.5)
-                    steering_pub.publish(28)
-                    time.sleep(2)
-                    brake_pub.publish(0)
-                    time.sleep(2)
-                    while distance < 100: # durak giriş arttı 
-                        pass
-                    if detected_obstacle == 1:
-                        break
-                    obstacle_control.publish(1)
-                    while distance < 210: # durak giriş arttı 
-                        pass
-                    reset_odom.publish(1)
-                    time.sleep(0.5)
-                    steering_pub.publish(-40)
-                    time.sleep(2)
-                    while distance < 300:
-                        pass
-                    brake_pub.publish(1)
-                    time.sleep(2)
-                    reset_odom.publish(1)
-                    time.sleep(0.5)
-                    steering_pub.publish(0)
-                    time.sleep(10)
-                    left_signal.publish(5)
-                    time.sleep(0.2)
-                    steering_pub.publish(-28)
-                    time.sleep(2)
-                    brake_pub.publish(0)
-                    time.sleep(2)
-                    while distance < 400: #320den 380e
-                        pass
-                    brake_pub.publish(1)
-                    time.sleep(2)
-                    steering_pub.publish(32)
-                    time.sleep(2)  
-                    reset_odom.publish(1)
-                    time.sleep(0.5)
-                    brake_pub.publish(0)
-                    time.sleep(2)
-                    while distance < 270:
-                        pass
-                elif current_lane == 0: # SOL SERITTEYSE
-                    # rospy.loginfo(" @@@@@@@@@@ SOL SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ")  
-                    # obstacle_control.publish(1)
-                    # brake_pub.publish(1)
-                    # time.sleep(2)
-                    # reset_odom.publish(1)
-                    # time.sleep(0.5)
-                    # brake_pub.publish(0)
-                    # durak_depth = sign_depth_dict[3]
-                    # while distance < int(durak_depth) * 100 - 900 : 
-                    #     pass
-                    # lane_control.publish(1) 
-                    # brake_pub.publish(1)
-                    # time.sleep(2)
-                    # right_signal.publish(5)
-                    # time.sleep(0.2)
-                    # reset_odom.publish(1)
-                    # time.sleep(0.5)
-                    # steering_pub.publish(30)
-                    # time.sleep(2)
-                    # brake_pub.publish(0)
-                    # while distance < 580:  
-                    #     pass
-                    # reset_odom.publish(1)
-                    # time.sleep(0.5)
-                    # steering_pub.publish(-30)
-                    # time.sleep(2)
-                    # while distance < 350:
-                    #     pass
-                    # brake_pub.publish(1)
-                    # time.sleep(2)
-                    # steering_pub.publish(0)
-                    # time.sleep(10)
-                    # left_signal.publish(5)
-                    # time.sleep(0.2)
-                    # steering_pub.publish(-28)
-                    # time.sleep(2)
-                    # reset_odom.publish(1)
-                    # time.sleep(0.5)
-                    # brake_pub.publish(0)
-                    # time.sleep(2)
-                    # while distance < 380:
-                    #     pass
-                    # brake_pub.publish(1)
-                    # time.sleep(2)
-                    # steering_pub.publish(32)
-                    # time.sleep(2)  
-                    # reset_odom.publish(1)
-                    # time.sleep(0.5)
-                    # brake_pub.publish(0)
-                    # time.sleep(2)
-                    # while distance < 270:
-                    #     pass
-                    rospy.loginfo(" @@@@@@@@@@ SOL SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ")  
-                    obstacle_control.publish(1)
-                    brake_pub.publish(1)
-                    time.sleep(2)
-                    reset_odom.publish(1)
-                    time.sleep(0.5)
-                    steering_pub.publish(40)
-                    time.sleep(2)
-                    brake_pub.publish(0)
-                    while distance < 330:
-                        pass
-                    brake_pub.publish(1)
-                    time.sleep(2)
-                    reset_odom.publish(1)
-                    time.sleep(0.5)
-                    steering_pub.publish(-40)
-                    time.sleep(2)
-                    brake_pub.publish(0)
-                    time.sleep(2)
-                    while distance < 200:
-                        pass
-                    reset_odom.publish(1)
-                    time.sleep(0.5) # buradan yukarısı güncellenebilir 
-                    durak_depth = sign_depth_dict[3]
-                    while distance < int(durak_depth) * 100 - 1050 : # 8.7 gibi bir değer olabilir
-                        pass
-                    lane_control.publish(1)
-                    brake_pub.publish(1)
-                    time.sleep(2)
-                    right_signal.publish(2)
-                    time.sleep(4)
-                    reset_odom.publish(1)
-                    time.sleep(0.5)
-                    steering_pub.publish(28)
-                    time.sleep(2)
-                    brake_pub.publish(0)
-                    while distance < 280:  
-                        pass
-                    reset_odom.publish(1)
-                    time.sleep(0.5)
-                    steering_pub.publish(-40)
-                    time.sleep(2)
-                    while distance < 350:
-                        pass
-                    brake_pub.publish(1)
-                    time.sleep(2)
-                    steering_pub.publish(0)
-                    time.sleep(10)
-                    left_signal.publish(2)
-                    time.sleep(4)
-                    steering_pub.publish(-28)
-                    time.sleep(2)
-                    reset_odom.publish(1)
-                    time.sleep(0.5)
-                    brake_pub.publish(0)
-                    time.sleep(2)
-                    while distance < 380:
-                        pass
-                    brake_pub.publish(1)
-                    time.sleep(2)
-                    steering_pub.publish(32)
-                    time.sleep(2)  
-                    reset_odom.publish(1)
-                    time.sleep(0.5)
-                    brake_pub.publish(0)
-                    time.sleep(2)
-                    while distance < 270:
-                        pass
-
-                obstacle_control.publish(0)      
-                lane_control.publish(0) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
+                durak_counter = durak_counter +1
+                if durak_counter < 3:
+                    if current_lane == 1: # SAG SERITTEYSE
+                        rospy.loginfo(" @@@@@@@@@@ SAG SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ") 
+                        obstacle_control.publish(1)
+                        brake_pub.publish(1)
+                        time.sleep(2) 
+                        reset_odom.publish(1)
+                        time.sleep(0.5)
+                        brake_pub.publish(0)
+                        time.sleep(2)
+                        durak_depth = sign_depth_dict[3]
+                        while distance < durak_depth * 100 - 600 : 
+                            pass
+                        lane_control.publish(1) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
+                        brake_pub.publish(1)
+                        time.sleep(2)
+                        reset_odom.publish(1)
+                        time.sleep(0.5)
+                        right_signal.publish(5)
+                        time.sleep(0.5)
+                        steering_pub.publish(28)
+                        time.sleep(2)
+                        brake_pub.publish(0)
+                        time.sleep(2)
+                        while distance < 310: # durak giriş arttı 
+                            pass
+                        reset_odom.publish(1)
+                        time.sleep(0.5)
+                        steering_pub.publish(-40)
+                        time.sleep(2)
+                        while distance < 300:
+                            pass
+                        brake_pub.publish(1)
+                        time.sleep(2)
+                        reset_odom.publish(1)
+                        time.sleep(0.5)
+                        steering_pub.publish(0)
+                        time.sleep(10)
+                        left_signal.publish(5)
+                        time.sleep(0.2)
+                        steering_pub.publish(-28)
+                        time.sleep(2)
+                        brake_pub.publish(0)
+                        time.sleep(2)
+                        while distance < 400: #320den 380e
+                            pass
+                        brake_pub.publish(1)
+                        time.sleep(2)
+                        steering_pub.publish(32)
+                        time.sleep(2)  
+                        reset_odom.publish(1)
+                        time.sleep(0.5)
+                        brake_pub.publish(0)
+                        time.sleep(2)
+                        while distance < 270:
+                            pass
+                    elif current_lane == 0: # SOL SERITTEYSE
+                        # rospy.loginfo(" @@@@@@@@@@ SOL SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ")  
+                        # obstacle_control.publish(1)
+                        # brake_pub.publish(1)
+                        # time.sleep(2)
+                        # reset_odom.publish(1)
+                        # time.sleep(0.5)
+                        # brake_pub.publish(0)
+                        # durak_depth = sign_depth_dict[3]
+                        # while distance < int(durak_depth) * 100 - 1000 : 
+                        #     pass
+                        # lane_control.publish(1)
+                        # brake_pub.publish(1)
+                        # time.sleep(2)
+                        # right_signal.publish(5)
+                        # time.sleep(0.2)
+                        # reset_odom.publish(1)
+                        # time.sleep(0.5)
+                        # steering_pub.publish(25)
+                        # time.sleep(2)
+                        # brake_pub.publish(0)
+                        # while distance < 500:  
+                        #     pass
+                        # reset_odom.publish(1)
+                        # time.sleep(0.5)
+                        # steering_pub.publish(-30)
+                        # time.sleep(2)
+                        # while distance < 350:
+                        #     pass
+                        # brake_pub.publish(1)
+                        # time.sleep(2)
+                        # steering_pub.publish(0)
+                        # time.sleep(10)
+                        # left_signal.publish(5)
+                        # time.sleep(0.2)
+                        # steering_pub.publish(-28)
+                        # time.sleep(2)
+                        # reset_odom.publish(1)
+                        # time.sleep(0.5)
+                        # brake_pub.publish(0)
+                        # time.sleep(2)
+                        # while distance < 380:
+                        #     pass
+                        # brake_pub.publish(1)
+                        # time.sleep(2)
+                        # steering_pub.publish(32)
+                        # time.sleep(2)  
+                        # reset_odom.publish(1)
+                        # time.sleep(0.5)
+                        # brake_pub.publish(0)
+                        # time.sleep(2)
+                        # while distance < 270:
+                        #     pass
+                        rospy.loginfo(" @@@@@@@@@@ SOL SERITTEN DURAGA GIRIS BASLIYOR @@@@@@@@@@@@@ ")  
+                        obstacle_control.publish(1)
+                        lane_control.publish(1) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
+                        brake_pub.publish(1)
+                        time.sleep(2) 
+                        reset_odom.publish(1)
+                        time.sleep(0.5)
+                        right_signal.publish(5)
+                        time.sleep(0.2)
+                        steering_pub.publish(28)
+                        time.sleep(2)
+                        brake_pub.publish(0)
+                        time.sleep(2)
+                        while distance < 310: # durak giriş arttı 
+                            pass
+                        reset_odom.publish(1)
+                        time.sleep(0.5)
+                        steering_pub.publish(-40)
+                        time.sleep(2)
+                        while distance < 300:
+                            pass
+                        brake_pub.publish(1)
+                        time.sleep(2)
+                        reset_odom.publish(1)
+                        time.sleep(0.5)
+                        right_signal.publish(5)
+                        time.sleep(0.5)
+                        steering_pub.publish(28)
+                        time.sleep(2)
+                        brake_pub.publish(0)
+                        time.sleep(2)
+                        while distance < 270: # durak giriş arttı 
+                            pass
+                        reset_odom.publish(1)
+                        time.sleep(0.5)
+                        steering_pub.publish(-40)
+                        time.sleep(2)
+                        while distance < 300:
+                            pass
+                        brake_pub.publish(1)
+                        time.sleep(2)
+                        reset_odom.publish(1)
+                        time.sleep(0.5)
+                        steering_pub.publish(0)
+                        time.sleep(10)
+                        left_signal.publish(5)
+                        time.sleep(0.2)
+                        steering_pub.publish(-28)
+                        time.sleep(2)
+                        brake_pub.publish(0)
+                        time.sleep(2)
+                        while distance < 400: #320den 380e
+                            pass
+                        brake_pub.publish(1)
+                        time.sleep(2)
+                        steering_pub.publish(32)
+                        time.sleep(2)  
+                        reset_odom.publish(1)
+                        time.sleep(0.5)
+                        brake_pub.publish(0)
+                        time.sleep(2)
+                        while distance < 270:
+                            pass
+                    obstacle_control.publish(0)      
+                    lane_control.publish(0) # Tekrar aynı karar algoritmasına girilmemesi için kullanılmaktadır.
+                else:
+                    pass
 
             elif detected_sign_number == 2: # DUR
                 lane_control.publish(1)
@@ -301,7 +304,7 @@ if __name__ == "__main__":
                         aci = (hedef - sign_midpoint)
                         if aci < 0:
                             aci *= 3
-                        steering_angle = aci * -40/346
+                        steering_angle = aci * -60/346
                         print("yay")
                         steering_pub.publish(int(steering_angle))
                         none_sayac = 0
@@ -1069,3 +1072,72 @@ if __name__ == "__main__":
                     brake_pub.publish(0)
                     lane_control.publish(False)
                     obstacle_control.publish(False)
+
+        if rota != None:
+            if rota == 9:
+                rospy.loginfo("##########1.önemli noktaya giris#########")
+                lane_control.publish(1)
+                brake_pub.publish(1)
+                time.sleep(2)
+                reset_odom.publish(1)
+                time.sleep(0.5)
+                left_signal.publish(5)
+                time.sleep(0.5)
+                steering_pub.publish(-30)
+                time.sleep(2)
+                while distance < 350:
+                    pass
+                lane_control.publish(0)
+                
+            elif rota == 10:
+                rospy.loginfo("##########2.önemli noktaya giris#########")
+                lane_control.publish(1)
+                brake_pub.publish(1)
+                time.sleep(2)
+                reset_odom.publish(1)
+                time.sleep(0.5)
+                right_signal.publish(5)
+                time.sleep(0.5)
+                steering_pub.publish(25)
+                time.sleep(2)
+                while distance < 350:
+                    pass
+                lane_control.publish(1)
+                brake_pub.publish(1)
+                time.sleep(2)
+                reset_odom.publish(1)
+                time.sleep(0.5)
+                right_signal.publish(5)
+                time.sleep(0.5)
+                steering_pub.publish(-20)
+                time.sleep(2)
+                while distance < 350:
+                    pass
+                lane_control.publish(0)
+            elif rota == 11:
+                rospy.loginfo("##########deneme noktası giris#########")
+                lane_control.publish(1)
+                brake_pub.publish(1)
+                time.sleep(2)
+                reset_odom.publish(1)
+                time.sleep(0.5)
+                right_signal.publish(5)
+                time.sleep(0.5)
+                steering_pub.publish(25)
+                time.sleep(2)
+                while distance < 350:
+                    pass
+                lane_control.publish(1)
+                brake_pub.publish(1)
+                time.sleep(2)
+                reset_odom.publish(1)
+                time.sleep(0.5)
+                right_signal.publish(5)
+                time.sleep(0.5)
+                steering_pub.publish(-20)
+                time.sleep(2)
+                while distance < 350:
+                    pass
+                lane_control.publish(0)
+            else:
+                pass

@@ -52,19 +52,26 @@ def control_motor_power():
     if brake_status:
         motor_power_pub.publish(0)
     else:
-        if current_velocity > 2.5:
+        if current_velocity > 2.2:
             motor_power_pub.publish(0)
-        elif current_velocity < 2.25:
+        elif current_velocity < 2.0:
             motor_power_pub.publish(6)
 
 if __name__ == '__main__':
     rospy.init_node('stabil_velocity_node')
+
+
     
     # Global variables
     current_velocity = 0.0
     brake_status = False
     previous_odom = None
     previous_time = None
+
+    # Wait for the lane tracking node to be ready
+    rospy.loginfo("Waiting for 'lane_track_node' service...")
+    rospy.wait_for_message("/lane_track/current_lane", Int8, timeout=100)
+    rospy.loginfo("'lane_track_node' service is now available.")
 
     # Publishers
     motor_power_pub = rospy.Publisher('/stm/motor_power', Int8, queue_size=1)
@@ -74,7 +81,7 @@ if __name__ == '__main__':
     rospy.Subscriber('/stm/brake', Bool, brake_callback)
     rospy.Subscriber('/stm/read_odometer', Float32, odometer_callback)
 
-    rate = rospy.Rate(3)  
+    rate = rospy.Rate(1)  
 
     rospy.spin()
 
