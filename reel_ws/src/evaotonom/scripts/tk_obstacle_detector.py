@@ -15,7 +15,7 @@ if __name__ == "__main__":
     obstacle_detected = False
     # Veriables
     scan = None
-    rate = rospy.Rate(1)
+    rate = rospy.Rate(5)
 
     # Publishers
     brake_pub = rospy.Publisher("/stm/brake", Bool, queue_size=1)
