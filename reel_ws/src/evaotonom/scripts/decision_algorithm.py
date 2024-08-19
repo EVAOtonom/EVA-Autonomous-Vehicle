@@ -334,10 +334,18 @@ if __name__ == "__main__":
                     lane_control.publish(1)
                     reset_odom.publish(1)
                     time.sleep(0.5)
+                    right_signal.publish(4)
+                    time.sleep(0.2)                    
                     steering_pub.publish(28)
                     time.sleep(2)
-                    while distance < 300:
+                    while distance < 310:
                         pass
+                    reset_odom.publish(1)
+                    time.sleep(0.5)
+                    steering_pub.publish(-40)
+                    time.sleep(2)
+                    while distance < 300:
+                        pass                    
                     steering_pub.publish(0)
                     time.sleep(2)
                     lane_control.publish(0)
