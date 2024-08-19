@@ -113,7 +113,7 @@ def annotate_image (blended_image_array, prediction):
     return blended_image_array, midpoints, endpoints, areas
 
 def steering_control(image, midpoints, areas):
-        global current_lane_number, kayit, mid_line_y, mid_line_x, count_0, count_1
+        global current_lane_number, kayit, mid_line_y, mid_line_x, count_0, count_1, aci_counter
         if areas['sol'] <= 50: # sol şerit pikseli 50'den fazla ise orta noktasını alıyor
             midpoints['sol'] = (0, 0)
         if areas['sag'] <= 50: # sag şerit pikseli 50'den fazla ise orta noktasını alıyor
@@ -168,7 +168,13 @@ def steering_control(image, midpoints, areas):
         elif uzaklik_x < 0:                               #sola döndürür
             steering = steering
 
-        steering_pub.publish(steering)
+        if aci_counter == 2:
+            steering_pub.publish(steering)
+            aci_counter = 0
+        else:
+            aci_counter += 1
+
+        #steering_pub.publish(steering)
 
         cv2.putText(image, f"tekerlek acisi: {steering}", (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
         cv2.putText(image, f"ucgen aci: {degree}", (15, 55), cv2.FONT_HERSHEY_SIMPLEX, 1, color=(255,255,255), thickness=2)
@@ -229,11 +235,13 @@ if __name__ == "__main__":
         'ensag': (0, 0, 255)   # Mavi
     }
     initialize_detection_variables()
-    rate = rospy.Rate(2)
+    rate = rospy.Rate(4)
     timer = time.strftime("%d.%m-%H:%M")
     obstacle_detected = False
     mid_line_x = 320
     mid_line_y = 180
+
+    aci_counter = 0
 
     #Subscribers
     rospy.Subscriber('/engel_var_mi', Bool, obstacle_callback, queue_size=1)
