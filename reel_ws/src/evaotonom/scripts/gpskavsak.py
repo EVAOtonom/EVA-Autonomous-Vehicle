@@ -27,6 +27,7 @@ if __name__ == "__main__":
     birinci_counter = 0
     ikinci_counter = 0
     deneme_counter = 0
+    park_counter = 0
     
     rect_areas = {
         1: [
@@ -101,6 +102,12 @@ if __name__ == "__main__":
             (40.790154, 29.509383),     # sağ üst         
             (40.790205, 29.509378),     # sol üst
             (40.790178, 29.509405)      # sol alt
+        ],
+        12: [
+            (40.790157, 29.509209),     # sağ alt       park nokta 
+            (40.790134, 29.509158),     # sağ üst         
+            (40.790100, 29.509196),     # sol üst
+            (40.790134, 29.509236)      # sol alt
         ]
 
 
@@ -151,10 +158,15 @@ if __name__ == "__main__":
                             onemli_nokta_pub.publish(10)
                         else:
                             pass
-                    elif area_num == 11: # park deneme
+                    elif area_num == 11: # ışıklardan parka deneme
                         if birinci_counter != 1:
                             deneme_counter = birinci_counter + 1
                             onemli_nokta_pub.publish(11)
+                            
+                    elif area_num == 12: # parka giris noktasi deneme
+                        if birinci_counter != 1:
+                            park_counter = park_counter + 1
+                            onemli_nokta_pub.publish(12)
                     else:
                         pass
 
