@@ -286,9 +286,13 @@ if __name__ == "__main__":
                 time.sleep(1)
                 brake_pub.publish(1)
                 time.sleep(6)
+                reset_odom.publish(1)
+                time.sleep(0.5)
                 brake_pub.publish(0)
-                time.sleep(2)
+                dur_distance = sign_depth_dict[2]
                 lane_control.publish(0)
+                while distance < dur_distance - 250:
+                    pass
 
             elif detected_sign_number == 15: # YEŞİL IŞIK elif detected_sign_number == 23 çıkarıldı
                 brake_pub.publish(0)
