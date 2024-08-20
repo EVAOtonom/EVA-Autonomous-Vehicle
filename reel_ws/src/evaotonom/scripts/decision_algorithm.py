@@ -348,12 +348,17 @@ if __name__ == "__main__":
                     
             if detected_sign_number == 20: #ikili yön
                 if current_lane ==0: #sol şeritteyse
+                    brake_pub.publish(1)
+                    time.sleep(2)
                     lane_control.publish(1)
+                    time.sleep(1)
                     reset_odom.publish(1)
                     time.sleep(0.5)
                     right_signal.publish(4)
                     time.sleep(0.2)                    
                     steering_pub.publish(28)
+                    time.sleep(2)
+                    brake_pub.publish(0)
                     time.sleep(2)
                     while distance < 310:
                         pass
