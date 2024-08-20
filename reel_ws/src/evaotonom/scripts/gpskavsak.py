@@ -82,6 +82,12 @@ if __name__ == "__main__":
             (40.790100, 29.509196),     # sol üst
             (40.790134, 29.509236)      # sol alt
         ]
+        # 10: [
+        #     (40.789979, 29.509342),     # sağ alt       deneme kavsak
+        #     (40.789928, 29.509393),     # sağ üst         
+        #     (40.789971, 29.509457),     # sol üst
+        #     (40.790020, 29.509388)      # sol alt
+        # ]
 
 
 
@@ -122,6 +128,9 @@ if __name__ == "__main__":
                         park_flag = True  # Bir kere yayınlandığında bayrak ayarlanır
                         onemli_nokta_pub.publish(9)
                         rospy.loginfo("Park noktası: 9")
+                    #elif area_num == 10:
+                        #kavsak_noktasi_pub.publish(area_num)
+                        #rospy.loginfo(f"Kavşak: {area_num}")
 
             if not found_area:
                 kavsak_noktasi_pub.publish(0)
