@@ -1235,7 +1235,7 @@ if __name__ == "__main__":
                     lane_control.publish(False)
                     obstacle_control.publish(False)
 
-                # elif kavsak_girisi == 5:
+                # elif kavsak_girisi == 10:
                 #     rospy.loginfo(f"@@@@@@@@@kavsak donusu basladi 3. giris duraga  {durak_counter} defa girildi")
                 #     if durak_counter == 2:
                 #         if current_lane == 1:
