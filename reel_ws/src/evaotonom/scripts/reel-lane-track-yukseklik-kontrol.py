@@ -240,6 +240,10 @@ if __name__ == "__main__":
     obstacle_detected = False
     mid_line_x = 320
     mid_line_y = 180
+    #Otonom için bekleme
+    rospy.loginfo("Kumandadan komut bekleniyor...")
+    rospy.wait_for_message('/stm/check_otonom', Bool, timeout=100) # Kumandadan otonom tuşuna basılmasını bekler.
+    rospy.loginfo("Otonom komutu geldi şerit takibi başlıyor.")
 
     aci_counter = 0
 
