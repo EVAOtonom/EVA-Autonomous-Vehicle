@@ -141,7 +141,7 @@ def tabela_bilgi(class_name, depth_in_meters):
             detected_sign.depth = depth_in_meters
             sign_pub.publish(detected_sign)
 
-        elif class_name == "dur" and depth_in_meters is not None and depth_in_meters < 7.0:
+        elif class_name == "dur" and depth_in_meters is not None and depth_in_meters < 10.0:
             detected_sign.sign_index = 2
             detected_sign.depth = depth_in_meters
             sign_pub.publish(detected_sign)
