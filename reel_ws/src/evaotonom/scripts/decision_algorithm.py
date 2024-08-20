@@ -87,6 +87,9 @@ if __name__ == "__main__":
     #motor_pub.publish(0)
     lane_control.publish(0)
 
+    last_execution_time = 0
+    timeout = 40  # 40 saniye
+
     while not rospy.is_shutdown():
         if detected_sign_number != None:
             if detected_sign_number == 3: # DURAK KARAR ALGORITMASI
@@ -281,18 +284,15 @@ if __name__ == "__main__":
                 else:
                     pass
 
-            elif detected_sign_number == 2: # DUR
+            elif detected_sign_number == 2 and (time.time() - last_execution_time) > timeout: # DUR
+                last_execution_time = time.time()
                 lane_control.publish(1)
                 time.sleep(1)
                 brake_pub.publish(1)
                 time.sleep(6)
-                reset_odom.publish(1)
-                time.sleep(0.5)
                 brake_pub.publish(0)
-                dur_distance = sign_depth_dict[2]
+                time.sleep(2)
                 lane_control.publish(0)
-                while distance < dur_distance - 250:
-                    pass
 
             elif detected_sign_number == 15: # YEŞİL IŞIK elif detected_sign_number == 23 çıkarıldı
                 brake_pub.publish(0)
@@ -346,15 +346,16 @@ if __name__ == "__main__":
                 else:
                     print("depth is none")
                     
-            if detected_sign_number == 20: #ikili yön
+            if detected_sign_number == 20 and (time.time() - last_execution_time) > timeout: # Timer koşulu eklendi #ikili yön
+                last_execution_time = time.time()
                 if current_lane ==0: #sol şeritteyse
                     brake_pub.publish(1)
                     time.sleep(2)
                     lane_control.publish(1)
-                    time.sleep(1)
+                    time.sleep(0.2)
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    right_signal.publish(4)
+                    right_signal.publish(6)
                     time.sleep(0.2)                    
                     steering_pub.publish(28)
                     time.sleep(2)
@@ -395,7 +396,7 @@ if __name__ == "__main__":
                     time.sleep(2)
                     reset_odom.publish(1)
                     time.sleep(0.5)
-                    left_signal.publish(4)
+                    left_signal.publish(6)
                     time.sleep(0.5)
                     steering_pub.publish(-40)
                     time.sleep(2)
@@ -490,7 +491,7 @@ if __name__ == "__main__":
                     time.sleep(0.5)
                     brake_pub.publish(1)
                     time.sleep(2)
-                    right_signal.publish(4)
+                    right_signal.publish(6)
                     time.sleep(0.5)
                     steering_pub.publish(40)
                     time.sleep(2)
@@ -685,7 +686,7 @@ if __name__ == "__main__":
                                 pass
                             reset_odom.publish(1)
                             time.sleep(0.5)
-                            left_signal.publish(4)
+                            left_signal.publish(6)
                             time.sleep(0.2)                    
                             steering_pub.publish(-28)
                             time.sleep(2)
@@ -1234,7 +1235,7 @@ if __name__ == "__main__":
                     lane_control.publish(False)
                     obstacle_control.publish(False)
 
-                # elif kavsak_girisi == 3:
+                # elif kavsak_girisi == 5:
                 #     rospy.loginfo(f"@@@@@@@@@kavsak donusu basladi 3. giris duraga  {durak_counter} defa girildi")
                 #     if durak_counter == 2:
                 #         if current_lane == 1:
